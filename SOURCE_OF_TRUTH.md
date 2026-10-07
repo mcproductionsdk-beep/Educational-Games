@@ -33,23 +33,29 @@ Repository: `mcproductionsdk-beep/Educational-Games`
 
 The root `index.html` is the arcade homepage.
 
-**The arcade is a launcher only. It must not contain duplicate copies of the games.** Each game card must link directly to that game's canonical GitHub Pages URL, for example:
+**The arcade is a launcher only. It must not contain duplicate copies of the games.** Each game remains canonical in its own repository. Student-facing arcade links may use verified `boringteacher.com/<game>/` routes backed by Cloudflare Workers, while GitHub Pages remains the origin deployment.
 
-`https://mcproductionsdk-beep.github.io/Word-Invaders/`
+Verified example:
+
+`https://boringteacher.com/word-invaders/` → Cloudflare Worker → `https://mcproductionsdk-beep.github.io/Word-Invaders/`
 
 ### Current hosting/routing state — verified 2026-10-07
 
-- The domain is managed in Cloudflare DNS.
-- `boringteacher.com` is served by GitHub Pages.
+- The domain is managed in Cloudflare.
+- `boringteacher.com` still uses GitHub Pages as the origin for the arcade homepage.
 - Cloudflare Pages is not the current host.
-- There are no Cloudflare Worker routes for the zone.
-- There are no Cloudflare Page Rules controlling game paths.
-- The apex GitHub Pages A records and the `www` CNAME are **DNS-only / not proxied**.
-- Therefore Cloudflare is currently **not caching or routing the website**, and Cloudflare cache purges are irrelevant to normal game publishing.
-- Individual games remain in their own repositories and are delivered through their own canonical GitHub Pages URLs.
-- The `Educational-Games` homepage links directly to those canonical URLs.
+- The four apex GitHub Pages A records for `boringteacher.com` are now **Proxied** through Cloudflare.
+- The `www` CNAME remains **DNS-only**.
+- A Cloudflare Worker named `boringteacher-game-router` exists and is deployed.
+- The first verified Worker route is `boringteacher.com/word-invaders/*`.
+- That route fetches the canonical Word Invaders GitHub Pages deployment at `https://mcproductionsdk-beep.github.io/Word-Invaders/`.
+- `https://boringteacher.com/word-invaders/` has been manually verified to open the game while keeping the Boring Teacher URL.
+- The Word Invaders arcade card now points to `/word-invaders/`, and clicking it from the public arcade has been manually verified to work.
+- Individual game repositories remain the canonical source of each game. The Worker is a delivery/routing layer, not a duplicate source.
+- Other arcade cards still use their direct GitHub Pages URLs until equivalent Boring Teacher routes are deliberately implemented and verified.
+- Because the apex domain is now proxied, Cloudflare can participate in routing/caching. Cache behavior must therefore be considered when debugging proxied routes.
 
-This architecture may change later. If it does, update this section immediately.
+This architecture may change as more games are moved behind Boring Teacher routes. Update this section whenever another route becomes canonical.
 
 ---
 
@@ -63,15 +69,15 @@ Therefore:
 2. Test the game logic before publishing.
 3. Commit the updated game to `main`.
 4. Confirm that game's GitHub Pages deployment serves the new behavior.
-5. Ensure the arcade card points directly to the game's canonical GitHub Pages URL.
+5. Ensure the arcade card points to the intended student-facing URL: a verified `boringteacher.com/<game>/` Worker route when one exists; otherwise the canonical GitHub Pages URL.
 6. Verify the link from `boringteacher.com`.
 7. Only then tell the user exactly what has been verified.
 
 ### Critical publishing rule
 
-> **Never copy game HTML into `Educational-Games` as a publishing method. Every game has one canonical repository and one canonical GitHub Pages URL. The Boring Teacher arcade is only a launcher and must link directly to those URLs. Cloudflare currently provides DNS only and is not part of game deployment or caching.**
+> **Never copy game HTML into `Educational-Games` as a publishing method. Every game has one canonical repository and GitHub Pages origin deployment. The Boring Teacher arcade is only a launcher. When a verified Cloudflare Worker route exists, the arcade should use the corresponding `boringteacher.com/<game>/` path; otherwise it should use the direct GitHub Pages URL.**
 
-Do not use local-looking arcade links such as `/word-invaders/` unless a real routing system for those paths is deliberately implemented and verified.
+Do not invent local-looking arcade links. A path such as `/word-invaders/` is valid only when a matching Cloudflare Worker route has been deliberately implemented and verified.
 
 If only the repository has been updated, say exactly that: **the repository is updated; live deployment is not yet verified.**
 
@@ -99,32 +105,45 @@ Do not infer a version from a filename alone. Inspect the actual repository/file
 
 ## 5. Arcade link architecture
 
-The arcade homepage must link directly to canonical GitHub Pages game deployments.
+The preferred student-facing architecture is now:
 
-Examples currently corrected on 2026-10-07 include:
+**arcade → Boring Teacher game path → Cloudflare Worker → canonical GitHub Pages origin**
+
+This has been implemented and verified for Word Invaders:
+
+- Word Invaders student URL → `https://boringteacher.com/word-invaders/`
+- Worker route → `boringteacher.com/word-invaders/*`
+- Worker → `boringteacher-game-router`
+- Canonical origin → `https://mcproductionsdk-beep.github.io/Word-Invaders/`
+- Arcade card href → `/word-invaders/`
+- Arcade card update commit → `33857cc3dbb41779bd2327469bd812288062de99`
+- Manual verification → direct Boring Teacher route works and clicking the arcade card works.
+
+Routes not yet migrated continue to use direct GitHub Pages links:
 
 - Word Racer → `https://mcproductionsdk-beep.github.io/Word-Racer/`
 - Word Jumper → `https://mcproductionsdk-beep.github.io/Word-Jumper/`
 - Frog River → `https://mcproductionsdk-beep.github.io/Frog-River/`
-- Word Invaders → `https://mcproductionsdk-beep.github.io/Word-Invaders/`
 - Word Snake → `https://mcproductionsdk-beep.github.io/Snake/`
 - Matching Columns → `https://mcproductionsdk-beep.github.io/Matching-Columns/`
+- Conjugation Shooter → `https://mcproductionsdk-beep.github.io/Conjugation-Shooter/`
+- Conjugation Adventure → `https://mcproductionsdk-beep.github.io/Conjugation-Adventure/`
+- Vector Monster → `https://mcproductionsdk-beep.github.io/Vector-Monster/`
+- Place Value Puzzle → `https://mcproductionsdk-beep.github.io/Place-Value-Puzzle/`
 
-Conjugation Shooter, Conjugation Adventure, Vector Monster, and Place Value Puzzle already use direct GitHub Pages links in the arcade.
-
-The arcade link correction was committed to `Educational-Games/main` on 2026-10-07 in commit `74525e03ce5f6c660aa0d2b06c5fa57f7ca9f99a`.
+Do not change another arcade card to a local Boring Teacher path until its Worker routing has been created and verified.
 
 ---
 
 ## 6. Architecture principle
 
-The current system already provides the desired single-source behavior for each game:
+The system preserves single-source behavior while allowing student-facing Boring Teacher URLs:
 
-**individual game repository → its GitHub Pages deployment → direct link from the Boring Teacher arcade**
+**individual game repository → GitHub Pages origin → Cloudflare Worker route → boringteacher.com game path**
 
-The arcade homepage itself is separately sourced from `Educational-Games` and served at `boringteacher.com`.
+The Worker does not store a second copy of the game. It fetches the canonical GitHub Pages deployment. This protects repository integrity while allowing students to stay under the Boring Teacher domain.
 
-Do not introduce duplicate game copies or Cloudflare routing unless there is a specific future requirement that cannot be met by direct canonical links.
+The arcade homepage remains separately sourced from `Educational-Games` and served at `boringteacher.com`.
 
 ---
 
@@ -337,9 +356,10 @@ When the source repository looks correct but the website looks old, diagnose in 
 3. **Commit:** Did the write reach `main`?
 4. **Pages configuration:** Is GitHub Pages deploying from the expected branch/folder or workflow?
 5. **Deployment:** Did the Pages deployment finish successfully?
-6. **Arcade link:** Does the homepage card point to the correct canonical GitHub Pages URL?
-7. **Browser cache:** Hard-refresh only after the server/deployment is known to be correct.
-8. **Cloudflare cache:** Purge only if Cloudflare is actually proxying/caching the relevant route.
+6. **Worker route:** If the game has a Boring Teacher route, does that route fetch the correct canonical GitHub Pages origin?
+7. **Arcade link:** Does the homepage card point to the intended Boring Teacher route (if verified) or direct canonical GitHub Pages URL?
+8. **Browser cache:** Hard-refresh only after the server/deployment is known to be correct.
+9. **Cloudflare cache:** Because the apex is now proxied, inspect/purge cache only when there is evidence that Cloudflare caching is causing stale content.
 
 Do not use cache purging as a substitute for verifying the deployment architecture.
 
@@ -355,7 +375,7 @@ A publishing task is done only when all applicable boxes are true:
 - [ ] Requested behavior implemented
 - [ ] Existing behavior regression-checked
 - [ ] Individual game repository updated
-- [ ] Arcade card points to the canonical GitHub Pages URL
+- [ ] Arcade card points to the verified Boring Teacher route when available, otherwise the canonical GitHub Pages URL
 - [ ] Commit confirmed
 - [ ] GitHub Pages/deployment state confirmed
 - [ ] Actual `boringteacher.com` route opened/verified
@@ -368,15 +388,23 @@ If the final public verification cannot be performed because of a permission/too
 
 ## 16. Current infrastructure status
 
-The earlier duplicate-copy/public-path approach is retired.
+The duplicate-copy approach remains retired.
 
-The canonical architecture is now:
+The target architecture is now:
 
-**one game repository → one GitHub Pages deployment → one direct arcade link**
+**one game repository → one GitHub Pages origin → Cloudflare Worker delivery → one Boring Teacher student URL**
 
-There is no current unresolved need for Cloudflare Worker routing. Cloudflare is DNS-only in the verified configuration.
+Current verified migration status:
 
-If a game appears stale, first test its direct GitHub Pages URL. If the direct URL is current but the arcade does not reach it, inspect the arcade card's `href`. Do not purge Cloudflare unless the DNS/proxy architecture has changed and Cloudflare is actually proxying the site.
+- Apex `boringteacher.com`: Cloudflare Proxied.
+- `www`: DNS-only.
+- Worker: `boringteacher-game-router`.
+- Word Invaders route: `boringteacher.com/word-invaders/*` → Worker → canonical Word Invaders GitHub Pages origin.
+- Word Invaders direct Boring Teacher URL: verified.
+- Word Invaders arcade click: verified.
+- Other games: not yet migrated to Worker routes; continue using direct GitHub Pages links.
+
+If a proxied game appears stale, test in this order: canonical GitHub Pages origin, Boring Teacher Worker route, arcade card href, then browser/Cloudflare cache. Do not duplicate game HTML into the arcade repository to solve routing problems.
 
 ---
 
