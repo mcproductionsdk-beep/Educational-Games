@@ -93,7 +93,7 @@ If only the repository has been updated, say exactly that: **the repository is u
 | Word Racer | `Word-Racer` | Word Racer Pixel V2.4 |
 | Word Frog | `Frog-River` | Word Frog Pixel V2.4 |
 | Word Invaders | `Word-Invaders` | Word Invaders Pixel V2.2 |
-| Word Snake | `Snake` | Repository exists; verify current entry-file path before editing |
+| Word Snake | `Word-Snake` | Word Snake Pixel V2.3 |
 | Conjugation Shooter | `Conjugation-Shooter` | Repository exists; inspect current file before editing |
 | Conjugation Adventure | `Conjugation-Adventure` | Repository currently needs verification before treating as deployed |
 | Vector Monster | `Vector-Monster` | Repository currently needs verification before treating as deployed |
@@ -124,7 +124,7 @@ Routes not yet migrated continue to use direct GitHub Pages links:
 - Word Racer → `https://mcproductionsdk-beep.github.io/Word-Racer/`
 - Word Jumper → `https://mcproductionsdk-beep.github.io/Word-Jumper/`
 - Frog River → `https://mcproductionsdk-beep.github.io/Frog-River/`
-- Word Snake → `https://mcproductionsdk-beep.github.io/Snake/`
+- Word Snake → `https://mcproductionsdk-beep.github.io/Word-Snake/`
 - Matching Columns → `https://mcproductionsdk-beep.github.io/Matching-Columns/`
 - Conjugation Shooter → `https://mcproductionsdk-beep.github.io/Conjugation-Shooter/`
 - Conjugation Adventure → `https://mcproductionsdk-beep.github.io/Conjugation-Adventure/`
@@ -302,7 +302,8 @@ Current standard game-over copy where used:
 - Speed increases after a full vocabulary round.
 - Prompt appears above the board and on/near the snake.
 - Correct catch replaces only that word; do not reset every object on the board.
-- Verify current repository entry file/version before the next publish.
+- Current canonical version: V2.3.
+- Canonical repository: `Word-Snake`.
 
 ---
 
