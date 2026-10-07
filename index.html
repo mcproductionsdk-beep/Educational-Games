@@ -1,36 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Educational Games</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Educational Games Arcade</title>
 <style>
-:root{--bg:#f6f8fc;--ink:#162033;--muted:#657086;--card:#fff;--line:#e4e8f0;--accent:#3857d6;--accent2:#eef1ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-header{background:#fff;border-bottom:1px solid var(--line)}.nav{max-width:1180px;margin:auto;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:850;letter-spacing:-.03em;font-size:22px}.tag{font-size:13px;color:var(--muted)}
-.hero{max-width:1180px;margin:auto;padding:70px 24px 42px}.hero h1{font-size:clamp(42px,7vw,76px);line-height:.98;letter-spacing:-.055em;margin:0;max-width:850px}.hero p{font-size:18px;line-height:1.6;color:var(--muted);max-width:650px;margin:24px 0 0}
-main{max-width:1180px;margin:auto;padding:0 24px 80px}.section-head{display:flex;align-items:end;justify-content:space-between;margin:38px 0 18px}.section-head h2{font-size:28px;letter-spacing:-.03em;margin:0}.section-head span{color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:.18s ease;box-shadow:0 6px 22px rgba(20,31,55,.045)}.card:hover{transform:translateY(-4px);box-shadow:0 14px 35px rgba(20,31,55,.10);border-color:#cdd4e4}.art{height:180px;display:flex;align-items:center;justify-content:center;font-size:72px;background:linear-gradient(135deg,#eef1ff,#f8f4ff)}.card:nth-child(2n) .art{background:linear-gradient(135deg,#eef9ff,#effbf4)}.card:nth-child(3n) .art{background:linear-gradient(135deg,#fff5e9,#fffbea)}
-.info{padding:20px}.info h3{font-size:20px;margin:0 0 8px;letter-spacing:-.02em}.info p{margin:0;color:var(--muted);line-height:1.45;font-size:14px}.play{display:inline-block;margin-top:16px;color:var(--accent);font-weight:750;font-size:13px}.note{margin-top:44px;background:var(--accent2);border-radius:18px;padding:22px 24px;color:#39425a;line-height:1.5}footer{max-width:1180px;margin:auto;padding:0 24px 45px;color:var(--muted);font-size:13px}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid{grid-template-columns:1fr}.hero{padding-top:48px}.art{height:150px}.tag{display:none}}
+:root{--sky:#63b7df;--navy:#102744;--cream:#fff3c4;--yellow:#f6d94b;--green:#79d85b;--pink:#ef6c88;--cyan:#5cc5d8;--white:#fffdf1}
+*{box-sizing:border-box}html{background:var(--sky)}body{margin:0;color:var(--navy);font-family:"Courier New",monospace;background:linear-gradient(#63b7df 0 78%,#4b9b62 78% 100%);min-height:100vh;image-rendering:pixelated}
+.shell{width:min(1180px,calc(100% - 20px));margin:10px auto 24px}
+header{background:var(--navy);color:#fff;border:5px solid var(--navy);box-shadow:0 0 0 4px var(--yellow);padding:14px 18px;text-align:center}
+h1{margin:0;font-size:clamp(25px,4vw,42px);letter-spacing:4px;text-shadow:4px 4px #000}.blink{color:var(--yellow);font-size:12px;font-weight:900;margin-top:6px;letter-spacing:2px;animation:blink 1.2s steps(1) infinite}@keyframes blink{50%{opacity:.35}}
+.section{margin-top:18px}.section-title{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#fff;text-shadow:3px 3px var(--navy);font-size:20px;letter-spacing:2px}.section-title:after{content:"";height:4px;background:var(--navy);flex:1;box-shadow:0 3px var(--yellow)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.card{position:relative;background:var(--cream);border:4px solid var(--navy);box-shadow:4px 4px 0 rgba(16,39,68,.8);text-decoration:none;color:var(--navy);min-height:178px;padding:12px;display:flex;flex-direction:column;transition:transform .08s}
+.card:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(16,39,68,.8);background:#fff8d9}.card:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--navy)}
+.icon{width:54px;height:54px;background:var(--cyan);border:3px solid var(--navy);display:grid;place-items:center;font-size:30px;box-shadow:inset -4px -4px #2e7c9a;margin-bottom:9px}.card:nth-child(4n+2) .icon{background:var(--yellow);box-shadow:inset -4px -4px #c19b25}.card:nth-child(4n+3) .icon{background:var(--green);box-shadow:inset -4px -4px #419438}.card:nth-child(4n+4) .icon{background:var(--pink);box-shadow:inset -4px -4px #b52f49}
+h3{margin:0 0 5px;font-size:16px;text-transform:uppercase}.desc{font-size:11px;font-weight:bold;line-height:1.3;color:#294361;flex:1}.play{align-self:flex-start;margin-top:10px;background:var(--green);border:3px solid var(--navy);padding:5px 9px;font-weight:900;font-size:11px;box-shadow:inset -2px -2px #419438}.card:hover .play{background:var(--yellow);box-shadow:inset -2px -2px #c19b25}
+.note{margin-top:18px;background:#d8eef0;border:4px solid var(--navy);padding:10px 13px;font-size:11px;font-weight:bold;line-height:1.45;box-shadow:4px 4px var(--navy)}footer{text-align:center;color:#fff;text-shadow:2px 2px var(--navy);font-size:10px;font-weight:bold;padding:18px 0}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{min-height:145px}.shell{width:min(100% - 12px,1180px)}header{padding:11px 8px}}
 </style></head>
-<body>
-<header><div class="nav"><div class="brand">EDUCATIONAL GAMES</div><div class="tag">Learn by playing.</div></div></header>
-<section class="hero"><h1>Pick a game.<br>Learn by playing.</h1><p>Fast, simple browser games for language and mathematics practice. Choose a game and start playing.</p></section>
-<main>
-<div class="section-head"><h2>Language Games</h2><span>8 games</span></div><div class="grid">
-<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Racer/" target="_blank" rel="noopener"><div class="art">🏎️</div><div class="info"><h3>Word Racer</h3><p>Race through traffic and find the correct vocabulary.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Jumper/" target="_blank" rel="noopener"><div class="art">🏃</div><div class="info"><h3>Word Jumper</h3><p>Jump, react and choose the right word as you run.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Frog-River/" target="_blank" rel="noopener"><div class="art">🐸</div><div class="info"><h3>Frog River</h3><p>Cross the river by landing on the correct answers.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Invaders/" target="_blank" rel="noopener"><div class="art">👾</div><div class="info"><h3>Word Invaders</h3><p>Defend yourself by shooting the correct vocabulary.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Snake/" target="_blank" rel="noopener"><div class="art">🐍</div><div class="info"><h3>Word Snake</h3><p>Guide the snake toward the correct word and build your score.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Matching-Columns/" target="_blank" rel="noopener"><div class="art">🔗</div><div class="info"><h3>Matching Columns</h3><p>Match words and meanings as quickly and accurately as you can.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Conjugation-Shooter/" target="_blank" rel="noopener"><div class="art">🎯</div><div class="info"><h3>Conjugation Shooter</h3><p>Find and shoot the correct verb conjugations.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Conjugation-Adventure/" target="_blank" rel="noopener"><div class="art">🗺️</div><div class="info"><h3>Conjugation Adventure</h3><p>Explore, talk to characters and master conjugations along the way.</p><span class="play">PLAY ↗</span></div></a>
-</div>
-<div class="section-head"><h2>Math Games</h2><span>2 games</span></div><div class="grid">
-<a class="card" href="https://mcproductionsdk-beep.github.io/Vector-Monster/" target="_blank" rel="noopener"><div class="art">👹</div><div class="info"><h3>Vector Monster</h3><p>Practice vector thinking through a fast visual challenge.</p><span class="play">PLAY ↗</span></div></a>
-<a class="card" href="https://mcproductionsdk-beep.github.io/Place-Value-Puzzle/" target="_blank" rel="noopener"><div class="art">🧩</div><div class="info"><h3>Place Value Puzzle</h3><p>Build numbers visually with place-value pieces and reveal the puzzle.</p><span class="play">PLAY ↗</span></div></a>
-</div>
-<div class="note"><strong>Use your own vocabulary.</strong> Many language games let you paste your own word pairs, so the same game can be used with different languages, units and classes.</div>
-</main><footer>Educational Games · Browser-based learning games</footer></body></html>
+<body><div class="shell">
+<header><h1>EDUCATIONAL GAMES</h1><div class="blink">★ CHOOSE YOUR GAME ★</div></header>
+
+<section class="section"><h2 class="section-title">LANGUAGE GAMES</h2><div class="grid">
+<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Racer/" target="_blank" rel="noopener"><div class="icon">🏎️</div><h3>Word Racer</h3><div class="desc">Race through traffic and find the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Jumper/" target="_blank" rel="noopener"><div class="icon">🏃</div><h3>Word Jumper</h3><div class="desc">Jump, react and choose the right word as you run.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Frog-River/" target="_blank" rel="noopener"><div class="icon">🐸</div><h3>Frog River</h3><div class="desc">Cross the river by landing on the correct answers.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Invaders/" target="_blank" rel="noopener"><div class="icon">👾</div><h3>Word Invaders</h3><div class="desc">Defend yourself by shooting the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Word-Snake/" target="_blank" rel="noopener"><div class="icon">🐍</div><h3>Word Snake</h3><div class="desc">Guide the snake toward the correct word and build your score.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Matching-Columns/" target="_blank" rel="noopener"><div class="icon">🔗</div><h3>Matching Columns</h3><div class="desc">Match words and meanings as quickly as you can.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Conjugation-Shooter/" target="_blank" rel="noopener"><div class="icon">🎯</div><h3>Conjugation Shooter</h3><div class="desc">Find and shoot the correct verb conjugations.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Conjugation-Adventure/" target="_blank" rel="noopener"><div class="icon">🗺️</div><h3>Conjugation Adventure</h3><div class="desc">Explore, meet characters and master conjugations.</div><div class="play">▶ PLAY</div></a>
+</div></section>
+
+<section class="section"><h2 class="section-title">MATH GAMES</h2><div class="grid">
+<a class="card" href="https://mcproductionsdk-beep.github.io/Vector-Monster/" target="_blank" rel="noopener"><div class="icon">👹</div><h3>Vector Monster</h3><div class="desc">Practice vector thinking through a fast visual challenge.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="https://mcproductionsdk-beep.github.io/Place-Value-Puzzle/" target="_blank" rel="noopener"><div class="icon">🧩</div><h3>Place Value Puzzle</h3><div class="desc">Build numbers visually and reveal the puzzle.</div><div class="play">▶ PLAY</div></a>
+</div></section>
+
+<div class="note">★ <b>MAKE IT YOURS:</b> Many language games let you paste your own vocabulary pairs and use them with different languages, units and classes.</div>
+<footer>EDUCATIONAL GAMES · LEARN BY PLAYING</footer>
+</div></body></html>
