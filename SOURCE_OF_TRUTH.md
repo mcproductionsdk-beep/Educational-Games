@@ -31,20 +31,23 @@ A change is complete only when the intended public URL on `boringteacher.com` ha
 ### Main arcade
 Repository: `mcproductionsdk-beep/Educational-Games`
 
-The root `index.html` is the arcade homepage. Game cards use public paths such as:
+The root `index.html` is the arcade homepage.
 
-`/matching-columns/`
+**The arcade is a launcher only. It must not contain duplicate copies of the games.** Each game card must link directly to that game's canonical GitHub Pages URL, for example:
 
-### Current hosting/routing state
+`https://mcproductionsdk-beep.github.io/Word-Invaders/`
 
-At the time this document was created:
+### Current hosting/routing state — verified 2026-10-07
 
 - The domain is managed in Cloudflare DNS.
-- The site itself is served from GitHub Pages.
+- `boringteacher.com` is served by GitHub Pages.
 - Cloudflare Pages is not the current host.
-- No Cloudflare Worker routing was confirmed as active.
-- The Cloudflare connection available to ChatGPT could inspect configuration but did not have permission to create the proposed Worker/change the routing.
-- Therefore do **not** assume that changing an individual game repository automatically changes `boringteacher.com`.
+- There are no Cloudflare Worker routes for the zone.
+- There are no Cloudflare Page Rules controlling game paths.
+- The apex GitHub Pages A records and the `www` CNAME are **DNS-only / not proxied**.
+- Therefore Cloudflare is currently **not caching or routing the website**, and Cloudflare cache purges are irrelevant to normal game publishing.
+- Individual games remain in their own repositories and are delivered through their own canonical GitHub Pages URLs.
+- The `Educational-Games` homepage links directly to those canonical URLs.
 
 This architecture may change later. If it does, update this section immediately.
 
@@ -52,27 +55,23 @@ This architecture may change later. If it does, update this section immediately.
 
 ## 3. The canonical publishing rule
 
-Many games have an individual development repository. The public arcade may also require a deployed copy/path inside `Educational-Games`.
+Each game has **one canonical source repository**. The `Educational-Games` repository is the arcade/launcher, not a second copy of the games.
 
 Therefore:
 
-1. Make the requested change to the correct game source.
+1. Make the requested change in the correct individual game repository.
 2. Test the game logic before publishing.
-3. Update the game's individual repository when that repository is part of the game's workflow.
-4. Update the corresponding public copy/path used by `Educational-Games` when the site is serving that copy.
-5. Confirm the commit succeeded.
-6. Confirm the GitHub Pages deployment/source configuration when relevant.
-7. Open the **actual boringteacher.com URL** and verify the requested behavior.
-8. Only then tell the user that the change is live.
+3. Commit the updated game to `main`.
+4. Confirm that game's GitHub Pages deployment serves the new behavior.
+5. Ensure the arcade card points directly to the game's canonical GitHub Pages URL.
+6. Verify the link from `boringteacher.com`.
+7. Only then tell the user exactly what has been verified.
 
-### Never do this
+### Critical publishing rule
 
-Do not say:
-- “It should be live now.”
-- “Refreshing should show it.”
-- “The website has been updated.”
+> **Never copy game HTML into `Educational-Games` as a publishing method. Every game has one canonical repository and one canonical GitHub Pages URL. The Boring Teacher arcade is only a launcher and must link directly to those URLs. Cloudflare currently provides DNS only and is not part of game deployment or caching.**
 
-unless the public URL has actually been verified.
+Do not use local-looking arcade links such as `/word-invaders/` unless a real routing system for those paths is deliberately implemented and verified.
 
 If only the repository has been updated, say exactly that: **the repository is updated; live deployment is not yet verified.**
 
@@ -98,41 +97,34 @@ Do not infer a version from a filename alone. Inspect the actual repository/file
 
 ---
 
-## 5. Current public route confirmed in the arcade
+## 5. Arcade link architecture
 
-### Matching Columns
+The arcade homepage must link directly to canonical GitHub Pages game deployments.
 
-Homepage route:
+Examples currently corrected on 2026-10-07 include:
 
-`https://boringteacher.com/matching-columns/`
+- Word Racer → `https://mcproductionsdk-beep.github.io/Word-Racer/`
+- Word Jumper → `https://mcproductionsdk-beep.github.io/Word-Jumper/`
+- Frog River → `https://mcproductionsdk-beep.github.io/Frog-River/`
+- Word Invaders → `https://mcproductionsdk-beep.github.io/Word-Invaders/`
+- Word Snake → `https://mcproductionsdk-beep.github.io/Snake/`
+- Matching Columns → `https://mcproductionsdk-beep.github.io/Matching-Columns/`
 
-The arcade homepage links to `/matching-columns/`.
+Conjugation Shooter, Conjugation Adventure, Vector Monster, and Place Value Puzzle already use direct GitHub Pages links in the arcade.
 
-A public copy was added at:
-
-`Educational-Games/matching-columns/index.html`
-
-The source was copied from:
-
-`Matching-Columns/index.html`
-
-Important current behavior: answers are validated on **Enter**, not on every input event. This is required so two-digit answers such as 10, 11, and 12 can be typed before validation.
-
-When Matching Columns changes, check both the individual source and the public site copy until/unless the architecture is changed to eliminate duplication.
+The arcade link correction was committed to `Educational-Games/main` on 2026-10-07 in commit `74525e03ce5f6c660aa0d2b06c5fa57f7ca9f99a`.
 
 ---
 
-## 6. Desired future architecture
+## 6. Architecture principle
 
-The preferred long-term system is:
+The current system already provides the desired single-source behavior for each game:
 
-**one canonical game source → automatic public delivery at boringteacher.com**
+**individual game repository → its GitHub Pages deployment → direct link from the Boring Teacher arcade**
 
-The goal is to remove manual duplicate copies.
+The arcade homepage itself is separately sourced from `Educational-Games` and served at `boringteacher.com`.
 
-A possible architecture is Cloudflare routing/proxying each `boringteacher.com/<game>/` path to the corresponding canonical repository/deployment. This has **not yet been implemented** and must not be described as active.
-
-Until automatic routing/synchronization is genuinely configured and tested, follow the dual-update/public-verification procedure in Section 3.
+Do not introduce duplicate game copies or Cloudflare routing unless there is a specific future requirement that cannot be met by direct canonical links.
 
 ---
 
@@ -281,7 +273,7 @@ Current standard game-over copy where used:
 - Shooting the correct answer advances to four new options.
 - Shooting a wrong answer costs a life.
 - A wrong shot must **not** remove/reset all four answer options.
-- Current canonical version: V2.2.
+- Current canonical gameplay: V2.4 (enemy shooting + progressive round speed). Note: the HTML title may still say V2.3; identify the build by its actual mechanics/code, not title alone.
 
 ### Word Snake
 - Arcade snake presentation.
@@ -341,11 +333,11 @@ Never create a new similarly named repository merely because the expected reposi
 When the source repository looks correct but the website looks old, diagnose in this order:
 
 1. **Source:** Is the requested behavior actually in the canonical file?
-2. **Public copy:** Is the same change present in the file/path that `Educational-Games` serves?
+2. **Canonical Pages URL:** Does the individual game's GitHub Pages URL serve the requested behavior?
 3. **Commit:** Did the write reach `main`?
 4. **Pages configuration:** Is GitHub Pages deploying from the expected branch/folder or workflow?
 5. **Deployment:** Did the Pages deployment finish successfully?
-6. **Route:** Does the homepage/public URL point to the expected path?
+6. **Arcade link:** Does the homepage card point to the correct canonical GitHub Pages URL?
 7. **Browser cache:** Hard-refresh only after the server/deployment is known to be correct.
 8. **Cloudflare cache:** Purge only if Cloudflare is actually proxying/caching the relevant route.
 
@@ -363,7 +355,7 @@ A publishing task is done only when all applicable boxes are true:
 - [ ] Requested behavior implemented
 - [ ] Existing behavior regression-checked
 - [ ] Individual game repository updated
-- [ ] Public `Educational-Games` copy updated if required
+- [ ] Arcade card points to the canonical GitHub Pages URL
 - [ ] Commit confirmed
 - [ ] GitHub Pages/deployment state confirmed
 - [ ] Actual `boringteacher.com` route opened/verified
@@ -374,13 +366,17 @@ If the final public verification cannot be performed because of a permission/too
 
 ---
 
-## 16. Current unresolved infrastructure item
+## 16. Current infrastructure status
 
-The project still needs a true **single-source automatic deployment** system.
+The earlier duplicate-copy/public-path approach is retired.
 
-Current manual duplication between individual game repositories and public paths can create drift. Until that is eliminated, every publication must explicitly synchronize the public copy and verify the live URL.
+The canonical architecture is now:
 
-GitHub Pages settings/deployment controls were not available through the connected GitHub tool at the time this document was created. If that access becomes available, inspect and document the exact Pages source configuration here.
+**one game repository → one GitHub Pages deployment → one direct arcade link**
+
+There is no current unresolved need for Cloudflare Worker routing. Cloudflare is DNS-only in the verified configuration.
+
+If a game appears stale, first test its direct GitHub Pages URL. If the direct URL is current but the arcade does not reach it, inspect the arcade card's `href`. Do not purge Cloudflare unless the DNS/proxy architecture has changed and Cloudflare is actually proxying the site.
 
 ---
 
