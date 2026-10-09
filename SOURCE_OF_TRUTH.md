@@ -414,3 +414,18 @@ If a proxied game appears stale, test in this order: canonical GitHub Pages orig
 The public site is the product.
 
 Repositories, commits, prototypes, and local files are intermediate states. For a student-facing change, the final truth is the behavior visible at the intended `boringteacher.com` URL.
+
+
+---
+
+## 18. Word Matching LINK_D1 release — 2026-10-09
+
+- Canonical repository: `mcproductionsdk-beep/Matching-Columns`.
+- Approved version: Word Matching V1.6 unified mobile/desktop with CREATE STUDENT LINK.
+- Canonical `index.html` updated on `main` at commit `7c25270fbac0bd49d56da7290a4b743c89569994`.
+- Uses the existing D1 vocabulary API at `https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev`; no new API, database, or Worker was created.
+- Teachers save vocabulary and language, receive a `#set=ID` link, and can copy it. Students open that link to load the saved set and see a simplified start screen.
+- The approved HTML preserves Word Matching mechanics, Quizlet import, categories, speech, scoring, and mobile/desktop controls.
+- Public canonical GitHub Pages URL: `https://mcproductionsdk-beep.github.io/Matching-Columns/`.
+- **Publishing status:** canonical GitHub source updated. Live Pages deployment and student-link end-to-end behavior must be verified separately; do not claim them verified based on commit alone.
+- Per single-source architecture, do not publish duplicate game HTML into `Educational-Games`.
