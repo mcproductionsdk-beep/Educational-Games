@@ -64,7 +64,7 @@ button{min-height:48px}
 /* Matching: preserve original mobile/desktop board and controls */
 body.studentMode #menu>.teacherMenu{display:none!important}
 </style></head><body><main class="app"><div class="logo">WORD MATCH</div>
-<section id="menu" class="screen active">
+<section id="menu" class="screen active"><div id="buildMarker" style="background:#fbe05b;color:#111;text-align:center;font:900 13px monospace;padding:9px;border:3px solid #111;margin:6px">MATCHING PREVIEW BUILD 9 · 10 OCT 2026</div>
 <div id="studentIntro">
   <div class="studentTitle" id="studentSetTitle">VOCABULARY SET</div>
   <div class="studentMeta" id="studentSetMeta">READY TO PLAY</div>
@@ -108,7 +108,7 @@ lernen	to learn</textarea>
     <div id="preview" class="preview"></div><div id="error" class="error"></div>
     <div class="shareBlock">
       <button id="shareStudentLink" class="pink menuButton" type="button" onclick="document.getElementById('shareStatus').textContent='SHARE CLICK RECEIVED - preparing link...'">🔗 SHARE WITH STUDENTS</button>
-      <div class="stepHint" id="shareStatus">DIAG 8 - Tap SHARE to check if button receives clicks.</div>
+      <div class="stepHint" id="shareStatus">BUILD 9 READY · Select a topic, then tap SHARE WITH STUDENTS.</div>
     </div>
     <button id="play" class="primary wide finalPlay teacherOnly" type="button">PLAY</button>
   </div>
@@ -283,19 +283,12 @@ async function loadStudentSet(){
 }
 
 /* Share button diagnostic: immediate visual response, errors surfaced to teacher. */
-E("shareStudentLink").onclick=async function(event){
-  if(event){event.preventDefault();event.stopPropagation()}
-  var status=E("shareStatus");
-  status.textContent="⏳ SHARE BUTTON PRESSED — checking vocabulary…";
-  try{
-    await createStudentLink();
-    if(lastStudentLink)await copyStudentLink();
-  }catch(err){
-    console.error("Sharing handler failed",err);
-    status.textContent="SHARE ERROR: "+(err&&err.message?err.message:String(err));
-  }
+E("shareStudentLink").onclick=async function(){
+ E("shareStatus").textContent="SHARE PRESSED - contacting vocabulary service...";
+ try{await createStudentLink();if(lastStudentLink)await copyStudentLink()}
+ catch(err){E("shareStatus").textContent="SHARE ERROR: "+(err.message||String(err))}
 };
 E("studentPlay").onclick=function(){if(!this.disabled)start()};
 window.addEventListener("hashchange",function(){if(location.hash.startsWith("#set="))loadStudentSet();else{document.body.classList.remove("studentMode");E("studentPlay").disabled=true}});
-cats(true);preview();loadStudentSet();
+try{cats(true);preview();loadStudentSet()}catch(startError){console.error("Menu initialization failed",startError);E("shareStatus").textContent="INITIALIZATION ERROR: "+startError.message}
 })();</script></body></html>
