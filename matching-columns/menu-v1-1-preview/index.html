@@ -113,7 +113,7 @@ lernen	to learn</textarea>
     <button id="play" class="primary wide finalPlay teacherOnly" type="button">PLAY</button>
   </div>
 </div></section>
-<section id="studentEntry" aria-live="polite"><h2>WORD MATCH</h2><h2 id="studentSetTitle">LOADING VOCABULARY…</h2><div id="studentSetMeta" class="student-meta">PLEASE WAIT</div><button id="studentPlay" class="primary wide" type="button" disabled>PLAY</button></section><section id="game" class="screen"><div class="hud"><div>SCORE <span id="score">0</span> · <span id="lives">❤❤❤</span></div><div id="progress" class="setBoard">SET 1</div></div><div class="board"><div class="columns"><div><div class="colTitle">ENGLISH</div><div id="english"></div></div><div><div class="colTitle" id="targetTitle">TARGET LANGUAGE</div><div id="targetWords"></div></div></div><div id="status" class="status"></div></div><div class="buttons"><button id="restart">RESTART</button><button id="mainMenu" class="pink">MAIN MENU</button><button id="expand" class="yellow">⛶ EXPAND GAME</button><button id="sound">🔊 SOUND ON</button></div></section>
+<section id="game" class="screen"><div class="hud"><div>SCORE <span id="score">0</span> · <span id="lives">❤❤❤</span></div><div id="progress" class="setBoard">SET 1</div></div><div class="board"><div class="columns"><div><div class="colTitle">ENGLISH</div><div id="english"></div></div><div><div class="colTitle" id="targetTitle">TARGET LANGUAGE</div><div id="targetWords"></div></div></div><div id="status" class="status"></div></div><div class="buttons"><button id="restart">RESTART</button><button id="mainMenu" class="pink">MAIN MENU</button><button id="expand" class="yellow">⛶ EXPAND GAME</button><button id="sound">🔊 SOUND ON</button></div></section>
 <div id="complete" class="overlay"><div><div class="big">ROUND COMPLETE!</div><div class="msg">All words matched!</div><button id="nextRound" class="primary">PLAY NEXT ROUND</button><button id="completeMenu" class="pink">MAIN MENU</button></div></div>
 <div id="gameOver" class="overlay"><div><div class="big" style="color:#ef6689">GAME OVER</div><div class="msg">Nice try, your grandma would be proud</div><button id="again" class="primary">PLAY AGAIN</button><button id="overMenu" class="pink">MAIN MENU</button></div></div>
 </main><script>
@@ -141,75 +141,147 @@ function start(){var a=parse(ta.value);if(a.length<4){E("error").textContent="Pl
 function renderSet(){var set=order.slice(setIndex,setIndex+SET),left=E("english"),right=E("targetWords");left.innerHTML="";right.innerHTML="";E("status").textContent="";var number={};set.forEach(function(v,i){number[v.id]=i+1;var r=document.createElement("div");r.className="row";r.innerHTML='<div class="num">'+(i+1)+'</div><div class="word"></div>';r.querySelector(".word").textContent=v.english;left.appendChild(r)});shuffle(set).forEach(function(v){var r=document.createElement("div");r.className="row";var w=document.createElement("div");w.className="word";w.textContent=v.target;var inp=document.createElement("input");inp.className="answer";inp.inputMode="numeric";inp.maxLength=2;inp.setAttribute("aria-label","Number for "+v.target);r.appendChild(w);r.appendChild(inp);var submit=document.createElement("button");submit.type="button";submit.className="mobile-submit";submit.textContent="✓";submit.setAttribute("aria-label","Confirm number for "+v.target);r.appendChild(submit);right.appendChild(r);submit.addEventListener("click",function(){inp.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}))});inp.addEventListener("keydown",function(e){if(e.key!=="Enter")return;e.preventDefault();var val=parseInt(inp.value,10);if(!val)return;if(val===number[v.id]){inp.disabled=true;r.classList.add("correct");score+=10;answered++;good();speak(v.target);E("status").textContent="✓ "+v.target;E("status").style.color="#78df62";hud();setTimeout(checkSet,250)}else{inp.value="";r.classList.add("wrong");bad();lives--;E("status").textContent="✗ TRY AGAIN";E("status").style.color="#ff8194";hud();setTimeout(function(){r.classList.remove("wrong");inp.focus()},350);if(lives<=0)gameOver()}})});hud();var first=right.querySelector("input");if(first&&!window.matchMedia("(max-width:720px)").matches)first.focus()}
 function checkSet(){var set=order.slice(setIndex,setIndex+SET);var locked=E("targetWords").querySelectorAll("input:disabled").length;if(locked===set.length){var finished=Math.floor(setIndex/SET)+1;setIndex+=SET;if(setIndex>=order.length){E("complete").classList.add("show")}else{E("status").textContent="✓ SET "+finished+" COMPLETE!";E("status").style.color="#78df62";setTimeout(renderSet,850)}}}
 function gameOver(){E("gameOver").classList.add("show")}
-function toMenu(){if(document.body.classList.contains("studentMode")){game.classList.remove("active");E("studentEntry").classList.remove("playing");return}game.classList.remove("active");menu.classList.add("active");E("gameOver").classList.remove("show");E("complete").classList.remove("show")}
+function toMenu(){if(document.body.classList.contains("studentMode")){game.classList.remove("active");menu.classList.add("active");return}game.classList.remove("active");menu.classList.add("active");E("gameOver").classList.remove("show");E("complete").classList.remove("show")}
 E("play").onclick=start;E("again").onclick=start;E("restart").onclick=start;E("mainMenu").onclick=toMenu;E("overMenu").onclick=toMenu;E("completeMenu").onclick=toMenu;E("nextRound").onclick=function(){round++;order=shuffle(vocab);setIndex=0;E("complete").classList.remove("show");renderSet()};E("swap").onclick=function(){var a=parse(ta.value);ta.value=a.map(function(x){return x[1]+"\t"+x[0]}).join("\n");preview()};E("language").onchange=function(){cats(false);E("category").value="custom";lang=this.value;updateVoiceCheck()};E("category").onchange=loadCat;ta.oninput=function(){E("category").value="custom";preview()};E("sound").onclick=function(){soundOn=!soundOn;this.textContent=soundOn?"🔊 SOUND ON":"🔇 SOUND OFF"};E("testVoice").onclick=function(){lang=E("language").value;var samples={"de-DE":"Guten Morgen","es-ES":"Buenos días","da-DK":"Godmorgen","en-US":"Good morning"};speak(samples[lang]||"Hello")};
 var expanded=false,app=document.querySelector(".app");E("expand").onclick=function(){expanded=!expanded;app.classList.toggle("expanded",expanded);this.textContent=expanded?"↙ RESTORE GAME":"⛶ EXPAND GAME"};
-/* LINK_D1 vocabulary sharing: game mechanics above are untouched. */
 var VOCAB_API="https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev";
-var STUDENT_GAME_URL="https://mcproductionsdk-beep.github.io/Matching-Columns/";
-var lastStudentLink="",sharingBusy=false,studentLoading=false;
-function studentPublicUrl(id){
-  var host=location.hostname.toLowerCase();
-  var base=(location.protocol==="https:"||location.protocol==="http:")&&host!=="localhost"&&host!=="127.0.0.1"&&host!=="" ? location.href : STUDENT_GAME_URL;
-  var u=new URL(base);u.search="";u.hash="set="+encodeURIComponent(id);return u.toString();
+var lastStudentLink="";
+var sharingBusy=false;
+
+function currentSetTitle(){
+  var c=E("category");
+  return c && c.value!=="custom" ? c.options[c.selectedIndex].text : "Custom Vocabulary";
 }
+
 async function createStudentLink(){
+  var pairs=parse(ta.value); // textarea remains the teacher-side source of truth
+  if(pairs.length<5){
+    E("shareStatus").textContent="Please add at least 5 valid word pairs first.";
+    return;
+  }
   if(sharingBusy)return;
-  var pairs=parse(ta.value);
-  if(pairs.length<5||pairs.length>200){E("shareStatus").textContent="Use between 5 and 200 valid vocabulary pairs.";return}
-  sharingBusy=true;var btn=E("createStudentLink");btn.disabled=true;btn.textContent="SAVING…";
-  E("shareStatus").textContent="Saving vocabulary to the existing D1 service…";
-  E("copyStudentLink").style.display="none";lastStudentLink="";
+  sharingBusy=true;
+  var button=E("shareStudentLink");
+  var oldText=button.textContent;
+  button.disabled=true;
+  button.textContent="SAVING…";
+  E("shareStatus").textContent="Saving this vocabulary set…";
+
   try{
-    var c=E("category"),title=c.value!=="custom"?c.options[c.selectedIndex].text:"Custom Vocabulary";
-    var res=await fetch(VOCAB_API+"/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:title,language:E("language").value,pairs:pairs})});
-    var data=await res.json();
-    if(!res.ok)throw Error(data.error||data.message||"HTTP "+res.status);
-    var id=data.id||data.setId||(data.set&&data.set.id);
-    if(!id)throw Error("No set ID returned");
-    lastStudentLink=studentPublicUrl(id);
-    E("copyStudentLink").style.display="inline-block";
-    E("shareStatus").textContent="✓ STUDENT LINK READY · "+pairs.length+" WORDS · SET "+id;
-  }catch(err){console.error("Student link save failed",err);E("shareStatus").textContent="Could not save the vocabulary. Check your connection and try again."}
-  finally{sharingBusy=false;btn.disabled=false;btn.textContent="🔗 CREATE STUDENT LINK"}
+    var controller=new AbortController();var timer=setTimeout(function(){controller.abort()},12000);var response;try{response=await fetch(VOCAB_API+"/sets",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        title:currentSetTitle(),
+        language:E("language").value,
+        pairs:pairs
+      }),signal:controller.signal
+    })}finally{clearTimeout(timer)}
+
+    var data=null;
+    try{data=await response.json()}catch(parseError){}
+
+    if(!response.ok){
+      throw new Error(data && (data.error||data.message) ? (data.error||data.message) : "HTTP "+response.status);
+    }
+
+    var setId=data && (data.id || data.setId || (data.set && data.set.id));
+    if(!setId)throw new Error("The API saved the set but did not return an ID.");
+
+    var u=new URL(location.href);
+    u.search="";
+    u.hash="set="+encodeURIComponent(setId);
+    lastStudentLink=u.toString();
+
+    E("shareStudentLink").style.display="block";
+    E("shareStatus").textContent="✓ STUDENT LINK READY — permanent set "+setId+" · "+pairs.length+" words.";
+  }catch(err){
+    console.error("Could not create vocabulary set:",err);
+    lastStudentLink="";
+    E("shareStudentLink").textContent="🔗 SHARE WITH STUDENTS";
+    E("shareStatus").textContent="Could not save this set: "+(err.name==="AbortError"?"Request timed out after 12 seconds":err.message||"Unknown error");
+  }finally{
+    sharingBusy=false;
+    button.disabled=false;
+    button.textContent=oldText;
+  }
 }
+
 async function copyStudentLink(){
   if(!lastStudentLink)return;
-  try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(lastStudentLink);
-    else throw Error("Clipboard API unavailable");
-  }catch(e){var x=document.createElement("textarea");x.value=lastStudentLink;x.style.position="fixed";x.style.opacity="0";document.body.appendChild(x);x.select();var ok=document.execCommand("copy");x.remove();if(!ok){E("shareStatus").textContent="Copy failed. Link: "+lastStudentLink;return}}
-  E("shareStatus").textContent="✓ LINK COPIED — send it to your students.";
+  try{await navigator.clipboard.writeText(lastStudentLink)}
+  catch(e){
+    var x=document.createElement("textarea");x.value=lastStudentLink;document.body.appendChild(x);
+    x.select();document.execCommand("copy");x.remove();
+  }
+  E("shareStatus").textContent="✓ LINK READY: "+lastStudentLink;
 }
-function loadedPairs(data){
-  var a=data&&(data.pairs||data.vocabulary||(data.set&&(data.set.pairs||data.set.vocabulary)));
-  if(typeof a==="string"){try{a=JSON.parse(a)}catch(e){return null}}
-  if(!Array.isArray(a))return null;
-  return a.map(function(v){return Array.isArray(v)?[String(v[0]||"").trim(),String(v[1]||"").trim()]:[String(v.target||v.term||"").trim(),String(v.english||v.definition||"").trim()]}).filter(function(v){return v[0]&&v[1]});
+
+function normalizeLoadedPairs(data){
+  var pairs=data && (data.pairs || data.vocabulary || (data.set && (data.set.pairs || data.set.vocabulary)));
+  if(typeof pairs==="string"){
+    try{pairs=JSON.parse(pairs)}catch(e){pairs=null}
+  }
+  return Array.isArray(pairs) ? pairs : null;
 }
+
 async function loadStudentSet(){
-  if(!location.hash.startsWith("#set="))return;
-  if(studentLoading)return;
-  studentLoading=true;
-  document.body.classList.add("studentMode");game.classList.remove("active");E("studentEntry").classList.remove("playing");
-  E("studentPlay").disabled=true;E("studentSetTitle").textContent="LOADING VOCABULARY…";E("studentSetMeta").textContent="PLEASE WAIT";
+  if(!location.hash.startsWith("#set="))return false;
+
+  var setId="";
+  try{setId=decodeURIComponent(location.hash.slice(5)).trim()}catch(e){return false}
+  if(!setId)return false;
+
+  document.body.classList.add("studentMode");E("studentIntro").hidden=false;
+  E("studentSetTitle").textContent="LOADING VOCABULARY…";
+  E("studentSetMeta").textContent="PLEASE WAIT";
+  E("studentPlay").disabled=true;
+
   try{
-    var id=decodeURIComponent(location.hash.slice(5)).trim();if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id))throw Error("Invalid set ID");
-    var res=await fetch(VOCAB_API+"/sets/"+encodeURIComponent(id),{headers:{"Accept":"application/json"}});
-    var data=await res.json();if(!res.ok)throw Error(data.error||data.message||"HTTP "+res.status);
-    var pairs=loadedPairs(data);if(!pairs||pairs.length<5)throw Error("Not enough valid vocabulary pairs");
-    var locale=data.language||data.lang||(data.set&&(data.set.language||data.set.lang));
-    if(!Array.from(E("language").options).some(function(o){return o.value===locale}))throw Error("Unsupported vocabulary language");
-    E("language").value=locale;cats(false);E("category").value="custom";lang=locale;updateVoiceCheck();
-    ta.value=pairs.map(function(p){return p[0]+"\t"+p[1]}).join("\n");preview();
-    E("studentSetTitle").textContent=String(data.title||(data.set&&data.set.title)||"TEACHER VOCABULARY").toUpperCase();
-    E("studentSetMeta").textContent=E("language").options[E("language").selectedIndex].text.toUpperCase()+" · "+pairs.length+" WORDS · SET "+id;
+    var response=await fetch(VOCAB_API+"/sets/"+encodeURIComponent(setId),{
+      method:"GET",
+      headers:{"Accept":"application/json"}
+    });
+    var data=null;
+    try{data=await response.json()}catch(parseError){}
+
+    if(!response.ok){
+      throw new Error(data && (data.error||data.message) ? (data.error||data.message) : "HTTP "+response.status);
+    }
+
+    var pairs=normalizeLoadedPairs(data);
+    if(!pairs || pairs.length<5)throw new Error("Set has fewer than 5 valid word pairs.");
+
+    var locale=data.language || data.lang || (data.set && (data.set.language || data.set.lang));
+    var title=data.title || (data.set && data.set.title) || "Teacher Vocabulary";
+
+    if(locale && Array.from(E("language").options).some(function(o){return o.value===locale})){
+      E("language").value=locale;
+      lang=locale;
+      cats(false);
+      updateVoiceCheck();
+    }
+
+    ta.value=pairs.map(function(pair){return pair[0]+"\t"+pair[1]}).join("\n");
+    E("category").value="custom";
+    preview();
+
+    E("studentSetTitle").textContent=String(title).toUpperCase();
+    var langName=E("language").options[E("language").selectedIndex].text;
+    E("studentSetMeta").textContent=langName.toUpperCase()+" · "+pairs.length+" WORDS · SET "+setId;
     E("studentPlay").disabled=false;
-  }catch(err){console.error("Student set loading failed",err);E("studentSetTitle").textContent="SET COULD NOT BE LOADED";E("studentSetMeta").textContent="Check your connection or ask your teacher to verify the link."}
-  finally{studentLoading=false}
+    return true;
+  }catch(err){
+    console.error("Could not load vocabulary set:",err);
+    E("studentSetTitle").textContent="SET COULD NOT BE LOADED";
+    E("studentSetMeta").textContent="CHECK THE LINK OR ASK YOUR TEACHER FOR A NEW ONE";
+    E("studentPlay").disabled=true;
+    return false;
+  }
 }
-E("createStudentLink").onclick=createStudentLink;
-E("copyStudentLink").onclick=copyStudentLink;
-E("studentPlay").onclick=function(){if(this.disabled)return;E("studentEntry").classList.add("playing");start()};
-window.addEventListener("hashchange",loadStudentSet);
+
+E("shareStudentLink").onclick=async function(){await createStudentLink();if(lastStudentLink)await copyStudentLink()};
+E("studentPlay").onclick=function(){if(!this.disabled)start()};
+window.addEventListener("hashchange",function(){if(location.hash.startsWith("#set="))loadStudentSet();else{document.body.classList.remove("studentMode");E("studentPlay").disabled=true}});
 cats(false);preview();loadStudentSet();
 })();</script></body></html>
