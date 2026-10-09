@@ -80,7 +80,7 @@ body.studentMode #menu>.teacherMenu{display:none!important}
     <div class="help">Choose the language and vocabulary you want to practise.</div>
     <div class="settingsFields">
       <div><div class="fieldLabel">Language</div><select id="language"><option value="de-DE">German</option><option value="es-ES">Spanish</option><option value="da-DK">Danish</option><option value="en-US">English</option></select></div>
-      <div><div class="fieldLabel">Vocabulary</div><select id="category"></select></div>
+      <div><div class="fieldLabel">Vocabulary</div><select id="category"><option value="custom">Custom / Paste your own</option></select></div>
     </div>
     <div id="voiceCheck" class="preview"><b>VOICE:</b> checking…</div>
     <button id="testVoice" class="yellow menuButton" type="button">🔊 TEST VOICE</button>
@@ -107,8 +107,8 @@ lernen	to learn</textarea>
     <button id="swap" type="button" class="menuButton">⇄ SWAP SIDES</button>
     <div id="preview" class="preview"></div><div id="error" class="error"></div>
     <div class="shareBlock">
-      <button id="shareStudentLink" class="pink menuButton" type="button">🔗 SHARE WITH STUDENTS</button>
-      <div class="stepHint" id="shareStatus">Creates a permanent student link for exactly the vocabulary shown above.</div>
+      <button id="shareStudentLink" class="pink menuButton" type="button" onclick="document.getElementById('shareStatus').textContent='SHARE CLICK RECEIVED - preparing link...'">🔗 SHARE WITH STUDENTS</button>
+      <div class="stepHint" id="shareStatus">DIAG 8 - Tap SHARE to check if button receives clicks.</div>
     </div>
     <button id="play" class="primary wide finalPlay teacherOnly" type="button">PLAY</button>
   </div>
@@ -127,7 +127,8 @@ var EXTRA={
 };
 Object.keys(EXTRA).forEach(function(l){Object.keys(EXTRA[l]).forEach(function(c){LIB[l][c]=EXTRA[l][c]})})
 function parse(t){var a=[];t.replace(/\r/g,"").trim().split("\n").forEach(function(l){var p=l.split("\t");if(p.length>=2)a.push([p[0].trim(),p.slice(1).join("\t").trim()])});return a.filter(function(x){return x[0]&&x[1]})}function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
-function preview(){var a=parse(ta.value);E("preview").innerHTML=a.length?"Detected <b>"+a.length+"</b> pairs.<br>"+a[0][1]+" ↔ "+a[0][0]:"No valid pairs detected."}function cats(load){var l=E("language").value,s=E("category");s.innerHTML='<option value="custom">Custom / Paste your own</option>';Object.keys(LIB[l]).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;s.appendChild(o)});if(load){s.value=Object.keys(LIB[l])[0];loadCat()}else{s.value="custom"}}function loadCat(){var c=E("category").value;if(c==="custom")return;ta.value=LIB[E("language").value][c].map(function(x){return x[0]+"\t"+x[1]}).join("\n");preview()}
+function preview(){var a=parse(ta.value);E("preview").innerHTML=a.length?"Detected <b>"+a.length+"</b> pairs.<br>"+a[0][1]+" ↔ "+a[0][0]:"No valid pairs detected."}function cats(load){var l=E("language").value,s=E("category"),previous=s.value;s.innerHTML='<option value="custom">Custom / Paste your own</option>';var groups=LIB[l]||LIB["de-DE"]||{};Object.keys(groups).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;s.appendChild(o)});if(load){s.value=Object.keys(groups)[0]||"custom";loadCat()}else{s.value=previous&&groups[previous]?previous:"custom"}}
+function loadCat(){var c=E("category").value;if(c==="custom")return;ta.value=LIB[E("language").value][c].map(function(x){return x[0]+"\t"+x[1]}).join("\n");preview()}
 function audio(){if(!soundOn)return null;try{var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;if(!audioCtx)audioCtx=new A();if(audioCtx.state==="suspended")audioCtx.resume();return audioCtx}catch(e){return null}}function beep(f,d){var a=audio();if(!a)return;var o=a.createOscillator(),g=a.createGain(),n=a.currentTime;o.type="square";o.frequency.value=f;g.gain.setValueAtTime(.035,n);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(a.destination);o.start();o.stop(n+d)}function good(){beep(520,.06);setTimeout(function(){beep(780,.08)},65)}function bad(){beep(150,.16)}var speechVoices=[];
 function loadVoices(){if(!("speechSynthesis"in window))return;speechVoices=window.speechSynthesis.getVoices()||[];updateVoiceCheck()}
 function voiceFor(locale){var wanted=(locale||"").toLowerCase().replace("_","-"),base=wanted.split("-")[0];return speechVoices.find(function(v){return(v.lang||"").toLowerCase().replace("_","-")===wanted})||speechVoices.find(function(v){return(v.lang||"").toLowerCase().replace("_","-").split("-")[0]===base})||null}
@@ -296,5 +297,5 @@ E("shareStudentLink").onclick=async function(event){
 };
 E("studentPlay").onclick=function(){if(!this.disabled)start()};
 window.addEventListener("hashchange",function(){if(location.hash.startsWith("#set="))loadStudentSet();else{document.body.classList.remove("studentMode");E("studentPlay").disabled=true}});
-cats(false);preview();loadStudentSet();
+cats(true);preview();loadStudentSet();
 })();</script></body></html>
