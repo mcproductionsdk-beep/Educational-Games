@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El complot contra el rey — RPG</title>
+<style>
+:root{--ink:#241f2d;--paper:#fff9df;--gold:#ffd85a;--red:#e64f5f;--blue:#3477c7}
+*{box-sizing:border-box}html,body{margin:0;background:#15131d;color:white;font-family:ui-monospace,"Courier New",monospace;overflow:hidden}
+#shell{position:relative;width:min(1100px,100vw);aspect-ratio:16/9;margin:auto;background:#000;overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;inset:12px 16px auto;display:flex;justify-content:space-between;z-index:5;font-weight:900;font-size:18px;text-shadow:2px 2px #111;pointer-events:none}
+#objective{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:5;background:#241f2ddd;border:2px solid #fff7;padding:7px 12px;border-radius:8px;font-size:14px;pointer-events:none}
+.overlay{position:absolute;inset:0;z-index:20;background:#15131dee;display:flex;align-items:center;justify-content:center}
+.card{width:min(760px,90%);background:#24202f;border:4px solid #f5e8c8;box-shadow:0 0 0 5px #0e0c12;padding:24px}
+h1{margin:0 0 10px;color:var(--gold);font-size:30px}.sub{color:#d8d0e0;line-height:1.45}
+.heroes{display:flex;gap:16px;margin:22px 0;justify-content:center}.heroChoice{width:120px;height:125px;background:#332e42;border:3px solid #756d84;cursor:pointer;color:#fff;font:inherit}.heroChoice:hover,.heroChoice:focus{border-color:var(--gold);outline:none}
+.preview{display:block;width:52px;height:70px;margin:0 auto 7px;image-rendering:pixelated}
+button{font:inherit;font-weight:800;background:var(--blue);color:#fff;border:0;border-bottom:4px solid #1e4d88;padding:9px 13px;cursor:pointer}
+button:hover{filter:brightness(1.12)}button:active{transform:translateY(2px);border-bottom-width:2px}
+.hidden{display:none!important}
+#bubble{position:absolute;z-index:10;width:470px;max-width:48%;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:10px;padding:14px 16px;box-shadow:0 5px 0 #17131d}
+#bubble:after{content:"";position:absolute;left:var(--tail,40px);bottom:-24px;border-left:18px solid transparent;border-right:18px solid transparent;border-top:24px solid var(--ink)}
+#bubble:before{content:"";position:absolute;z-index:2;left:calc(var(--tail,40px) + 4px);bottom:-16px;border-left:14px solid transparent;border-right:14px solid transparent;border-top:19px solid var(--paper)}
+#speaker{color:#9d3e50;font-weight:1000;margin-bottom:7px}.line{font-size:19px;line-height:1.35;margin:6px 0}.inf{font-size:14px;color:#665e6b;margin:5px 0 9px}
+#answer{width:72%;font:inherit;font-size:19px;padding:8px;border:3px solid var(--ink);outline:none}
+.accents{display:inline-flex;gap:4px;margin-left:5px;vertical-align:top}.accent{background:#eee;color:#222;border-bottom:3px solid #aaa;padding:8px 9px}
+.actions{margin-top:9px;display:flex;gap:8px;align-items:center}.feedback{font-size:25px;font-weight:1000;color:var(--red)}
+.choice{display:block;width:100%;text-align:left;margin:6px 0;background:#514969;border-bottom-color:#332d44}.choice:hover{background:#665b80}
+.reward{color:#9a6b00;font-weight:1000}.nope{animation:pop .22s ease-out}@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+#toast{position:absolute;z-index:12;left:50%;top:20%;transform:translateX(-50%);background:#211d2ae8;border:3px solid #fff;padding:12px 18px;font-weight:1000;pointer-events:none}
+#recon{position:absolute;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(690px,88%);background:#241f2df5;border:4px solid #f5e8c8;padding:20px;box-shadow:0 0 0 5px #111}
+.progress{color:var(--gold);font-weight:1000}
+#bossPrompt{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);background:#241f2de8;border:3px solid #fff;padding:9px 14px;font-size:14px;text-align:center}
+.kbd{display:inline-block;border:1px solid #aaa;background:#eee;color:#222;padding:1px 5px;border-radius:3px}
+#touchControls{position:absolute;bottom:8px;left:12px;right:12px;z-index:7;display:none;justify-content:space-between;align-items:end;pointer-events:none}.pad{display:grid;grid-template-columns:repeat(3,44px);gap:4px}#touchControls button{pointer-events:auto;touch-action:none;padding:10px;user-select:none}.up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}
+@media(pointer:coarse){#touchControls{display:flex}}
+@media(max-width:760px){html,body{overflow:auto}#shell{height:100svh;aspect-ratio:auto}canvas#game{object-fit:contain}.card{padding:12px;max-height:95%;overflow:auto}h1{font-size:22px}.heroes{gap:5px;flex-wrap:wrap;margin:12px 0}.heroChoice{width:100px;height:110px}#hud{font-size:13px;inset:8px}#objective{top:35px;font-size:10px;width:max-content;max-width:95%;text-align:center}#bubble{max-width:calc(100% - 24px);max-height:calc(100% - 90px);overflow:auto}.line{font-size:16px}.accents{display:flex;margin:6px 0;flex-wrap:wrap}#answer{width:100%}#recon{max-height:90%;overflow:auto;padding:12px}#bossPrompt{bottom:120px;font-size:11px}#touchControls{display:flex}}
+</style></head>
+<body>
+<div id="shell">
+<canvas id="game" width="960" height="540"></canvas>
+<div id="touchControls"><div class="pad"><button class="up" data-key="ArrowUp" aria-label="Arriba">▲</button><button class="left" data-key="ArrowLeft" aria-label="Izquierda">◀</button><button class="down" data-key="ArrowDown" aria-label="Abajo">▼</button><button class="right" data-key="ArrowRight" aria-label="Derecha">▶</button></div><button id="fire">DISPARAR</button></div>
+<div id="hud"><span id="health"></span><span id="status"></span></div>
+<div id="objective"></div>
+<div id="bubble" class="hidden"><div id="speaker"></div><div id="content"></div></div>
+<div id="toast" class="hidden"></div>
+<div id="recon" class="hidden"></div>
+<div id="bossPrompt" class="hidden"></div>
+<div id="start" class="overlay"><div class="card">
+<h1>⚔ EL COMPLOT CONTRA EL REY</h1>
+<div class="sub">Interroga a los habitantes. Conjuga en futuro, comprende sus respuestas y gana balas. Después reconstruye el complot y detén a Mario.</div>
+<div class="heroes">
+<button class="heroChoice" data-h="0"><canvas class="preview" width="52" height="70"></canvas>Aventurera</button>
+<button class="heroChoice" data-h="1"><canvas class="preview" width="52" height="70"></canvas>Explorador</button>
+<button class="heroChoice" data-h="2"><canvas class="preview" width="52" height="70"></canvas>Guardiana</button>
+<button class="heroChoice" data-h="3"><canvas class="preview" width="52" height="70"></canvas>Pícaro</button>
+</div>
+<div class="sub">Movimiento: <span class="kbd">WASD</span> o flechas. Acércate a un habitante para hablar. <span class="kbd">Enter</span> envía respuestas.</div>
+</div></div>
+</div>
+<script>
+"use strict";
+const cv=document.getElementById("game"),ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+const $=id=>document.getElementById(id), bubble=$("bubble"), content=$("content"), speaker=$("speaker");
+let state="menu", heroStyle=0, lives=5, ammo=0, clues=[], completed=new Set(), current=-1, phase="", invuln=0;
+const player={x:470,y:290,r:11,dir:"down",moving:false,step:0,speed:150};
+const keys={}; let last=performance.now(), audioCtx=null;
+const villagers=[
+ {x:310,y:205,name:"Granjero",style:4,q:"¿Dónde ____ Mario mañana?",inf:"trabajar",form:"trabajará",a:"Mario ____ mañana en el castillo.",clue:"Mario trabajará mañana en el castillo.",check:"¿Dónde trabajará Mario mañana?",opts:["En el castillo","En el mercado","En su casa"],correct:0,label:"DÓNDE"},
+ {x:650,y:205,name:"Cocinera",style:5,q:"¿Con quién ____ Mario esta noche?",inf:"hablar",form:"hablará",a:"Mario ____ esta noche con el guardia.",clue:"Mario hablará esta noche con el guardia.",check:"¿Con quién hablará Mario?",opts:["Con el rey","Con el guardia","Con el herrero"],correct:1,label:"CON QUIÉN"},
+ {x:310,y:375,name:"Herrero",style:6,q:"¿Qué ____ Mario al castillo?",inf:"llevar",form:"llevará",a:"Mario ____ una botella al castillo.",clue:"Mario llevará una botella al castillo.",check:"¿Qué llevará Mario?",opts:["Una corona","Una botella","Una espada"],correct:1,label:"QUÉ"},
+ {x:650,y:375,name:"Anciana",style:7,q:"¿Cuándo ____ Mario al castillo?",inf:"entrar",form:"entrará",a:"Mario ____ mañana por la noche.",clue:"Mario entrará mañana por la noche.",check:"¿Cuándo entrará Mario?",opts:["Esta mañana","Mañana por la noche","La próxima semana"],correct:1,label:"CUÁNDO"},
+ {x:475,y:190,name:"Guardia",style:8,q:"¿Cómo ____ Mario al rey?",inf:"matar",form:"matará",a:"Mario ____ al rey con veneno.",clue:"Mario matará al rey con veneno.",check:"¿Cómo matará Mario al rey?",opts:["Con una espada","Con fuego","Con veneno"],correct:2,label:"CÓMO"}
+];
+const buildings=[{x:45,y:55,w:220,h:115,roof:"#c95460"},{x:690,y:50,w:220,h:120,roof:"#397fca"},{x:55,y:360,w:205,h:115,roof:"#d2764f"},{x:700,y:355,w:205,h:120,roof:"#6b62aa"}];
+const ponds=[{x:0,y:0,w:300,h:75},{x:660,y:0,w:300,h:70}];
+const trees=[[28,95],[310,75],[610,85],[915,95],[315,450],[620,455],[20,470],[920,465]];
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+function drawWorld(){
+ rect(0,0,960,540,"#79cf72");rect(0,245,960,82,"#a56b4e");rect(438,0,86,540,"#a56b4e");
+ ponds.forEach(p=>rect(p.x,p.y,p.w,p.h,"#4ca0d9"));
+ buildings.forEach(b=>drawHouse(b));
+ trees.forEach(t=>drawTree(t[0],t[1]));
+ // castle gate unlock cue
+ if(completed.size===villagers.length){rect(417,0,128,45,"#69616f");rect(432,12,98,33,"#2e2935");ctx.fillStyle="#ffe06a";ctx.font="bold 12px monospace";ctx.fillText("CASTILLO",446,33)}
+ villagers.forEach((v,i)=>drawPerson(v.x,v.y,v.style,false,0,completed.has(i)));
+ drawPerson(player.x,player.y,heroStyle,true,player.step,false);
+}
+function drawHouse(b){rect(b.x,b.y+22,b.w,b.h-22,"#ded1b2");rect(b.x-8,b.y,b.w+16,35,b.roof);rect(b.x+b.w/2-18,b.y+b.h-46,36,46,"#513529");rect(b.x+30,b.y+55,30,27,"#4b94cf");rect(b.x+b.w-60,b.y+55,30,27,"#4b94cf")}
+function drawTree(x,y){rect(x-4,y+20,8,25,"#70452f");ctx.fillStyle="#4e9c47";ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.fill();ctx.fillStyle="#70b94e";ctx.beginPath();ctx.arc(x-8,y-7,15,0,7);ctx.fill()}
+function palette(s){return [["#3e74b5","#e7a77b","#47352e"],["#4b9a62","#d9a176","#382e29"],["#8d59a8","#e5aa80","#3c302c"],["#c85b55","#dba27b","#332924"],["#719b3e","#e3aa7d","#57392d"],["#d45c65","#e8ad82","#6a3c2f"],["#72509a","#d99b72","#3a2d28"],["#c79339","#e2aa7d","#b8b4aa"],["#455b88","#d9a177","#2f2927"]][s%9]}
+function drawPerson(x,y,s,isHero,step,ghost){
+ const [shirt,skin,hair]=palette(s), bob=isHero&&player.moving?Math.abs(Math.sin(step*7))*2:0, swing=isHero&&player.moving?Math.sin(step*7)*3:0;
+ ctx.save();ctx.translate(Math.round(x),Math.round(y-bob));if(ghost)ctx.globalAlpha=.32;
+ // shadow
+ ctx.fillStyle="#0003";ctx.fillRect(-10,19,20,5);
+ // legs
+ ctx.fillStyle="#343046";ctx.fillRect(-8,8+swing,6,15);ctx.fillRect(2,8-swing,6,15);
+ // torso + arms
+ ctx.fillStyle=shirt;ctx.fillRect(-10,-10,20,20);ctx.fillRect(-14,-8-swing/2,5,15);ctx.fillRect(9,-8+swing/2,5,15);
+ // head/hair
+ ctx.fillStyle=skin;ctx.fillRect(-8,-26,16,16);ctx.fillStyle=hair;ctx.fillRect(-9,-30,18,7);ctx.fillRect(-9,-25,4,7);
+ ctx.fillStyle="#222";ctx.fillRect(-4,-20,2,2);ctx.fillRect(4,-20,2,2);
+ if(!ghost&&!isHero){ctx.fillStyle="#fff";ctx.fillRect(-3,-42,6,6);ctx.fillStyle="#222";ctx.font="bold 10px monospace";ctx.fillText("!",-3,-36)}
+ ctx.restore()
+}
+function update(dt){
+ if(state!=="world"&&state!=="boss")return;
+ let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);
+ let len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;player.moving=!!(dx||dy);
+ if(player.moving){player.step+=dt;let nx=player.x+dx*player.speed*dt,ny=player.y+dy*player.speed*dt;if(state==="boss"||!blocked(nx,ny)){player.x=nx;player.y=ny} if(Math.abs(dx)>Math.abs(dy))player.dir=dx>0?"right":"left";else player.dir=dy>0?"down":"up"}
+ player.x=Math.max(18,Math.min(942,player.x));player.y=Math.max(35,Math.min(520,player.y));
+ if(invuln>0)invuln-=dt;
+ if(state==="world"){
+   for(let i=0;i<villagers.length;i++)if(!completed.has(i)&&Math.hypot(player.x-villagers[i].x,player.y-villagers[i].y)<34){beginTalk(i);break}
+   if(completed.size===villagers.length&&player.y<48&&player.x>405&&player.x<555)beginRecon();
+ } else updateBoss(dt);
+}
+function blocked(x,y){for(const b of buildings)if(x>b.x-10&&x<b.x+b.w+10&&y>b.y-5&&y<b.y+b.h+8)return true;return false}
+function validateNPCPositions(){
+ const safe=[[310,205],[650,205],[310,375],[650,375],[475,190]];
+ villagers.forEach((v,i)=>{
+   if(blocked(v.x,v.y)){v.x=safe[i][0];v.y=safe[i][1]}
+ });
+}
+function render(){if(state==="boss")drawBoss();else drawWorld();hud()}
+function frame(t){let dt=Math.min(.035,(t-last)/1000);last=t;update(dt);render();requestAnimationFrame(frame)}
+function hud(){$("health").textContent="❤️".repeat(Math.max(0,lives));$("status").textContent=`🔎 ${completed.size}/${villagers.length}   🔫 ${ammo}`;$("objective").textContent=state==="boss"?"DERROTA A MARIO":completed.size<villagers.length?"OBJETIVO: INTERROGA A TODOS LOS HABITANTES":"OBJETIVO: VE AL CASTILLO"}
+function beginTalk(i){Object.keys(keys).forEach(k=>keys[k]=false);if(state!=="world")return;state="talk";player.moving=false;current=i;phase="question";showConjugation()}
+function placeBubble(){
+ const v=villagers[current], shell=$("shell").getBoundingClientRect(), sx=shell.width/960, sy=shell.height/540, bw=shell.width<=760?shell.width-24:Math.min(470,shell.width*.48);
+ let left=v.x*sx-bw/2, top=v.y*sy-190;left=Math.max(12,Math.min(shell.width-bw-12,left));top=Math.max(65,Math.min(shell.height-205,top));
+ if(shell.width<=760){left=12;top=65}
+ bubble.style.width=bw+"px";bubble.style.left=left+"px";bubble.style.top=top+"px";bubble.style.setProperty("--tail",Math.max(22,Math.min(bw-55,v.x*sx-left-18))+"px")
+}
+function showConjugation(){
+ const v=villagers[current];placeBubble();bubble.classList.remove("hidden");speaker.textContent=v.name;
+ const sentence=phase==="question"?v.q:v.a;
+ content.innerHTML=`<div class="line">${sentence}</div><div class="inf">[${v.inf}]</div><input id="answer" autocomplete="off" spellcheck="false"><span class="accents" id="acc"></span><div class="actions"><button id="send">Enviar</button><span class="feedback" id="feedback"></span></div>`;
+ const inp=$("answer"),acc=$("acc");["á","é","í","ó","ú","ñ"].forEach(ch=>{let b=document.createElement("button");b.className="accent";b.textContent=ch;b.onclick=()=>{inp.value+=ch;inp.focus()};acc.appendChild(b)});
+ $("send").onclick=submitConj;inp.onkeydown=e=>{if(e.key==="Enter")submitConj()};inp.focus()
+}
+function submitConj(){
+ const v=villagers[current],inp=$("answer");if(inp.value.trim().toLocaleLowerCase("es")===v.form){
+  tone(760,.08);let full=(phase==="question"?v.q:v.a).replace("____",v.form);speak(full);
+  content.innerHTML=`<div class="line"><b>${full}</b></div><div class="actions"><span class="reward">✓ CORRECTO</span></div>`;
+  if(phase==="question"){phase="answer";setTimeout(showConjugation,900)}else setTimeout(showCheck,900)
+ }else{damage(false);$("feedback").innerHTML='<span class="nope">NOPE</span>';inp.select()}
+}
+function showCheck(){
+ const v=villagers[current];placeBubble();speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.check}</div>`+v.opts.map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("");
+ content.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answerCheck(+b.dataset.i))
+}
+function answerCheck(i){
+ const v=villagers[current];if(i!==v.correct){damage(false);flash("NOPE");return}
+ tone(880,.1);speak(v.opts[i]);completed.add(current);clues.push({label:v.label,text:v.clue});ammo++;
+ speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.clue}</div><div class="reward">🔫 +1 BALA</div><div class="inf">Pista añadida al cuaderno.</div><button id="continue">Continuar</button>`;$("continue").onclick=endTalk
+}
+function endTalk(){bubble.classList.add("hidden");state="world";let v=villagers[current];let ang=Math.atan2(player.y-v.y,player.x-v.x);player.x=v.x+Math.cos(ang)*42;player.y=v.y+Math.sin(ang)*42;current=-1}
+function damage(bossHit=true){lives--;tone(125,.16);if(lives<=0){state="dead";setTimeout(()=>location.reload(),500)}else if(bossHit)invuln=1}
+function flash(msg){let t=$("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),600)}
+function beginRecon(){
+ if(state!=="world")return;state="recon";let box=$("recon");box.classList.remove("hidden");
+ window.recon=[
+  ["DÓNDE","¿Dónde trabajará Mario mañana?",["En el castillo","En su casa","En el mercado"],0],
+  ["CON QUIÉN","¿Con quién hablará Mario esta noche?",["Con el rey","Con el guardia","Con la cocinera"],1],
+  ["QUÉ","¿Qué llevará Mario al castillo?",["Una botella","Una espada","Una corona"],0],
+  ["CUÁNDO","¿Cuándo entrará Mario al castillo?",["Mañana por la noche","Esta mañana","La próxima semana"],0],
+  ["CÓMO","¿Cómo matará Mario al rey?",["Con fuego","Con veneno","Con una espada"],1]
+ ];window.ri=0;showRecon()
+}
+function showRecon(){
+ let q=recon[ri],box=$("recon");box.innerHTML=`<div class="progress">RECONSTRUYE EL PLAN · ${ri+1}/${recon.length} · ${q[0]}</div><h2>${q[1]}</h2>`+q[2].map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("");
+ box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>pickRecon(+b.dataset.i))
+}
+function pickRecon(i){let q=recon[ri];if(i!==q[3]){damage(false);flash("NOPE");return}tone(820,.08);ri++;if(ri<recon.length)showRecon();else{$("recon").innerHTML=`<div class="progress">PLAN DESCUBIERTO</div><h2>Mario intentará matar al rey.</h2><p>Trabajará en el castillo, hablará con el guardia, llevará una botella, entrará mañana por la noche y usará veneno.</p><p class="reward">Munición disponible: 🔫 ${ammo}</p><button id="fight">ENTRAR AL CASTILLO</button>`;$("fight").onclick=startBoss}}
+let boss={x:480,y:105,hp:5,t:0,dir:1,shots:[]},playerShots=[];
+function startBoss(){$("recon").classList.add("hidden");state="boss";player.x=480;player.y=455;boss={x:480,y:105,hp:5,t:0,dir:1,shots:[]};playerShots=[];$("bossPrompt").classList.remove("hidden");$("bossPrompt").innerHTML=`Muévete y apunta. <span class="kbd">ESPACIO</span> dispara. Cada impacto consume 1 bala.`}
+function updateBoss(dt){
+ boss.t+=dt;boss.x+=boss.dir*85*dt;if(boss.x<130||boss.x>830)boss.dir*=-1;
+ if(boss.t>1.25){boss.t=0;let a=Math.atan2(player.y-boss.y,player.x-boss.x);boss.shots.push({x:boss.x,y:boss.y+18,vx:Math.cos(a)*155,vy:Math.sin(a)*155})}
+ boss.shots.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt});boss.shots=boss.shots.filter(s=>s.x>-20&&s.x<980&&s.y>-20&&s.y<560);
+ playerShots.forEach(s=>{s.y-=320*dt});playerShots=playerShots.filter(s=>{if(s.y<=-20&&!s.dead)ammo++;return s.y>-20&&!s.dead});
+ for(const s of boss.shots)if(invuln<=0&&Math.hypot(s.x-player.x,s.y-player.y)<16){s.x=-100;damage(true)}
+ for(const s of playerShots)if(!s.dead&&Math.hypot(s.x-boss.x,s.y-boss.y)<34){s.dead=true;boss.hp--;tone(300,.08);flash("¡IMPACTO!");if(boss.hp<=0)win()}
+}
+function shoot(){if(state!=="boss"||ammo<=0)return;ammo--;playerShots.push({x:player.x,y:player.y-18,dead:false});tone(520,.045)}
+function drawBoss(){
+ rect(0,0,960,540,"#2c273c");for(let i=0;i<12;i++)rect(i*80,0,3,540,"#332e45");rect(80,55,800,420,"#4b4056");rect(100,75,760,380,"#332d3f");
+ ctx.fillStyle="#7d6b87";for(let y=90;y<450;y+=38)for(let xx=110+(y%76?20:0);xx<850;xx+=70)ctx.fillRect(xx,y,58,4);
+ drawPerson(boss.x,boss.y,3,false,0,false);ctx.fillStyle="#e64f5f";ctx.fillRect(boss.x-42,boss.y-50,84,8);ctx.fillStyle="#78c765";ctx.fillRect(boss.x-42,boss.y-50,84*(boss.hp/5),8);
+ drawPerson(player.x,player.y,heroStyle,true,player.step,false);
+ ctx.fillStyle="#ffd85a";playerShots.forEach(s=>ctx.fillRect(s.x-2,s.y-7,4,12));ctx.fillStyle="#f06a6a";boss.shots.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,6,0,7);ctx.fill()})
+}
+function win(){state="win";$("bossPrompt").classList.add("hidden");let r=$("recon");r.classList.remove("hidden");r.innerHTML=`<div class="progress">🏆 MISIÓN COMPLETADA</div><h1>¡HAS SALVADO AL REY!</h1><p>Descubriste el complot y derrotaste a Mario.</p><button onclick="location.reload()">Jugar otra vez</button>`;speak("¡Has salvado al rey!")}
+function tone(f,d){try{audioCtx ||= new (AudioContext||webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;o.type="square";g.gain.setValueAtTime(.045,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch{}}
+function speak(text){try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text),vs=speechSynthesis.getVoices();u.voice=vs.find(v=>/^es(-|_)/i.test(v.lang))||null;u.lang="es-ES";u.rate=.9;speechSynthesis.speak(u)}catch{}}
+addEventListener("keydown",e=>{if(e.target.matches("input,textarea"))return;keys[e.key]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.code==="Space")shoot()});
+addEventListener("keyup",e=>keys[e.key]=false);
+document.querySelectorAll(".heroChoice").forEach((b,i)=>{let pc=b.querySelector("canvas"),pctx=pc.getContext("2d"),old=ctx; /* previews drawn manually */ pctx.fillStyle="#222";pctx.fillRect(20,48,5,18);pctx.fillRect(29,48,5,18);pctx.fillStyle=palette(i)[0];pctx.fillRect(15,27,24,23);pctx.fillStyle=palette(i)[1];pctx.fillRect(19,11,16,17);pctx.fillStyle=palette(i)[2];pctx.fillRect(17,7,20,8);b.onclick=()=>{heroStyle=i;$("start").classList.add("hidden");state="world";tone(600,.05)}})
+addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
+addEventListener("resize",()=>{if(state==="talk")placeBubble()});
+document.querySelectorAll("[data-key]").forEach(b=>{b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys[b.dataset.key]=true});["pointerup","pointercancel","lostpointercapture"].forEach(type=>b.addEventListener(type,()=>keys[b.dataset.key]=false))});
+$("fire").addEventListener("pointerdown",e=>{e.preventDefault();shoot()});
+validateNPCPositions();requestAnimationFrame(frame);
+</script></body></html>
