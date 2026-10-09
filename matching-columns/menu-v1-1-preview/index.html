@@ -150,7 +150,7 @@ var sharingBusy=false;
 
 function currentSetTitle(){
   var c=E("category");
-  return c && c.value!=="custom" ? c.options[c.selectedIndex].text : "Custom Vocabulary";
+  return c && c.value!=="custom" && c.selectedIndex>=0 && c.options[c.selectedIndex] ? c.options[c.selectedIndex].text : "Custom Vocabulary";
 }
 
 async function createStudentLink(){
@@ -281,7 +281,19 @@ async function loadStudentSet(){
   }
 }
 
-E("shareStudentLink").onclick=async function(){await createStudentLink();if(lastStudentLink)await copyStudentLink()};
+/* Share button diagnostic: immediate visual response, errors surfaced to teacher. */
+E("shareStudentLink").onclick=async function(event){
+  if(event){event.preventDefault();event.stopPropagation()}
+  var status=E("shareStatus");
+  status.textContent="⏳ SHARE BUTTON PRESSED — checking vocabulary…";
+  try{
+    await createStudentLink();
+    if(lastStudentLink)await copyStudentLink();
+  }catch(err){
+    console.error("Sharing handler failed",err);
+    status.textContent="SHARE ERROR: "+(err&&err.message?err.message:String(err));
+  }
+};
 E("studentPlay").onclick=function(){if(!this.disabled)start()};
 window.addEventListener("hashchange",function(){if(location.hash.startsWith("#set="))loadStudentSet();else{document.body.classList.remove("studentMode");E("studentPlay").disabled=true}});
 cats(false);preview();loadStudentSet();
