@@ -1,0 +1,28 @@
+/* Boring Teacher Core V1 development — scoped arcade teacher/student menus. */
+.bt-menu{--bt-ink:#152945;--bt-paper:#fffdf0;--bt-pink:#ff77ab;--bt-yellow:#ffe26b;--bt-blue:#70c9ff;font-family:"Courier New",monospace;color:var(--bt-ink);max-width:1120px;margin:0 auto;padding:12px;box-sizing:border-box}
+.bt-menu *{box-sizing:border-box}
+.bt-logo{font-size:clamp(22px,4vw,40px);font-weight:900;text-align:center;letter-spacing:1px;margin:8px 0 16px;text-shadow:3px 3px 0 var(--bt-yellow)}
+.bt-teacher-columns{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:12px;align-items:start}
+.bt-card{background:var(--bt-paper);border:3px solid var(--bt-ink);box-shadow:5px 5px 0 var(--bt-ink);padding:16px;min-width:0}
+.bt-card h2{font-size:17px;line-height:1.3;margin:0 0 8px;font-weight:900}
+.bt-help{font-size:12px;line-height:1.5;margin:0}
+.bt-settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bt-field-label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:900;text-transform:uppercase}
+.bt-menu select,.bt-menu textarea{width:100%;border:3px solid var(--bt-ink);border-radius:0;background:white;color:var(--bt-ink);font:700 14px "Courier New",monospace;padding:9px}
+.bt-menu textarea{height:260px;min-height:180px;resize:vertical;margin-top:10px;white-space:pre;tab-size:4}
+.bt-button{width:100%;border:3px solid var(--bt-ink);border-radius:0;box-shadow:3px 3px 0 var(--bt-ink);background:#fff;font:900 14px "Courier New",monospace;color:var(--bt-ink);padding:11px;cursor:pointer;margin-top:9px;min-height:46px}
+.bt-button:focus-visible,.bt-menu a:focus-visible{outline:3px solid #075cff;outline-offset:3px}
+.bt-button:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--bt-ink)}
+.bt-button:disabled{opacity:.6;cursor:wait}
+.bt-yellow{background:var(--bt-yellow)}.bt-pink{background:var(--bt-pink)}.bt-primary{background:var(--bt-blue)}
+.bt-preview,.bt-share-status,.bt-error{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.bt-preview{background:#f0f6ff;padding:9px;border:2px solid var(--bt-ink);margin:10px 0 0}
+.bt-error{color:#a0002c;font-weight:900}
+.bt-share-block{margin-top:12px;padding-top:12px;border-top:3px solid var(--bt-ink)}
+.bt-share-status{margin-top:9px}.bt-student-link{display:block;color:#124bb4;overflow-wrap:anywhere;text-decoration:underline}
+.bt-final-play{font-size:20px;padding:14px;margin-top:14px;min-height:56px}
+.bt-howto{margin-top:12px;padding:10px;background:#fff8d9;border:3px solid var(--bt-ink)}
+.bt-howto summary{cursor:pointer;font-size:13px;font-weight:900}
+.bt-howto-text{font-size:12px;line-height:1.5;white-space:pre-line}
+.bt-student-card{max-width:600px;margin:0 auto}.bt-student-title{overflow-wrap:anywhere}.bt-student-meta{font-size:14px;font-weight:900}
+@media(max-width:760px){.bt-teacher-columns{grid-template-columns:1fr;gap:10px}.bt-settings-fields{grid-template-columns:1fr}.bt-card{padding:12px}.bt-menu textarea{height:34vh;min-height:210px;font-size:16px}.bt-menu select{min-height:48px;font-size:16px}.bt-button{min-height:48px}.bt-pink,.bt-final-play{min-height:56px}}
