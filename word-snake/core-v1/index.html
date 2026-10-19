@@ -28,7 +28,7 @@ function random(n){return Math.floor(Math.random()*n)}
 function key(x,y){return x+','+y}
 function freeCell(used){for(let i=0;i<1000;i++){let p={x:random(COLS),y:random(ROWS)};if(!used.has(key(p.x,p.y)))return p}return null}
 function chooseWrong(){const pool=pairs.map((p,i)=>i).filter(i=>i!==current);return pool[random(pool.length)]}
-function fillFoods(){foods=[];const used=new Set(snake.map(p=>key(p.x,p.y)));let choices=[current];for(let i=0;i<3;i++)choices.push(chooseWrong());choices.sort(()=>Math.random()-.5);for(const i of choices){const p=freeCell(used);if(!p)break;used.add(key(p.x,p.y));foods.push({...p,index:i})}}
+function fillFoods(){foods=[];const used=new Set(snake.map(p=>key(p.x,p.y)));let choices=[current];const distractors=pairs.map((p,i)=>i).filter(i=>i!==current);for(let i=distractors.length-1;i>0;i--){const j=random(i+1);[distractors[i],distractors[j]]=[distractors[j],distractors[i]]}choices.push(...distractors.slice(0,3));choices.sort(()=>Math.random()-.5);for(const i of choices){const p=freeCell(used);if(!p)break;used.add(key(p.x,p.y));foods.push({...p,index:i})}}
 function updateHud(){$('score').textContent='SCORE '+score;$('lives').textContent='♥ '.repeat(lives).trim();$('round').textContent='ROUND '+round+' · '+(current+1)+'/'+pairs.length;$('prompt').textContent=pairs[current]?.[1]||'READY?'}
 function feedback(text,bad=false){$('message').textContent=text;$('message').style.color=bad?'#ff687b':'#a2f68e'}
 function say(){if(pairs[current]){try{if(contextPronounce)contextPronounce(pairs[current][0]);else voice.speak(pairs[current][0],locale)}catch(e){}}}
@@ -42,7 +42,7 @@ function draw(){ctx.fillStyle='#0d1736';ctx.fillRect(0,0,960,560);ctx.strokeStyl
 function stop(){clearInterval(timer);timer=null;playing=false;paused=false}
 const adapter=registerGame({id:'word-snake',capabilities:{vocabulary:true,pronunciation:true,sharing:true},start({vocabulary,locale:language,pronounce}){if(!vocabulary?.pairs||vocabulary.pairs.length<5)throw Error('Five pairs required');pairs=vocabulary.pairs.map(p=>[String(p[0]),String(p[1])]);locale=language;contextPronounce=pronounce;root.hidden=true;root.style.display='none';screen.hidden=false;restart()},pause(){paused=true;draw()},resume(){paused=false;draw()},reset(){stop();screen.hidden=true;root.hidden=false;root.style.display='';$('overlay').textContent=''}});
 const services={game:{start:async data=>{adapter.reset();return adapter.start(data)}},voice,sharing};
-const options={gameTitle:'WORD SNAKE',instructions:'Steer with arrows or WASD. Collect the correct target-language translation of the English prompt. Wrong answers cost lives. P pauses; edges wrap.',categories,initialText:categories['de-DE'].Basics.map(p=>p.join('\t')).join('\n'),language:'de-DE',minPlayPairs:5,canonicalGameUrl:'https://boringteacher.com/word-snake/'};
+const options={gameTitle:'WORD SNAKE',instructions:'Steer with arrows or WASD. Collect the correct target-language translation of the English prompt. Wrong answers cost lives. P pauses; edges wrap.',categories,initialText:categories['de-DE'].Basics.map(p=>p.join('\t')).join('\n'),language:'de-DE',minPlayPairs:5,canonicalGameUrl:'https://boringteacher.com/word-snake/core-v1/'};
 const setId=readStudentSetId(location.href);if(setId)mountStudentMenu(root,services,{...options,setId});else mountTeacherMenu(root,services,options);
 $('pause').onclick=()=>{if(!playing)return;paused=!paused;$('pause').textContent=paused?'RESUME (P)':'PAUSE (P)';draw()};
 $('restart').onclick=()=>{if(pairs.length)restart()};
