@@ -55,9 +55,7 @@ const adapter = registerGame({
     root.style.display = 'none';
     legacy.start();
   },
-  reset() {
-    document.getElementById('mainMenu').click();
-  },
+  reset() {},
 });
 const services = { game: { start: async context => { adapter.reset(); return adapter.start(context); } }, voice, sharing };
 const instructions = 'Use arrow keys or WASD to steer. Eat the correct translated word, avoid incorrect words, and wrap around the edges. P pauses. Wrong words cost lives.';
