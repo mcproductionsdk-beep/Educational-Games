@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Word Snake — Core V1</title>
+<link rel="stylesheet" href="../core/menu.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#15244b;color:#fff;font:700 15px 'Courier New',monospace}button{cursor:pointer;font:inherit}#core-menu-root{max-width:1120px;margin:auto}#game-screen{max-width:1120px;margin:10px auto;padding:12px;border:5px solid #101935;background:#243b6b;box-shadow:0 0 0 4px #ffdb59}#game-screen[hidden]{display:none!important}header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}h1{color:#8aee71;text-shadow:3px 3px #111;margin:5px 0}#hud{display:flex;gap:12px;flex-wrap:wrap;color:#ffe178}#prompt{margin:8px 0;background:#101b3e;border:3px solid #f9dd67;text-align:center;padding:10px;font-size:clamp(18px,3vw,27px)}canvas{display:block;width:100%;height:auto;max-height:65vh;aspect-ratio: 24/14;background:#0d1736;image-rendering:pixelated;border:4px solid #101935}#controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#controls button{background:#ffe17a;color:#14234c;border:3px solid #101935;padding:8px 12px}#message{min-height:26px;color:#93ed7b;margin:8px 0}#touch{display:flex;gap:8px;justify-content:center;margin-top:8px}#touch button{min-width:54px}#overlay{font-size:20px;color:#ffe178;text-align:center}small{color:#d9e4ff}
+</style></head><body>
+<div id="core-menu-root"></div>
+<section id="game-screen" hidden aria-label="Word Snake game"><header><h1>🐍 WORD SNAKE</h1><div id="hud"><span id="score">SCORE 0</span><span id="lives">♥ ♥ ♥</span><span id="round">ROUND 1</span></div></header>
+<div id="prompt" aria-live="polite">READY?</div><canvas id="board" width="960" height="560" aria-label="Snake vocabulary board"></canvas><div id="message" aria-live="polite"></div>
+<div id="controls"><button id="pause">PAUSE (P)</button><button id="restart">RESTART</button><button id="back">MAIN MENU</button><button id="repeat">🔊 REPEAT</button><button id="fullscreen">FULL SCREEN</button></div>
+<div id="touch"><button data-dir="up">▲</button><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div>
+<small>Arrows / WASD to move · P to pause · Correct answers grow the snake · Avoid wrong answers · Edges wrap around.</small><div id="overlay" aria-live="polite"></div></section>
+<script type="module">
+import {mountTeacherMenu,mountStudentMenu} from '../core/menu.js';
+import {createSharingClient,readStudentSetId} from '../core/sharing.js';
+import {createVoiceService} from '../core/voice.js';
+import {registerGame} from '../core/game-adapter.js';
+const $=id=>document.getElementById(id),root=$('core-menu-root'),screen=$('game-screen'),canvas=$('board'),ctx=canvas.getContext('2d');
+const COLS=24,ROWS=14,SIZE=40;
+const categories={
+'es-ES':{'Basics':[['hola','hello'],['gato','cat'],['perro','dog'],['casa','house'],['agua','water'],['libro','book'],['rojo','red'],['verde','green']]},
+'de-DE':{'Basics':[['hallo','hello'],['Katze','cat'],['Hund','dog'],['Haus','house'],['Wasser','water'],['Buch','book'],['rot','red'],['grün','green']]},
+'da-DK':{'Basics':[['hej','hello'],['kat','cat'],['hund','dog'],['hus','house'],['vand','water'],['bog','book'],['rød','red'],['grøn','green']]}
+};
+const voice=createVoiceService(),sharing=createSharingClient({apiBaseUrl:'https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev'});
+let pairs=[],locale='de-DE',snake=[],direction={x:1,y:0},nextDirection={x:1,y:0},foods=[],current=0,score=0,lives=3,round=1,wrongSinceCorrect=0,timer=null,paused=false,playing=false,ended=false,contextPronounce=null;
+function random(n){return Math.floor(Math.random()*n)}
+function key(x,y){return x+','+y}
+function freeCell(used){for(let i=0;i<1000;i++){let p={x:random(COLS),y:random(ROWS)};if(!used.has(key(p.x,p.y)))return p}return null}
+function chooseWrong(){const pool=pairs.map((p,i)=>i).filter(i=>i!==current);return pool[random(pool.length)]}
+function fillFoods(){foods=[];const used=new Set(snake.map(p=>key(p.x,p.y)));let choices=[current];const distractors=pairs.map((p,i)=>i).filter(i=>i!==current);for(let i=distractors.length-1;i>0;i--){const j=random(i+1);[distractors[i],distractors[j]]=[distractors[j],distractors[i]]}choices.push(...distractors.slice(0,3));choices.sort(()=>Math.random()-.5);for(const i of choices){const p=freeCell(used);if(!p)break;used.add(key(p.x,p.y));foods.push({...p,index:i})}}
+function updateHud(){$('score').textContent='SCORE '+score;$('lives').textContent='♥ '.repeat(lives).trim();$('round').textContent='ROUND '+round+' · '+(current+1)+'/'+pairs.length;$('prompt').textContent=pairs[current]?.[1]||'READY?'}
+function feedback(text,bad=false){$('message').textContent=text;$('message').style.color=bad?'#ff687b':'#a2f68e'}
+function say(){if(pairs[current]){try{if(contextPronounce)contextPronounce(pairs[current][0]);else voice.speak(pairs[current][0],locale)}catch(e){}}}
+function newQuestion(){fillFoods();updateHud();say()}
+function restart(){clearInterval(timer);snake=[{x:5,y:7},{x:4,y:7},{x:3,y:7}];direction={x:1,y:0};nextDirection={...direction};current=0;score=0;lives=3;round=1;wrongSinceCorrect=0;ended=false;paused=false;playing=true;$('pause').textContent='PAUSE (P)';$('overlay').textContent='';feedback('Find the correct translation!');newQuestion();timer=setInterval(tick,165);draw()}
+function end(){playing=false;ended=true;clearInterval(timer);$('overlay').textContent='GAME OVER · SCORE '+score;feedback('Choose RESTART or MAIN MENU.')}
+function tick(){if(!playing||paused)return;direction=nextDirection;const head={x:(snake[0].x+direction.x+COLS)%COLS,y:(snake[0].y+direction.y+ROWS)%ROWS};if(snake.slice(0,-1).some(p=>p.x===head.x&&p.y===head.y)){lives--;feedback('NOPE! You hit your tail.',true);snake=[{x:5,y:7},{x:4,y:7},{x:3,y:7}];direction={x:1,y:0};nextDirection={...direction};if(lives<=0){updateHud();end();return}fillFoods();updateHud();draw();return}
+snake.unshift(head);const food=foods.find(f=>f.x===head.x&&f.y===head.y);if(food){if(food.index===current){score+=10;wrongSinceCorrect=0;feedback('CORRECT! +10');current++;if(current>=pairs.length){current=0;round++;feedback('ROUND '+round+' COMPLETE!')}newQuestion()}else{snake.pop();lives--;wrongSinceCorrect++;feedback('NOPE! Wrong translation.',true);if(lives<=0){updateHud();end();return}if(wrongSinceCorrect>=3){wrongSinceCorrect=0;feedback('Try again! Find the correct word.')}fillFoods();updateHud()}}else snake.pop();draw()}
+function turn(x,y){if(!playing||paused)return;if(direction.x===-x&&direction.y===-y)return;nextDirection={x,y}}
+function draw(){ctx.fillStyle='#0d1736';ctx.fillRect(0,0,960,560);ctx.strokeStyle='#1a2b51';ctx.lineWidth=1;for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*SIZE,0);ctx.lineTo(x*SIZE,560);ctx.stroke()}for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*SIZE);ctx.lineTo(960,y*SIZE);ctx.stroke()}for(const f of foods){ctx.fillStyle='#f6d66b';ctx.fillRect(f.x*SIZE+2,f.y*SIZE+2,SIZE-4,SIZE-4);ctx.fillStyle='#132044';ctx.font='bold 11px Courier New';ctx.textAlign='center';const word=pairs[f.index]?.[0]||'';const chunks=word.length>10?[word.slice(0,10),word.slice(10,20)]:[word];chunks.forEach((t,i)=>ctx.fillText(t,f.x*SIZE+SIZE/2,f.y*SIZE+19+i*12))}snake.forEach((p,i)=>{ctx.fillStyle=i===0?'#b6ff74':'#5fdb67';ctx.fillRect(p.x*SIZE+2,p.y*SIZE+2,SIZE-4,SIZE-4);if(i===0){ctx.fillStyle='#16243b';ctx.fillRect(p.x*SIZE+10,p.y*SIZE+11,5,5);ctx.fillRect(p.x*SIZE+25,p.y*SIZE+11,5,5)}});if(paused){ctx.fillStyle='#101a39c9';ctx.fillRect(0,0,960,560);ctx.fillStyle='#ffe17a';ctx.font='bold 52px Courier New';ctx.textAlign='center';ctx.fillText('PAUSED',480,285)}}
+function stop(){clearInterval(timer);timer=null;playing=false;paused=false}
+const adapter=registerGame({id:'word-snake',capabilities:{vocabulary:true,pronunciation:true,sharing:true},start({vocabulary,locale:language,pronounce}){if(!vocabulary?.pairs||vocabulary.pairs.length<5)throw Error('Five pairs required');pairs=vocabulary.pairs.map(p=>[String(p[0]),String(p[1])]);locale=language;contextPronounce=pronounce;root.hidden=true;root.style.display='none';screen.hidden=false;restart()},pause(){paused=true;draw()},resume(){paused=false;draw()},reset(){stop();screen.hidden=true;root.hidden=false;root.style.display='';$('overlay').textContent=''}});
+const services={game:{start:async data=>{adapter.reset();return adapter.start(data)}},voice,sharing};
+const options={gameTitle:'WORD SNAKE',instructions:'Steer with arrows or WASD. Collect the correct target-language translation of the English prompt. Wrong answers cost lives. P pauses; edges wrap.',categories,initialText:categories['de-DE'].Basics.map(p=>p.join('\t')).join('\n'),language:'de-DE',minPlayPairs:5,canonicalGameUrl:'https://boringteacher.com/word-snake/core-v1/'};
+const setId=readStudentSetId(location.href);if(setId)mountStudentMenu(root,services,{...options,setId});else mountTeacherMenu(root,services,options);
+$('pause').onclick=()=>{if(!playing)return;paused=!paused;$('pause').textContent=paused?'RESUME (P)':'PAUSE (P)';draw()};
+$('restart').onclick=()=>{if(pairs.length)restart()};
+$('back').onclick=()=>adapter.reset();
+$('repeat').onclick=say;
+$('fullscreen').onclick=()=>screen.requestFullscreen?.();
+const dirs={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+window.addEventListener('keydown',e=>{if(screen.hidden)return;const k=e.key.length===1?e.key.toLowerCase():e.key;if(dirs[k]){e.preventDefault();turn(...dirs[k])}else if(k==='p'&&!e.repeat){e.preventDefault();$('pause').click()}});
+document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>{const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};turn(...d[b.dataset.dir])});
+draw();
+</script></body></html>
