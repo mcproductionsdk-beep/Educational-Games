@@ -3,7 +3,7 @@
 <title>Matching Columns — Boring Teacher</title>
 <link rel="stylesheet" href="./styles/menu.css">
 <style>html,body{overflow:hidden}body{margin:0;background:#10192e;color:#f8f8ff;font-family:"Courier New",monospace}#matchingFrame{display:none;width:100%;height:calc(100dvh - 12px);min-height:600px;border:0;background:#16264e}#matchingFrame.playing{display:block}#app{max-width:1100px;margin:8px auto}#app[hidden]{display:none!important}body:has(#matchingFrame.playing) #app{display:none!important}</style></head>
-<body><main id="app" style="padding:18px;text-align:center">Loading Matching Columns V1.6…</main><iframe id="matchingFrame" title="Word Matching Columns gameplay" src="./matching-game.html?release=matching-core-v16-website-5"></iframe>
+<body><div id="bt-deploy-audit" style="position:fixed;z-index:2147483647;top:0;left:0;right:0;background:#ffe45c;color:#111;padding:12px;font:900 15px monospace;text-align:center">MATCHING V1.6 — DEPLOYMENT AUDIT 2026-10-20</div><main id="app" style="padding:18px;text-align:center">Loading Matching Columns V1.6…</main><iframe id="matchingFrame" title="Word Matching Columns gameplay" src="./matching-game.html?release=matching-core-v16-website-5"></iframe>
 <script>window.addEventListener("error",function(e){const r=document.getElementById("app");if(r&&!r.textContent.trim())r.textContent="Unable to load the game menu: "+(e.message||"unknown error")});window.addEventListener("unhandledrejection",function(e){const r=document.getElementById("app");if(r&&!r.textContent.trim())r.textContent="Menu error: "+String(e.reason||"unknown")});</script>
 <script type="module">
 const root=document.getElementById('app');
