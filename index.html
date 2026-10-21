@@ -22,7 +22,9 @@ h3{margin:0 0 5px;font-size:16px;text-transform:uppercase}.desc{font-size:11px;f
 .sentence-section{background:#17243a;border:3px solid #3b5573;border-radius:12px;padding:15px 17px 18px;box-shadow:4px 4px 0 #102744}
 .sentence-section .section-title{color:#a5f3fc;text-shadow:none;letter-spacing:1px}
 .sentence-section .section-title:after{height:2px;background:#496482;box-shadow:none}
-.sentence-section .grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.sentence-section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:850px){.sentence-section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.sentence-section .grid{grid-template-columns:1fr}}
 .sentence-section .card{background:#20314b;border:2px solid #496482;border-radius:8px;box-shadow:none;color:#f5f7ff;min-height:160px}
 .sentence-section .card:hover{background:#283d59;transform:translateY(-2px);box-shadow:0 5px 0 #102033}
 .sentence-section .icon,.sentence-section .card:nth-child(n) .icon{background:#0c1627;border:1px solid #55708e;border-radius:6px;box-shadow:none}
