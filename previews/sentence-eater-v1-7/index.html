@@ -29,6 +29,7 @@ const base=[
 '#.###.#####.###.#.###.#####.###.#',
 '#...............#...............#',
 '#################################'];
+let LIB={};
 let sentences=[['I eat an apple.','Yo como una manzana'],['She drinks water.','Ella bebe agua'],['We live in Denmark.','Nosotros vivimos en Dinamarca'],['They study Spanish.','Ellos estudian español'],['He has a dog.','Él tiene un perro'],['I read a book.','Yo leo un libro'],['We go to school.','Nosotros vamos a la escuela'],['My sister sings well.','Mi hermana canta bien'],['I want some coffee.','Yo quiero un café'],['The cat sleeps here.','El gato duerme aquí']];
 const C=33,R=19,S=32,cv=document.querySelector('#game'),ctx=cv.getContext('2d');let maze=[],dots=new Set(),pellets=new Set(),player,ghosts=[],sentence=0,word=0,score=0,lives=3,mazeNum=1,freeze=0,invuln=0,paused=false,over=false,sound=true,last=0,acc=0,ghostAcc=0,messageTimer=0,transition=0,blocked=0,collectionFreeze=0,wordFlash='',wordFlashTimer=0,respawnGhost=null,mazeFade=0,flashAge=0,flashDuration=0;let keys={};let heldDirections=[];let currentLanguage='es-ES';let boostHeld=false;let completionToken=0,completionFallback=null;const $=id=>document.getElementById(id),dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}],pick=a=>a[Math.random()*a.length|0],words=()=>sentences[sentence%sentences.length][1].split(/\s+/),valid=(x,y)=>y>=0&&y<R&&x>=0&&x<C&&maze[y][x]!=='#',key=(x,y)=>x+','+y;
 function layout(){let offset=(mazeNum-1)%4;maze=base.map(r=>r.split(''));if(offset){for(let y=2;y<R-2;y++)for(let x=2;x<C-2;x++){if((x+y+offset*3)%17===0&&maze[y][x]==='#'&&validBase(x-1,y)&&validBase(x+1,y))maze[y][x]='.'}}// The central sentence chamber is solid and never contains dots, ghosts or the player.
@@ -163,7 +164,6 @@ window.addEventListener('blur',()=>{keys={};heldDirections=[];boostHeld=false;})
 function toggle(){if(over)return;paused=!paused;$('pause').textContent=paused?'▶ RESUME':'Ⅱ PAUSE'}$('pause').onclick=toggle;$('restart').onclick=restart;$('again').onclick=restart;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'♫ SOUND ON':'♫ SOUND OFF';if(!sound&&'speechSynthesis'in window){speechSynthesis.cancel();if(transition>10)finishSentenceSpeech(completionToken)}};restart();requestAnimationFrame(frame);
 // Sentence menu preview adapter. API pair order: [target-language, English].
 const STAGING_API='https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
-let LIB={};
 // Load canonical V1.7 candidate JSON directly, rather than scraping Sentence Invaders HTML.
 const V17_URL='https://raw.githubusercontent.com/mcproductionsdk-beep/Educational-Games/content/sentence-library-v1-7-editorial/libraries/sentences/v1.7-candidate.json';
 let libraryReady=false;
