@@ -6,6 +6,32 @@ body.menu-open{overflow:auto;display:block}body.menu-open #app,body.menu-open #o
 #teacherMenu{display:none;max-width:960px;margin:18px auto;padding:14px;background:#17243a;border:2px solid #3b5573;border-radius:12px;color:#f5f7ff;font-family:ui-monospace,Consolas,'Courier New',monospace}
 body.menu-open #teacherMenu{display:block}
 #teacherMenu h1{color:#a5f3fc;font-size:24px;margin:0 0 8px}#teacherMenu h2{font-size:15px;margin:0 0 8px}#teacherMenu p{color:#b9d4e8;font-size:12px;line-height:1.4}#teacherMenu .columns{display:grid;grid-template-columns:1fr 1.2fr;gap:12px}#teacherMenu .panel{background:#20314b;border:2px solid #496482;border-radius:8px;padding:12px}#teacherMenu label{display:block;font-size:12px;margin:10px 0 4px;color:#b9d4e8}#teacherMenu select,#teacherMenu input,#teacherMenu textarea{width:100%;background:#0c1627;color:white;border:1px solid #55708e;border-radius:5px;padding:9px;font:13px monospace}#teacherMenu textarea{height:155px;resize:vertical}#teacherMenu button{background:#243a55;border:1px solid #6486a8;margin:6px 6px 3px 0;padding:9px 12px}#teacherMenu button.primary{background:#167c77;border-color:#6ee7b7}#teacherMenu .mini{font-size:12px;color:#b9d4e8;line-height:1.4;margin:6px 0}#teacherMenu #menuError{color:#ffd47b;white-space:pre-wrap}#teacherMenu #shareResult a{color:#a5f3fc;overflow-wrap:anywhere}#teacherMenu.student-mode .teacher-only{display:none!important}#teacherMenu.student-mode .columns{grid-template-columns:1fr}#teacherMenu.student-mode #studentPanel{display:block}#studentPanel{display:none}#menuReturn{display:none}body:not(.menu-open) #menuReturn{display:inline-block}@media(max-width:650px){#teacherMenu .columns{grid-template-columns:1fr}#teacherMenu{margin:6px;padding:10px}}
+
+/* Unified compact sentence-game menu preview — gameplay CSS untouched */
+body.menu-open{background:#080e1b;font-weight:400}
+#teacherMenu{width:min(932px,calc(100vw - 24px));max-width:932px;margin:12px auto;padding:12px 14px}
+#teacherMenu h1{font-size:22px;margin:0 0 3px}
+#teacherMenu h2{font-size:15px;margin:0 0 5px}
+#teacherMenu p{font-size:11px;line-height:1.3;margin:5px 0;font-weight:400}
+#teacherMenu .columns{gap:9px}
+#teacherMenu .panel{padding:10px 11px}
+#teacherMenu label{font-size:11px;margin:7px 0 3px}
+#teacherMenu select,#teacherMenu input{padding:7px 8px}
+#teacherMenu textarea{height:112px;padding:7px 8px}
+#teacherMenu button{padding:8px 11px;margin:7px 6px 3px 0;font-size:12px}
+#teacherMenu .mini{font-size:11px;line-height:1.3;margin:5px 0}
+#teacherMenu details{margin-top:7px;font-size:12px;font-weight:400;color:#b9d4e8}
+#teacherMenu details summary{cursor:pointer}
+#teacherMenu #setTitle{padding:5px 8px}
+#teacherMenu #playBuilt,#teacherMenu #playCustom,#teacherMenu #useCustom,#teacherMenu #playStudent{background:#167c77;border-color:#6ee7b7}
+@media(max-width:650px){#teacherMenu{width:auto;margin:6px;padding:10px}#teacherMenu .panel{padding:9px}}
+
+/* Unified menu: center teacher menu vertically, without affecting gameplay */
+body.menu-open{min-height:100dvh;display:flex;align-items:center;justify-content:center}
+body.menu-open #teacherMenu{flex:0 1 932px;margin:12px auto}
+#teacherMenu #playBuilt{min-width:135px;margin-top:12px}
+@media(max-height:660px){body.menu-open{display:block}body.menu-open #teacherMenu{margin:12px auto}}
+@media(max-width:650px){body.menu-open{display:block}body.menu-open #teacherMenu{margin:6px}}
 </style></head><body><section id="teacherMenu"><h1>SENTENCE EATER</h1><p>Choose a language and grammar topic, or paste your own English → target-language sentences.</p><div class="columns"><div class="panel"><h2>GAME SETTINGS</h2><div class="teacher-only"><label for="language">LANGUAGE</label><select id="language"><option value="es-ES">🇪🇸 Spanish</option><option value="de-DE">🇩🇪 German</option><option value="da-DK">🇩🇰 Danish</option><option value="fr-FR">🇫🇷 French</option><option value="it-IT">🇮🇹 Italian</option></select><label for="topic">TOPICS</label><select id="topic"></select><p id="bankInfo" class="mini"></p></div><p id="voiceStatus" class="mini">VOICE: Device speech</p><button id="testVoice">🔊 TEST VOICE</button><div class="teacher-only"><button id="playBuilt" class="primary">▶ PLAY</button></div><div id="studentPanel"><p id="studentInfo"></p><button id="playStudent" class="primary" disabled>▶ PLAY SENTENCES</button></div><details><summary>▶ HOW TO PLAY</summary><p>Hold ARROWS or WASD to move through the maze. Collect the correct word ghosts in sentence order. Wrong ghosts cost lives; power pellets freeze ghosts. Pause with P.</p></details></div><div class="panel teacher-only"><h2>YOUR SENTENCES</h2><label for="setTitle">NAME YOUR SENTENCE SET</label><input id="setTitle" type="text" maxlength="100" placeholder="e.g. German Articles and Gender — M2" autocomplete="off"><label for="custom">YOUR SENTENCES · English [TAB] Translation</label><textarea id="custom" placeholder="I eat bread[TAB]Como pan"></textarea><p class="mini">Paste two-column pairs, one pair per line separated by a tab or |. At least 2 sentences for custom mode. Built-in topics use the V1.7 candidate library; no generated contextual variations.</p><button id="swap">⇄ SWAP SIDES</button><p id="previewCount" class="mini"></p><button id="share">🔗 SHARE WITH STUDENTS</button><button id="playCustom" class="primary">▶ PLAY CUSTOM SENTENCES</button><div id="shareResult" class="mini"></div></div></div><p id="menuError" role="status"></p></section><div id="app"><header class="hud"><div class="title">◉ SENTENCE EATER</div><div class="stats"><span id="score">SCORE 0000</span> · <span id="lives">♥ ♥ ♥</span></div><div class="controls"><button id="menuReturn">MENU</button><button id="restart">↻ RESTART</button><button id="pause">Ⅱ PAUSE</button><button id="sound">♫ SOUND ON</button></div></header><div class="slots" id="slots" aria-hidden="true"></div><div class="frame"><canvas id="game" width="1056" height="608"></canvas></div><div class="prompt" id="prompt">I eat an apple.</div><footer class="bottom"><span id="progress">MAZE 1 · SENTENCE 1</span><span class="msg" id="msg">ARROWS / WASD · COLLECT WORDS IN ORDER</span></footer></div><div id="overlay"><div class="modal"><h2 id="overlayTitle">GAME OVER</h2><p id="overlayText"></p><button id="again">↻ RESTART GAME</button></div></div>
 <script>
 (()=>{'use strict';
