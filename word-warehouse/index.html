@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Word Warehouse — Boring Teacher</title>
-<link rel="stylesheet" href="./styles/menu.css">
+<link rel="stylesheet" href="./styles/menu.css?release=warehouse-student-grid-20261023c">
 <style>html,body{overflow-x:hidden}html{overflow-y:auto}body{overflow-y:auto;margin:0;background:#10192e;color:#f8f8ff;font-family:"Courier New",monospace}#warehouseFrame{display:none;width:100%;height:calc(100dvh - 12px);min-height:600px;border:0;background:#16264e}#warehouseFrame.playing{display:block}#app{max-width:1100px;margin:8px auto}#app[hidden]{display:none!important}body:has(#warehouseFrame.playing) #app{display:none!important}</style></head>
-<body><main id="app"></main><iframe id="warehouseFrame" title="Word Word Warehouse gameplay" src="./game-multilingual-v2.html"></iframe>
+<body><main id="app"></main><iframe id="warehouseFrame" title="Word Warehouse gameplay" src="./game-multilingual-v2.html"></iframe>
 <script type="module">
-import {mountTeacherMenu,mountStudentMenu} from './core/menu.js?release=matching-multilingual-v2-20261023b';
+import {mountTeacherMenu,mountStudentMenu} from './core/menu.js?release=warehouse-student-grid-20261023c';
 import {createSharingClient,readStudentSetId} from './core/sharing.js?release=matching-v2-20261023b';
 import {createVoiceService} from './core/voice.js';
 import {WAREHOUSE_CATEGORIES} from './core/warehouse-categories.js';
