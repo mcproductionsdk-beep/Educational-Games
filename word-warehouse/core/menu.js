@@ -86,7 +86,7 @@ export function mountStudentMenu(root,services,options={}){
     link.append(image,label);grid.append(link);
   }
   card.append(headingGames,grid);
-  const updateGameLinks=id=>{for(const link of grid.querySelectorAll("a")){const url=new URL(link.href);url.hash="set="+encodeURIComponent(id);link.href=url.toString();}};
+  const updateGameLinks=id=>{for(const link of grid.querySelectorAll("a")){const url=new URL(link.href);url.hash="set="+encodeURIComponent(id);url.searchParams.set("autoplay","1");link.href=url.toString();}};
   grid.hidden=true;
   return{destroy(){abort.abort();clean();}};
 }
