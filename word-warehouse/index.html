@@ -11,6 +11,10 @@ import {createVoiceService} from './core/voice.js';
 import {WAREHOUSE_CATEGORIES} from './core/warehouse-categories.js';
 import {LANGUAGE_OPTIONS,categoriesForPair} from './core/multilingual-vocabulary-v2.js?release=matching-v2-20261023b';
 const root=document.getElementById('app'),frame=document.getElementById('warehouseFrame');
+// Production routing: keep the approved landscape desktop engine unchanged.
+// Phones in portrait receive the separately validated touch/portrait engine.
+const mobilePortrait=matchMedia('(pointer:coarse) and (max-width: 700px) and (orientation: portrait)').matches;
+frame.src=mobilePortrait?'./mobile-preview.html?release=warehouse-mobile-approved-20261023':'./game-multilingual-v2.html?release=warehouse-delivery-fit-20261023';
 const sharing=createSharingClient({apiBaseUrl:'https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev'});
 const voice=createVoiceService();let menu=null,ready=false,pending=null,playing=false,startWatchdog=null;
 const options={title:'WORD WAREHOUSE',instructions:'Arrows or WASD to move; SPACE to pick up a brick; deliver it to the matching translation box.',categories:WAREHOUSE_CATEGORIES,defaultCategory:'Animals',defaultText:'',defaultPromptLanguage:'en-US',defaultLanguage:'es-ES',previewGameUrl:location.href,onPlay:start};
