@@ -1,44 +1,30 @@
-/** Boring Teacher Core — vocabulary primitives. No DOM, network or gameplay. */
+// BoringTeacher Core V1 — vocabulary primitives.
+// Pair order is deliberately preserved. No automatic translation or reversal.
 export function parsePairs(text) {
-  if (typeof text !== 'string') throw new TypeError('Vocabulary input must be text.');
   const pairs = [], rejectedLines = [];
-  text.replace(/\r\n?/g, '\n').split('\n').forEach((line, index) => {
+  String(text ?? "").split(/\r?\n/).forEach((line, index) => {
     if (!line.trim()) return;
-    const fields = line.split('\t');
-    const target = fields.slice(1).join('\t').trim();
-    if (fields.length < 2 || !fields[0].trim() || !target) {
-      rejectedLines.push(index + 1);
-      return;
+    const columns = line.split("\t");
+    if (columns.length !== 2 || !columns[0].trim() || !columns[1].trim()) {
+      rejectedLines.push(index + 1); return;
     }
-    pairs.push([fields[0].trim(), target]);
+    pairs.push([columns[0].trim(), columns[1].trim()]);
   });
   return { pairs, rejectedLines };
 }
-export function validateSet(set, opts = {}) {
-  const invalid = message => ({ ok: false, error: { code: 'VALIDATION', message } });
-  const minPairs = opts.minPairs ?? 5;
-  if (!Number.isSafeInteger(minPairs) || minPairs < 0) return invalid('Minimum pair count must be a nonnegative integer.');
-  if (!set || typeof set !== 'object' || Array.isArray(set)) return invalid('Vocabulary set is invalid.');
-  if (typeof set.title !== 'string' || !set.title.trim()) return invalid('Enter a vocabulary set title.');
-  if (typeof set.language !== 'string' || !set.language.trim()) return invalid('Choose a language.');
-  if (!Array.isArray(set.pairs)) return invalid('Vocabulary pairs must be a list.');
-  const pairs = [];
-  for (let i = 0; i < set.pairs.length; i++) {
-    const pair = set.pairs[i];
-    if (!Array.isArray(pair) || pair.length !== 2 || pair.some(s => typeof s !== 'string' || !s.trim())) {
-      return invalid(`Vocabulary pair ${i + 1} must contain a prompt and a target.`);
-    }
-    pairs.push([pair[0].trim(), pair[1].trim()]);
-  }
-  if (pairs.length < minPairs) return invalid(`Enter at least ${minPairs} valid vocabulary pairs.`);
-  return { ok: true, value: { title: set.title.trim(), language: set.language.trim(), pairs } };
-}
 export function swapPairs(pairs) {
-  if (!Array.isArray(pairs)) throw new TypeError('Vocabulary pairs must be a list.');
-  return pairs.map((pair, i) => {
-    if (!Array.isArray(pair) || pair.length !== 2 || pair.some(s => typeof s !== 'string')) {
-      throw new TypeError(`Invalid vocabulary pair at index ${i}.`);
-    }
-    return [pair[1], pair[0]];
-  });
+  return pairs.map(([prompt, target]) => [target, prompt]);
+}
+export function validateSet(set, { minPairs = 5 } = {}) {
+  const fail = message => ({ ok: false, error: { code: "VALIDATION", message } });
+  if (!set || typeof set !== "object") return fail("Missing vocabulary set.");
+  if (typeof set.title !== "string" || !set.title.trim()) return fail("Enter a set title.");
+  if (typeof set.language !== "string" || !set.language.trim()) return fail("Choose a language.");
+  if (!Array.isArray(set.pairs) || set.pairs.length < minPairs) return fail(`At least ${minPairs} pairs are required.`);
+  if (!set.pairs.every(p => Array.isArray(p) && p.length === 2 && p.every(v => typeof v === "string" && v.trim()))) {
+    return fail("Each pair must contain two nonempty text values.");
+  }
+  const promptLanguage=typeof set.promptLanguage==="string"&&set.promptLanguage.trim()?set.promptLanguage.trim():"en-US";
+  if(promptLanguage===set.language.trim())return fail("Prompt and target languages must differ.");
+  return { ok: true, value: { title: set.title.trim(), language: set.language.trim(), promptLanguage, pairs: set.pairs.map(p => p.map(v => v.trim())) } };
 }
