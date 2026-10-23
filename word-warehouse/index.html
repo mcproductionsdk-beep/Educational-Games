@@ -5,7 +5,7 @@
 <style>html,body{overflow-x:hidden}html{overflow-y:auto}body{overflow-y:auto;margin:0;background:#10192e;color:#f8f8ff;font-family:"Courier New",monospace}#warehouseFrame{display:none;width:100%;height:calc(100dvh - 12px);min-height:600px;border:0;background:#16264e}#warehouseFrame.playing{display:block}#app{max-width:1100px;margin:8px auto}#app[hidden]{display:none!important}body:has(#warehouseFrame.playing) #app{display:none!important}</style></head>
 <body><main id="app"></main><iframe id="warehouseFrame" title="Word Warehouse gameplay" src="./game-multilingual-v2.html"></iframe>
 <script type="module">
-import {mountTeacherMenu,mountStudentMenu} from './core/menu.js?release=warehouse-student-grid-20261023c';
+import {mountTeacherMenu,mountStudentMenu} from './core/menu.js?release=warehouse-student-autoplay-20261023e';
 import {createSharingClient,readStudentSetId} from './core/sharing.js?release=matching-v2-20261023b';
 import {createVoiceService} from './core/voice.js';
 import {WAREHOUSE_CATEGORIES} from './core/warehouse-categories.js';
