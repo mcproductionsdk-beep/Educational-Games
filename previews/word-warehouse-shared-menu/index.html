@@ -17,6 +17,24 @@ textarea{height:295px;min-height:220px;font-size:16px;line-height:1.35}
 #menu .row button{flex:1 1 auto;min-height:62px;white-space:normal}
 #menu #preview{margin-top:16px}
 @media(max-width:800px){.cols{grid-template-columns:1fr}.wrap{padding:8px 12px}textarea{height:240px}h1{font-size:28px}}
+
+/* V1.4 aligned teacher menu geometry — measured from published Word Racer/Invaders/Frog */
+body{font-family:"Courier New",monospace;font-size:14px;font-weight:700}
+.wrap{width:min(1120px,calc(100vw - 12px));max-width:none;margin:6px auto;padding:10px}
+h1{font:900 clamp(27px,4vw,44px) "Courier New",monospace;letter-spacing:4px;margin:4px auto 18px;text-align:center}
+#menu .cols{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:12px;align-items:start}
+#menu .panel{padding:12px;min-width:0}
+#menu h2{font-size:18px;margin:0 0 8px}
+#menu label{font:900 12px "Courier New",monospace;text-transform:uppercase;margin:12px 0 5px}
+#menu select{min-height:48px;padding:9px;font-size:14px}
+#menu textarea{height:min(38vh,285px);min-height:180px;padding:9px;font:700 14px "Courier New",monospace;line-height:1.4}
+#menu .muted{font-size:13px;line-height:1.4}
+#menu .panel:first-child #testVoice{width:100%;min-height:48px;margin:8px 0 12px}
+#menu .row{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+#menu .row button{flex:1 1 130px;min-height:48px;font:900 14px "Courier New",monospace;padding:10px}
+#menu #shareStudentLink{flex:2 1 190px}
+#menu #preview{font-size:12px;margin:8px 0}
+@media(max-width:760px){#menu .cols{grid-template-columns:1fr;gap:10px}#menu textarea{height:34vh;min-height:210px;font-size:16px}#menu select{font-size:16px}#menu .row button{min-height:56px}}
 </style></head><body><h1>WORD WAREHOUSE</h1><main class="wrap">
 <section id="menu"><div class="cols"><div class="panel"><h2>TEACHER · GAME SETTINGS</h2><label>Target language</label><select id="lang"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="en-US">English</option></select><label>Category</label><select id="category"><option value="custom">Custom vocabulary</option></select><p class="muted">Move with arrow keys or WASD. Press SPACE near the central brick, then walk into the correct English box. Deliver eight words per round; positions shuffle each round. No countdown!</p><button id="testVoice">🔊 TEST VOICE</button><details><summary>HOW TO PLAY</summary><p class="muted">The stopwatch runs while you play. Wrong deliveries send the brick back to the middle and add a mistake. Press P to pause.</p></details></div>
 <div class="panel"><h2>PASTE QUIZLET WORDS</h2><p class="muted">Paste English and target-language word pairs separated by TAB, one pair per line.</p><textarea id="words"></textarea><div class="row"><button id="swap">⇄ SWAP SIDES</button><button id="shareStudentLink">🔗 SHARE WITH STUDENTS</button><button id="play">▶ PLAY</button></div><p id="preview" class="muted"></p><p id="status" role="status"></p><div id="link"></div><button id="copyLink" type="button" hidden>📋 COPY LINK</button><p id="copyStatus" class="muted" role="status" hidden></p></div></div></section>
