@@ -1,20 +1,16 @@
-/** Approved Master Menu V1.1 locale inventory; display order preserved. */
+// Inventory pending confirmation against the approved menu.
 const LANGUAGES = Object.freeze([
-  Object.freeze({ locale: 'de-DE', label: 'German' }),
-  Object.freeze({ locale: 'es-ES', label: 'Spanish' }),
-  Object.freeze({ locale: 'da-DK', label: 'Danish' }),
-  Object.freeze({ locale: 'en-US', label: 'English' }),
+  { locale: "es-ES", label: "Spanish" },
+  { locale: "de-DE", label: "German" },
+  { locale: "da-DK", label: "Danish" },
+  { locale: "en-US", label: "English" },
+  { locale: "fr-FR", label: "French" },
+  { locale: "it-IT", label: "Italian" }
 ]);
 export function normalizeLocale(value) {
-  if (typeof value !== 'string' || !value.trim()) return '';
-  const candidate = value.trim().replace(/_/g, '-');
-  try { return Intl.getCanonicalLocales(candidate)[0] || ''; }
-  catch (error) { if (error instanceof RangeError) return ''; throw error; }
+  const raw = String(value ?? "").trim().replace(/_/g, "-");
+  const match = LANGUAGES.find(x => x.locale.toLowerCase() === raw.toLowerCase());
+  return match?.locale ?? raw;
 }
-export function getSupportedLanguages() {
-  return LANGUAGES.map(({ locale, label }) => ({ locale, label }));
-}
-export function isSupportedLocale(value) {
-  const normalized = normalizeLocale(value);
-  return LANGUAGES.some(({ locale }) => locale === normalized);
-}
+export function getSupportedLanguages() { return LANGUAGES.map(x => ({ ...x })); }
+export function isSupportedLocale(value) { return LANGUAGES.some(x => x.locale === normalizeLocale(value)); }
