@@ -84,7 +84,7 @@ let voices=[],state=null,raf=0,last=0,source=null;function voiceFor(lang){return
 
 const LIBRARY_URL='https://raw.githubusercontent.com/mcproductionsdk-beep/Educational-Games/content/sentence-library-v1-7-editorial/libraries/sentences/v1.7-candidate.json';
 const SENTENCE_API='https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
-const SHARE_BASE='https://boringteacher.com/sentence-warehouse/';
+const SHARE_BASE='https://boringteacher.com/sentence-games/';
 const LOCALES=['es-ES','de-DE','da-DK','fr-FR','it-IT'];
 let grammarLibrary=null,studentSet=null,studentPairs=null,studentMode=false,libraryReady=false;
 const validPairs=p=>Array.isArray(p)&&p.length>=2&&p.length<=100&&p.every(x=>Array.isArray(x)&&x.length===2&&x.every(t=>typeof t==='string'&&t.trim()&&t.length<=1000));
