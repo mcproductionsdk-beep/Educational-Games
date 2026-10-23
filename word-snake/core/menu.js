@@ -1,206 +1,80 @@
-import { parsePairs, validateSet, swapPairs } from './vocabulary.js';
-import { getSupportedLanguages } from './languages.js';
-import { buildStudentUrl, readStudentSetId } from './sharing.js';
-
-const el = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-};
-const button = (text, className, id) => {
-  const node = el('button', className, text);
-  node.type = 'button';
-  if (id) node.id = id;
-  return node;
-};
-const paragraph = (text, className) => el('p', className, text);
-function assertRoot(root) {
-  if (!root || typeof root.replaceChildren !== 'function') throw new TypeError('A DOM root is required.');
+import { parsePairs, swapPairs, validateSet } from "./vocabulary.js";
+import { getSupportedLanguages } from "./languages.js";
+import { buildStudentUrl, readStudentSetId } from "./sharing.js";
+const el=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;};
+const add=(parent,...children)=>{parent.append(...children);return parent;};
+const button=(text,cls="")=>{const b=el("button",cls,text);b.type="button";return b;};
+function details(help){const d=el("details","teacherHowTo"),s=el("summary","", "▶ HOW TO PLAY");add(d,s,el("div","",help));return d;}
+const APPROVED_MENU = "<div id=\"studentIntro\" hidden></div>\n<div class=\"teacherMenu warehouseCols\">\n  <div class=\"card settingsCard warehousePanel\">\n    <h2>TEACHER · GAME SETTINGS</h2>\n    <label class=\"fieldLabel\" for=\"promptLanguage\">Prompt language</label>\n    <select id=\"promptLanguage\"></select>\n    <label class=\"fieldLabel\" for=\"language\">Target language</label>\n    <select id=\"language\"></select>\n    <label class=\"fieldLabel\" for=\"category\">Category</label>\n    <select id=\"category\"></select>\n    <p class=\"help\">Choose a vocabulary category or paste your own word pairs.</p>\n    <div id=\"voiceCheck\" class=\"preview\">VOICE: ready to test</div>\n    <button id=\"testVoice\" class=\"menuButton\" type=\"button\">🔊 TEST VOICE</button>\n    <details class=\"teacherHowTo\"><summary>HOW TO PLAY</summary><div>Select the correct translation. Each correct answer earns one point.</div></details>\n  </div>\n  <div class=\"card vocabCard warehousePanel\">\n    <h2>PASTE QUIZLET WORDS</h2>\n    <p class=\"help\">Paste target-language words and prompt-language translations separated by TAB, one pair per line.</p>\n    <textarea id=\"words\"></textarea>\n    <div class=\"warehouseActions\">\n      <button id=\"swap\" type=\"button\">⇄ SWAP SIDES</button>\n      <button id=\"shareStudentLink\" type=\"button\">🔗 SHARE WITH STUDENTS</button>\n      <button id=\"play\" class=\"primary\" type=\"button\">▶ PLAY</button>\n    </div>\n    <div id=\"preview\" class=\"preview\"></div>\n    <div id=\"error\" class=\"error\"></div>\n    <div id=\"shareStatus\" class=\"stepHint\">Creates a student link for the vocabulary shown above.</div>\n  </div>\n</div>";
+function shell(root,title){root.replaceChildren();root.classList.add("bt-core");const logo=el("div","bt-logo",title);root.append(logo);return()=>{root.replaceChildren();root.classList.remove("bt-core");};}
+export function mountTeacherMenu(root,services,options={}){
+  const clean=shell(root,options.title??"BORING TEACHER");
+  const abort=new AbortController(),signal=abort.signal;
+  // Preserve the complete approved Word Racer menu markup and IDs; bind Core services below.
+  const menuSection=el("section");menuSection.id="menu";menuSection.className="screen active";menuSection.innerHTML=APPROVED_MENU;
+  root.append(menuSection);
+  const byId=id=>menuSection.querySelector("#"+id);
+  const promptLang=byId("promptLanguage"),lang=byId("language"),category=byId("category"),words=byId("words"),preview=byId("preview"),error=byId("error"),voiceStatus=byId("voiceCheck");
+  const testVoice=byId("testVoice"),swap=byId("swap"),share=byId("shareStudentLink"),play=byId("play"),shareStatus=byId("shareStatus");
+  const title={value:options.defaultSetTitle??"My vocabulary"};
+  const titleInput=el("input","setTitleInput");titleInput.id="setTitle";titleInput.type="text";titleInput.maxLength=100;titleInput.placeholder="e.g. Unit 3 – My Family";titleInput.value=title.value;
+  const titleLabel=el("label","fieldLabel","Vocabulary list name");titleLabel.htmlFor="setTitle";words.before(titleLabel,titleInput);
+  let customTitle=title.value;
+  function setTitleFromCategory(){if(category.value){titleInput.value=category.value;}else{titleInput.value=customTitle;}title.value=titleInput.value.trim();}
+  titleInput.addEventListener("input",()=>{shareStatus.textContent="Creates a student link for the vocabulary shown above.";title.value=titleInput.value.trim();if(!category.value)customTitle=titleInput.value;},{signal});
+  menuSection.querySelector(".teacherHowTo div").textContent=options.instructions??"Select the correct translation.";
+  const cats=options.categories??{};
+  const multilingual=Boolean(options.multilingualLibrary&&options.getCategoriesForPair);
+  const languageOptions=options.languageOptions??getSupportedLanguages();
+  const pairCategories=()=>multilingual?options.getCategoriesForPair(promptLang.value,lang.value):(cats[lang.value]??{});
+  function excludeSame(){for(const opt of lang.options)opt.disabled=opt.value===promptLang.value;if(lang.value===promptLang.value)lang.value=languageOptions.find(l=>l.locale!==promptLang.value)?.locale??"";}
+  let customDraft=options.defaultText??"";
+  for(const l of languageOptions){for(const select of [promptLang,lang]){const opt=el("option","",l.label);opt.value=l.locale;select.append(opt);}}
+  promptLang.value=options.defaultPromptLanguage??"en-US";
+  lang.value=options.defaultLanguage??"es-ES";
+  if(!multilingual){promptLang.value="en-US";promptLang.disabled=true;}
+  excludeSame();
+  function setCategories(){category.replaceChildren();const custom=el("option","","Custom vocabulary");custom.value="";category.append(custom);for(const key of Object.keys(pairCategories())){const opt=el("option","",key);opt.value=key;category.append(opt);}}
+  function current(){const parsed=parsePairs(words.value);const checked=validateSet({title:title.value,language:lang.value,promptLanguage:promptLang.value,pairs:parsed.pairs},{minPairs:options.minPairs??5});return {parsed,checked};}
+  function refresh(){const {parsed}=current();preview.textContent=parsed.pairs.length+" vocabulary pairs"+(parsed.rejectedLines.length?" · Invalid lines: "+parsed.rejectedLines.join(", "):"");}
+  function loadCategory(){setTitleFromCategory();const pairs=pairCategories()[category.value];if(pairs){words.value=pairs.map(p=>p.join("\t")).join("\n");refresh();}else{words.value=customDraft;refresh();}}
+  setCategories();words.value=customDraft;const initialCategory=options.defaultCategory??Object.keys(cats[lang.value]??{})[0];if(initialCategory&&pairCategories()[initialCategory]){category.value=initialCategory;loadCategory();}else refresh();
+  function onLanguageChange(){shareStatus.textContent="Creates a student link for the vocabulary shown above.";error.textContent="";excludeSame();const wasCustom=category.value==="";const previous=category.value;setCategories();if(!wasCustom&&pairCategories()[previous]){category.value=previous;loadCategory();}else{category.value="";words.value=customDraft;setTitleFromCategory();refresh();}}
+  lang.addEventListener("change",onLanguageChange,{signal});
+  promptLang.addEventListener("change",onLanguageChange,{signal});
+  category.addEventListener("change",()=>{shareStatus.textContent="Creates a student link for the vocabulary shown above.";loadCategory();},{signal});
+  words.addEventListener("input",()=>{shareStatus.textContent="Creates a student link for the vocabulary shown above.";category.value="";customDraft=words.value;setTitleFromCategory();refresh();},{signal});
+  swap.addEventListener("click",()=>{const {parsed}=current();if(parsed.rejectedLines.length){error.textContent="Correct invalid lines before swapping.";return;}words.value=swapPairs(parsed.pairs).map(p=>p.join("\t")).join("\n");const previousPrompt=promptLang.value;promptLang.value=lang.value;lang.value=previousPrompt;excludeSame();error.textContent="";category.value="";customDraft=words.value;setTitleFromCategory();shareStatus.textContent="Creates a student link for the vocabulary shown above.";refresh();},{signal});
+  testVoice.addEventListener("click",async()=>{const examples={"es-ES":"Hola, buenos días","de-DE":"Hallo, guten Morgen","da-DK":"Hej, godmorgen","en-US":"Hello, good morning","fr-FR":"Bonjour, comment allez-vous","it-IT":"Ciao, buongiorno"};const phrase=examples[lang.value]??"Hello, good morning";voiceStatus.textContent="VOICE: testing…";try{const result=await services.voice.speak(phrase,lang.value);if(!signal.aborted)voiceStatus.textContent="VOICE: "+result.status;}catch{if(!signal.aborted)voiceStatus.textContent="VOICE: unavailable";}},{signal});
+  play.addEventListener("click",async()=>{const {parsed,checked}=current();if(parsed.rejectedLines.length||!checked.ok){error.textContent=parsed.rejectedLines.length?"Correct invalid vocabulary lines.":checked.error.message;return;}error.textContent="";await options.onPlay?.(checked.value);},{signal});
+  share.addEventListener("click",async()=>{
+    const {parsed,checked}=current();
+    if(parsed.rejectedLines.length||!checked.ok){error.textContent=parsed.rejectedLines.length?"Correct invalid vocabulary lines.":checked.error.message;return;}
+    error.textContent="";share.disabled=true;shareStatus.textContent="Saving vocabulary…";
+    try{
+      const {id}=await services.sharing.saveSet(checked.value);
+      if(signal.aborted)return;
+      const url=buildStudentUrl(options.previewGameUrl??location.href,id);
+      const link=el("a","",url);link.href=url;link.target="_blank";link.rel="noopener";
+      const copy=button("COPY LINK","yellow");
+      copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(url);copy.textContent="COPIED";}catch{copy.textContent="Select the link above to copy."; }},{signal});
+      shareStatus.replaceChildren(link,el("div","", " "),copy);
+    }catch(e){if(!signal.aborted)shareStatus.textContent=e.message??"Could not share vocabulary.";}
+    finally{if(!signal.aborted)share.disabled=false;}
+  },{signal});
+  return{destroy(){abort.abort();clean();},getCurrentSet(){const {parsed,checked}=current();return parsed.rejectedLines.length||!checked.ok?null:checked.value;}};
 }
-function howTo(text) {
-  const details = el('details', 'bt-howto');
-  details.append(el('summary', '', '▶ HOW TO PLAY'), paragraph(text || 'Follow the game instructions.', 'bt-howto-text'));
-  return details;
-}
-function startGame(adapter, context, status) {
-  return Promise.resolve().then(() => adapter.start(context)).catch(error => {
-    status.textContent = 'Could not start the game. Please try again.';
-    status.dataset.state = 'error';
-    return false;
-  });
-}
-function gameContext(set, services) {
-  return {
-    vocabulary: set,
-    locale: set.language,
-    pronounce: text => services.voice?.speak(text, set.language),
-  };
-}
-function resolveServices(services) {
-  if (!services?.sharing?.saveSet || !services?.sharing?.loadSet || !services?.game?.start)
-    throw new TypeError('Menu requires sharing save/load and a game adapter.');
-}
-function install(root, view, cleanup) {
-  root.replaceChildren(view);
-  return () => { cleanup(); if (root.contains(view)) root.replaceChildren(); };
-}
-export function mountTeacherMenu(root, services, options = {}) {
-  assertRoot(root); resolveServices(services);
-  const view = el('section', 'bt-menu bt-teacher');
-  const logo = el('h1', 'bt-logo', options.gameTitle || 'BORING TEACHER');
-  const columns = el('div', 'bt-teacher-columns');
-  const settings = el('section', 'bt-card bt-settings');
-  settings.append(el('h2', '', 'GAME SETTINGS'), paragraph('Choose the language and vocabulary you want to practise.', 'bt-help'));
-  const fields = el('div', 'bt-settings-fields');
-  const languageField = el('label', 'bt-field-label', 'Language');
-  const language = el('select'); language.id = 'language';
-  for (const item of getSupportedLanguages()) {
-    const option = el('option', '', item.label); option.value = item.locale; language.append(option);
-  }
-  language.value = options.language || 'de-DE';
-  languageField.append(language);
-  const categoryField = el('label', 'bt-field-label', 'Vocabulary');
-  const category = el('select'); category.id = 'category';
-  const custom = el('option', '', 'Custom / Paste your own'); custom.value = 'custom'; category.append(custom);
-  const categories = options.categories || {};
-  const populate = () => {
-    category.replaceChildren(custom);
-    const choices = categories[language.value] || {};
-    for (const name of Object.keys(choices)) {
-      const opt = el('option', '', name); opt.value = name; category.append(opt);
-    }
-    category.value = 'custom';
-  };
-  populate(); categoryField.append(category); fields.append(languageField, categoryField); settings.append(fields);
-  const voiceCheck = paragraph('', 'bt-preview'); voiceCheck.id = 'voiceCheck';
-  const updateVoice = () => {
-    const item = getSupportedLanguages().find(item => item.locale === language.value);
-    const voices = services.voice?.listVoices?.() || [];
-    const exact = voices.find(v => v.lang?.toLowerCase().replace('_','-') === language.value.toLowerCase());
-    const fallback = exact || voices.find(v => v.lang?.split('-')[0].toLowerCase() === language.value.split('-')[0]);
-    voiceCheck.textContent = 'VOICE: Device speech · ' + (item?.label || language.value) + ' · ' + (fallback?.name || 'Browser default (voice availability varies)');
-  };
-  updateVoice();
-  const testVoice = button('🔊 TEST VOICE', 'bt-button bt-yellow', 'testVoice');
-  settings.append(voiceCheck, testVoice, howTo(options.instructions));
-  const vocab = el('section', 'bt-card bt-vocabulary');
-  vocab.append(el('h2', '', 'YOUR VOCABULARY'), paragraph('Use a ready-made list above, or paste/edit your own Quizlet-style term and definition pairs.', 'bt-help'));
-  const textarea = el('textarea'); textarea.id = 'vocabularyInput'; textarea.setAttribute('aria-label', 'Vocabulary pairs'); textarea.placeholder = 'cat\tgato\ndog\tperro'; textarea.value = options.initialText || '';
-  const swap = button('⇄ SWAP SIDES', 'bt-button', 'swap');
-  const preview = paragraph('', 'bt-preview'); preview.id = 'preview';
-  const error = paragraph('', 'bt-error'); error.id = 'error'; error.setAttribute('role', 'alert');
-  const shareBlock = el('div', 'bt-share-block');
-  const share = button('🔗 SHARE WITH STUDENTS', 'bt-button bt-pink', 'shareStudentLink');
-  const shareStatus = el('div', 'bt-share-status'); shareStatus.id = 'shareStatus'; shareStatus.setAttribute('aria-live','polite');
-  shareStatus.textContent = 'Creates a permanent student link for exactly the vocabulary shown above.';
-  shareBlock.append(share, shareStatus);
-  const play = button('PLAY', 'bt-button bt-primary bt-final-play', 'play');
-  vocab.append(textarea, swap, preview, error, shareBlock, play);
-  columns.append(settings, vocab); view.append(logo, columns);
-  let destroyed = false, revision = 0;
-  const current = () => ({ title: (options.setTitle || options.gameTitle || 'Vocabulary').trim(), language: language.value, pairs: parsePairs(textarea.value).pairs });
-  const refresh = () => {
-    const parsed = parsePairs(textarea.value);
-    preview.textContent = parsed.pairs.length ? `Detected ${parsed.pairs.length} pairs. ${parsed.pairs[0][1]} → ${parsed.pairs[0][0]}` : 'No valid pairs detected.';
-    error.textContent = parsed.rejectedLines.length ? `Ignored invalid lines: ${parsed.rejectedLines.join(', ')}.` : '';
-  };
-  const onInput = () => { revision++; refresh(); };
-  const onLanguage = () => { revision++; populate(); updateVoice(); };
-  const onCategory = () => {
-    if (category.value !== 'custom') {
-      const selected = categories[language.value]?.[category.value] || [];
-      textarea.value = selected.map(pair => pair.join('\t')).join('\n');
-      onInput();
-    }
-  };
-  const onSwap = () => {
-    const parsed = parsePairs(textarea.value);
-    textarea.value = swapPairs(parsed.pairs).map(pair => pair.join('\t')).join('\n');
-    onInput();
-  };
-  const onTestVoice = () => {
-    const defaults = { 'de-DE': 'Guten Tag', 'es-ES': 'Hola', 'da-DK': 'Goddag', 'en-US': 'Hello' };
-    void services.voice?.speak(options.testPhrases?.[language.value] || defaults[language.value] || 'Hello', language.value);
-  };
-  const onPlay = () => {
-    const checked = validateSet(current(), { minPairs: options.minPlayPairs ?? 1 });
-    if (!checked.ok) { error.textContent = checked.error.message; return; }
-    error.textContent = '';
-    void startGame(services.game, gameContext(checked.value, services), error);
-  };
-  const onShare = async () => {
-    if (share.disabled) return;
-    const checked = validateSet(current());
-    if (!checked.ok) { shareStatus.textContent = checked.error.message; return; }
-    const snapshot = ++revision;
-    share.disabled = true; share.textContent = 'Saving this vocabulary set…';
-    shareStatus.replaceChildren(document.createTextNode('Saving this vocabulary set…'));
-    try {
-      const saved = await services.sharing.saveSet(checked.value);
-      if (destroyed || revision !== snapshot) {
-        if (!destroyed) shareStatus.textContent = 'Vocabulary changed while saving. Share again to create a link for the latest words.';
-        return;
-      }
-      const url = buildStudentUrl(options.canonicalGameUrl, saved.id);
-      const anchor = el('a', 'bt-student-link', url); anchor.href = url; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer';
-      shareStatus.replaceChildren(paragraph('Student link (select or copy):'), anchor);
-      try { await globalThis.navigator?.clipboard?.writeText(url); } catch { /* link remains visible */ }
-    } catch (cause) {
-      if (!destroyed && revision === snapshot) shareStatus.textContent = cause?.message || 'Could not share vocabulary. Please retry.';
-    } finally {
-      if (!destroyed) { share.disabled = false; share.textContent = '🔗 SHARE WITH STUDENTS'; }
-    }
-  };
-  textarea.addEventListener('input', onInput); language.addEventListener('change', onLanguage);
-  category.addEventListener('change', onCategory); swap.addEventListener('click', onSwap);
-  testVoice.addEventListener('click', onTestVoice); play.addEventListener('click', onPlay);
-  share.addEventListener('click', onShare); refresh();
-  const detach = install(root, view, () => {
-    destroyed = true; revision++;
-    textarea.removeEventListener('input', onInput); language.removeEventListener('change', onLanguage);
-    category.removeEventListener('change', onCategory); swap.removeEventListener('click', onSwap);
-    testVoice.removeEventListener('click', onTestVoice); play.removeEventListener('click', onPlay);
-    share.removeEventListener('click', onShare);
-  });
-  return { destroy: detach, getCurrentSet: () => destroyed ? null : current() };
-}
-export function mountStudentMenu(root, services, options = {}) {
-  assertRoot(root); resolveServices(services);
-  const view = el('section', 'bt-menu bt-student');
-  const logo = el('h1', 'bt-logo', options.gameTitle || 'BORING TEACHER');
-  const card = el('section', 'bt-card bt-student-card');
-  const title = el('h2', 'bt-student-title', 'Loading vocabulary…');
-  const meta = paragraph('', 'bt-student-meta');
-  const status = paragraph('Loading shared vocabulary…', 'bt-preview'); status.setAttribute('role', 'status');
-  const play = button('PLAY', 'bt-button bt-primary bt-final-play', 'play'); play.disabled = true;
-  card.append(title, meta, play, howTo(options.instructions), status); view.append(logo, card);
-  let destroyed = false, generation = 0, loaded = null;
-  const onPlay = () => { if (loaded && !destroyed) void startGame(services.game, gameContext(loaded, services), status); };
-  play.addEventListener('click', onPlay);
-  const detach = install(root, view, () => { destroyed = true; generation++; play.removeEventListener('click', onPlay); });
-  const load = async (id) => {
-    const token = ++generation;
-    loaded = null; play.disabled = true; title.textContent = 'Loading vocabulary…'; meta.textContent = ''; status.textContent = 'Loading shared vocabulary…';
-    try {
-      if (!id) throw new Error('The student link is missing a valid vocabulary ID.');
-      const result = await services.sharing.loadSet(id);
-      if (destroyed || token !== generation) return;
-      const checked = validateSet(result);
-      if (!checked.ok) throw new Error(checked.error.message);
-      loaded = checked.value;
-      title.textContent = loaded.title;
-      const label = getSupportedLanguages().find(l => l.locale === loaded.language)?.label || loaded.language;
-      meta.textContent = `${label} · ${loaded.pairs.length} words`;
-      status.textContent = 'Ready to play.';
-      play.disabled = false;
-    } catch (cause) {
-      if (!destroyed && token === generation) {
-        title.textContent = 'Vocabulary unavailable';
-        status.textContent = cause?.message || 'Could not load shared vocabulary.';
-      }
-    }
-  };
-  void load(options.setId ?? readStudentSetId(options.url || globalThis.location?.href || 'https://example.invalid/'));
-  return { destroy: detach, reload: load };
+export function mountStudentMenu(root,services,options={}){
+  const clean=shell(root,options.title??"BORING TEACHER"),abort=new AbortController(),signal=abort.signal;
+  const card=el("div","studentIntro"),heading=el("div","studentTitle","LOADING VOCABULARY"),meta=el("div","studentMeta","Please wait…"),play=button("PLAY","primary");
+  play.disabled=true;add(card,heading,meta,play,details(options.instructions??"Select the correct translation."));root.append(card);
+  let set=null;
+  play.addEventListener("click",()=>{if(set)options.onPlay?.(set);},{signal});
+  const id=readStudentSetId(options.studentUrl??location.href);
+  const recover=button("RETURN TO TEACHER MENU","menuButton");
+  recover.addEventListener("click",()=>options.onRecover?.(),{signal});
+  function showRecovery(){if(!recover.isConnected)card.append(recover);}
+  if(!id){heading.textContent="INVALID LINK";meta.textContent="This student link has no valid set ID.";showRecovery();}
+  else services.sharing.loadSet(id).then(value=>{if(signal.aborted)return;set=value;heading.textContent=value.title;meta.textContent=(value.promptLanguage??"en-US")+" → "+value.language+" · "+value.pairs.length+" words";play.disabled=false;}).catch(e=>{if(signal.aborted)return;heading.textContent="UNABLE TO LOAD";meta.textContent=e.message??"Could not load vocabulary.";showRecovery();});
+  return{destroy(){abort.abort();clean();}};
 }
