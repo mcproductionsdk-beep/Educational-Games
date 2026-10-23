@@ -81,53 +81,42 @@ const rect=(x,y,w,h,c)=>{context.fillStyle=c;context.fillRect(x,y,w,h)};
 function drawText(t,x,y,color='#fff',size=16){context.fillStyle=color;context.font='bold '+size+'px monospace';context.textAlign='center';context.textBaseline='middle';context.fillText(t,x,y)}
 function short(t,n=12){return [...t].length>n?[...t].slice(0,n-1).join('')+'…':t}
 // Pixel-art Viking: 3px pixels, walking limbs, front/back/side views.
+// Construction worker sprite adapted from Sentence Warehouse; cargo text stays screen-facing.
 function drawViking(s){
-  const moving=!!s.walking, phase=moving?Math.floor(s.step/75)%4:0;
-  const stride=[0,2,0,-2][phase], swing=[0,-2,0,2][phase];
-  const facing=s.facing||'down', back=facing==='up', side=facing==='left'||facing==='right';
-  const c=context, size=3;
-  c.save();c.translate(Math.round(s.x),Math.round(s.y));
-  if(facing==='left')c.scale(-1,1);
-  // Ground shadow, fixed to the player's collision point.
-  c.fillStyle='#07122299';c.fillRect(-23,29,46,6);
-  // Local 3px pixel grid, approximately 54 by 72 screen pixels.
-  const px=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x*size,y*size,w*size,h*size)};
-  const ink='#252331', steel='#c7c7c9', steelDark='#85848d', horn='#fff0b3', hornShade='#bba77b';
-  const skin='#f8bd81', shade='#d98d65', hair='#b94722', beard='#e8792a', gold='#f9c35c';
-  c.translate(0,-2);
-  // Boots and alternating stride, separate from the body.
-  px(-6+swing,7,5,4,ink);px(-5+swing,7,4,3,'#743c2a');px(1-swing,7,5,4,ink);px(2-swing,7,4,3,'#743c2a');
-  px(-6+swing,10,6,2,'#4a2b27');px(1-swing,10,6,2,'#4a2b27');
-  // Tunic, belt, buckle and shoulder plates.
-  px(-7,-5,14,13,ink);px(-6,-5,12,12,side?'#387a83':'#247e83');
-  px(-7,-4,3,5,steelDark);px(4,-4,3,5,steelDark);
-  px(-6,3,12,2,'#633b2f');px(-2,3,4,3,steel);px(-1,4,2,1,ink);
-  px(-6,6,12,2,'#96543b');
-  // Arms swing while walking, unless holding the delivery brick.
-  const armShift=s.carrying?-4:stride;
-  px(-10,-3+armShift,3,8,ink);px(-9,-3+armShift,2,6,steelDark);px(-10,3+armShift,3,3,skin);
-  px(7,-3-armShift,3,8,ink);px(8,-3-armShift,2,6,steelDark);px(7,3-armShift,3,3,skin);
-  // Face and red beard (back view shows hair instead).
-  px(-6,-17,12,13,ink);px(-5,-16,10,11,back?hair:skin);
-  if(!back){
-    px(-5,-10,10,5,hair);px(-4,-8,8,5,beard);px(-3,-6,6,3,'#c75924');
-    px(-4,-13,2,2,side?skin:'#238755');px(2,-13,2,2,side?skin:'#238755');
-    if(side){px(3,-11,3,2,shade);px(3,-10,2,1,'#ad5537')}
-    else{px(-1,-11,2,2,shade);px(-2,-8,4,1,'#ffd79e')}
-  }else{px(-4,-13,8,8,'#9d391e');px(-2,-8,4,3,hair)}
-  // Helmet, faceguard and distinctive asymmetric pixel horns.
-  px(-7,-19,14,4,ink);px(-6,-20,12,4,steelDark);px(-4,-21,8,2,steel);
-  px(-7,-18,14,2,gold);px(-1,-20,2,7,steel);
-  px(-10,-22,4,6,ink);px(-9,-23,3,5,hornShade);px(-10,-25,2,4,horn);
-  px(6,-22,4,6,ink);px(6,-23,3,5,hornShade);px(8,-25,2,4,horn);
-  px(-10,-27,2,3,horn);px(8,-27,2,3,horn);
-  if(s.carrying){
-    // Raised cargo is drawn above the helmet, with a readable label.
-    px(-10,-37,20,7,ink);px(-9,-36,18,5,'#efb65a');px(-9,-36,18,1,'#ffe2a1');
-    c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#382509';
-    c.fillText(short(current()[1],9),0,-100);
-  }
-  c.restore();
+ const c=context,phase=s.walking?Math.floor(s.step/90)%4:0,bob=s.walking?[0,2,0,-2][phase]:0;
+ const back=s.facing==='up';
+ c.save();c.translate(Math.round(s.x),Math.round(s.y)+bob);
+ if(s.facing==='left')c.scale(-1,1);
+ const px=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x*3,y*3,w*3,h*3)};
+ c.fillStyle='#07122288';c.fillRect(-22,29,44,5);
+ const stride=s.walking?[0,2,0,-2][phase]:0;
+ px(-6+stride,7,5,4,'#17283a');px(2-stride,7,5,4,'#17283a');
+ px(-6+stride,10,6,2,'#384e62');px(1-stride,10,6,2,'#384e62');
+ px(-7,-6,14,14,'#192a39');px(-6,-5,12,12,'#ff981f');
+ px(-2,-5,4,12,'#ffdd4d');px(-6,3,12,2,'#dce4e8');
+ px(-7,5,14,2,'#243b52');
+ px(-6,-17,12,12,'#1b2938');px(-5,-16,10,10,back?'#4b3227':'#d69a72');
+ if(!back){px(-3,-13,2,2,'#162638');px(2,-13,2,2,'#162638');px(-1,-10,2,1,'#8b543b')}
+ px(-7,-20,14,5,'#19293a');px(-6,-21,12,5,'#f2b919');px(-7,-18,14,2,'#ffd849');px(-4,-22,8,2,'#ffd849');
+ if(s.carrying){
+   px(-10,-15,3,12,'#ff981f');px(7,-15,3,12,'#ff981f');
+   px(-10,-18,3,4,'#d69a72');px(7,-18,3,4,'#d69a72');
+   c.restore();
+   // Draw the crate after restoring the mirrored sprite transform.
+   const x=Math.round(s.x)-76,y=Math.round(s.y)+bob-121,w=152,h=55;
+   c.fillStyle='#071323';c.fillRect(x+5,y+5,w,h);
+   c.fillStyle='#4b7896';c.fillRect(x,y,w,h);
+   c.fillStyle='#315470';c.fillRect(x+4,y+4,w-8,h-8);
+   const word=String(current()?.[1]??'');
+   let font=20;c.font='bold '+font+'px monospace';
+   while(font>13&&c.measureText(word).width>w-16){font--;c.font='bold '+font+'px monospace'}
+   c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff8df';
+   c.fillText(word,Math.round(s.x),y+h/2,w-14);
+   return;
+ }
+ px(-10,-3,3,9,'#ff981f');px(7,-3,3,9,'#ff981f');
+ px(-10,4,3,3,'#d69a72');px(7,4,3,3,'#d69a72');
+ c.restore();
 }
 function render(){const s=active;if(!s)return;rect(0,0,900,610,'#14253e');context.strokeStyle='#243b57';for(let x=0;x<900;x+=30){context.beginPath();context.moveTo(x,0);context.lineTo(x,610);context.stroke()}for(let y=0;y<610;y+=30){context.beginPath();context.moveTo(0,y);context.lineTo(900,y);context.stroke()}
 s.roundPairs.forEach((pair,i)=>{const z=zones[s.positions[i]],done=s.order.slice(0,s.index).includes(i);rect(z.x+5,z.y+5,138,72,'#080f1e');rect(z.x,z.y,138,72,done?'#27624c':'#42709c');rect(z.x+4,z.y+4,130,64,done?'#1a4b3c':'#253e61');drawText(short(pair[0]),z.x+69,z.y+35,done?'#8cffb8':'#fff',15);if(done)drawText('✓',z.x+122,z.y+13,'#8cffb8',18)});
