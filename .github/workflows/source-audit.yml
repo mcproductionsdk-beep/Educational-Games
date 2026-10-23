@@ -1,0 +1,28 @@
+name: Source registry audit (read-only)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'core/**'
+      - 'word-warehouse/**'
+      - 'sentence-eater/**'
+      - 'sentence-warehouse/**'
+      - 'scripts/source_audit.py'
+      - '.github/workflows/source-audit.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run read-only audit
+        run: python scripts/source_audit.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-audit-report
+          path: source-audit-report.json
