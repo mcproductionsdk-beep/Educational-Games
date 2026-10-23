@@ -1,19 +1,18 @@
 {
   "schemaVersion": 2,
-  "status": "development-draft",
-  "description": "Concept-aligned migration of the verified V1 vocabulary. French and Italian are planned but not populated; no existing game consumes this file yet.",
+  "status": "development-translation-review",
+  "description": "Concept-aligned V2 development library. Existing V1 translations retained, French and Italian candidate translations added for review before gameplay integration.",
   "defaultPromptLanguage": "en",
   "defaultTargetLanguage": "es-ES",
   "supportedLanguages": [
     "en",
     "es-ES",
     "de-DE",
-    "da-DK"
-  ],
-  "plannedLanguages": [
+    "da-DK",
     "fr-FR",
     "it-IT"
   ],
+  "plannedLanguages": [],
   "languageSelection": {
     "promptMustDifferFromTarget": true,
     "teacherSetsLanguagesForSharedSets": true,
@@ -27,7 +26,9 @@
         "en": "cat",
         "es-ES": "gato",
         "de-DE": "Katze",
-        "da-DK": "kat"
+        "da-DK": "kat",
+        "fr-FR": "chat",
+        "it-IT": "gatto"
       }
     },
     {
@@ -37,7 +38,9 @@
         "en": "dog",
         "es-ES": "perro",
         "de-DE": "Hund",
-        "da-DK": "hund"
+        "da-DK": "hund",
+        "fr-FR": "chien",
+        "it-IT": "cane"
       }
     },
     {
@@ -47,7 +50,9 @@
         "en": "bird",
         "es-ES": "pájaro",
         "de-DE": "Vogel",
-        "da-DK": "fugl"
+        "da-DK": "fugl",
+        "fr-FR": "oiseau",
+        "it-IT": "uccello"
       }
     },
     {
@@ -57,7 +62,9 @@
         "en": "fish",
         "es-ES": "pez",
         "de-DE": "Fisch",
-        "da-DK": "fisk"
+        "da-DK": "fisk",
+        "fr-FR": "poisson",
+        "it-IT": "pesce"
       }
     },
     {
@@ -67,7 +74,9 @@
         "en": "horse",
         "es-ES": "caballo",
         "de-DE": "Pferd",
-        "da-DK": "hest"
+        "da-DK": "hest",
+        "fr-FR": "cheval",
+        "it-IT": "cavallo"
       }
     },
     {
@@ -77,7 +86,9 @@
         "en": "cow",
         "es-ES": "vaca",
         "de-DE": "Kuh",
-        "da-DK": "ko"
+        "da-DK": "ko",
+        "fr-FR": "vache",
+        "it-IT": "mucca"
       }
     },
     {
@@ -87,7 +98,9 @@
         "en": "pig",
         "es-ES": "cerdo",
         "de-DE": "Schwein",
-        "da-DK": "gris"
+        "da-DK": "gris",
+        "fr-FR": "cochon",
+        "it-IT": "maiale"
       }
     },
     {
@@ -97,7 +110,9 @@
         "en": "sheep",
         "es-ES": "oveja",
         "de-DE": "Schaf",
-        "da-DK": "får"
+        "da-DK": "får",
+        "fr-FR": "mouton",
+        "it-IT": "pecora"
       }
     },
     {
@@ -107,7 +122,9 @@
         "en": "mouse",
         "es-ES": "ratón",
         "de-DE": "Maus",
-        "da-DK": "mus"
+        "da-DK": "mus",
+        "fr-FR": "souris",
+        "it-IT": "topo"
       }
     },
     {
@@ -117,7 +134,9 @@
         "en": "rabbit",
         "es-ES": "conejo",
         "de-DE": "Kaninchen",
-        "da-DK": "kanin"
+        "da-DK": "kanin",
+        "fr-FR": "lapin",
+        "it-IT": "coniglio"
       }
     },
     {
@@ -127,7 +146,9 @@
         "en": "duck",
         "es-ES": "pato",
         "de-DE": "Ente",
-        "da-DK": "and"
+        "da-DK": "and",
+        "fr-FR": "canard",
+        "it-IT": "anatra"
       }
     },
     {
@@ -137,7 +158,9 @@
         "en": "chicken",
         "es-ES": "pollo",
         "de-DE": "Huhn",
-        "da-DK": "kylling"
+        "da-DK": "kylling",
+        "fr-FR": "poulet",
+        "it-IT": "pollo"
       }
     },
     {
@@ -147,7 +170,9 @@
         "en": "bread",
         "es-ES": "pan",
         "de-DE": "Brot",
-        "da-DK": "brød"
+        "da-DK": "brød",
+        "fr-FR": "pain",
+        "it-IT": "pane"
       }
     },
     {
@@ -157,7 +182,9 @@
         "en": "water",
         "es-ES": "agua",
         "de-DE": "Wasser",
-        "da-DK": "vand"
+        "da-DK": "vand",
+        "fr-FR": "eau",
+        "it-IT": "acqua"
       }
     },
     {
@@ -167,7 +194,9 @@
         "en": "milk",
         "es-ES": "leche",
         "de-DE": "Milch",
-        "da-DK": "mælk"
+        "da-DK": "mælk",
+        "fr-FR": "lait",
+        "it-IT": "latte"
       }
     },
     {
@@ -177,7 +206,9 @@
         "en": "cheese",
         "es-ES": "queso",
         "de-DE": "Käse",
-        "da-DK": "ost"
+        "da-DK": "ost",
+        "fr-FR": "fromage",
+        "it-IT": "formaggio"
       }
     },
     {
@@ -187,7 +218,9 @@
         "en": "apple",
         "es-ES": "manzana",
         "de-DE": "Apfel",
-        "da-DK": "æble"
+        "da-DK": "æble",
+        "fr-FR": "pomme",
+        "it-IT": "mela"
       }
     },
     {
@@ -197,7 +230,9 @@
         "en": "banana",
         "es-ES": "plátano",
         "de-DE": "Banane",
-        "da-DK": "banan"
+        "da-DK": "banan",
+        "fr-FR": "banane",
+        "it-IT": "banana"
       }
     },
     {
@@ -207,7 +242,9 @@
         "en": "egg",
         "es-ES": "huevo",
         "de-DE": "Ei",
-        "da-DK": "æg"
+        "da-DK": "æg",
+        "fr-FR": "œuf",
+        "it-IT": "uovo"
       }
     },
     {
@@ -217,7 +254,9 @@
         "en": "rice",
         "es-ES": "arroz",
         "de-DE": "Reis",
-        "da-DK": "ris"
+        "da-DK": "ris",
+        "fr-FR": "riz",
+        "it-IT": "riso"
       }
     },
     {
@@ -227,7 +266,9 @@
         "en": "potato",
         "es-ES": "patata",
         "de-DE": "Kartoffel",
-        "da-DK": "kartoffel"
+        "da-DK": "kartoffel",
+        "fr-FR": "pomme de terre",
+        "it-IT": "patata"
       }
     },
     {
@@ -237,7 +278,9 @@
         "en": "carrot",
         "es-ES": "zanahoria",
         "de-DE": "Karotte",
-        "da-DK": "gulerod"
+        "da-DK": "gulerod",
+        "fr-FR": "carotte",
+        "it-IT": "carota"
       }
     },
     {
@@ -247,7 +290,9 @@
         "en": "salt",
         "es-ES": "sal",
         "de-DE": "Salz",
-        "da-DK": "salt"
+        "da-DK": "salt",
+        "fr-FR": "sel",
+        "it-IT": "sale"
       }
     },
     {
@@ -257,7 +302,9 @@
         "en": "sugar",
         "es-ES": "azúcar",
         "de-DE": "Zucker",
-        "da-DK": "sukker"
+        "da-DK": "sukker",
+        "fr-FR": "sucre",
+        "it-IT": "zucchero"
       }
     },
     {
@@ -267,7 +314,9 @@
         "en": "head",
         "es-ES": "cabeza",
         "de-DE": "Kopf",
-        "da-DK": "hoved"
+        "da-DK": "hoved",
+        "fr-FR": "tête",
+        "it-IT": "testa"
       }
     },
     {
@@ -277,7 +326,9 @@
         "en": "hand",
         "es-ES": "mano",
         "de-DE": "Hand",
-        "da-DK": "hånd"
+        "da-DK": "hånd",
+        "fr-FR": "main",
+        "it-IT": "mano"
       }
     },
     {
@@ -287,7 +338,9 @@
         "en": "foot",
         "es-ES": "pie",
         "de-DE": "Fuß",
-        "da-DK": "fod"
+        "da-DK": "fod",
+        "fr-FR": "pied",
+        "it-IT": "piede"
       }
     },
     {
@@ -297,7 +350,9 @@
         "en": "eye",
         "es-ES": "ojo",
         "de-DE": "Auge",
-        "da-DK": "øje"
+        "da-DK": "øje",
+        "fr-FR": "œil",
+        "it-IT": "occhio"
       }
     },
     {
@@ -307,7 +362,9 @@
         "en": "ear",
         "es-ES": "oreja",
         "de-DE": "Ohr",
-        "da-DK": "øre"
+        "da-DK": "øre",
+        "fr-FR": "oreille",
+        "it-IT": "orecchio"
       }
     },
     {
@@ -317,7 +374,9 @@
         "en": "nose",
         "es-ES": "nariz",
         "de-DE": "Nase",
-        "da-DK": "næse"
+        "da-DK": "næse",
+        "fr-FR": "nez",
+        "it-IT": "naso"
       }
     },
     {
@@ -327,7 +386,9 @@
         "en": "mouth",
         "es-ES": "boca",
         "de-DE": "Mund",
-        "da-DK": "mund"
+        "da-DK": "mund",
+        "fr-FR": "bouche",
+        "it-IT": "bocca"
       }
     },
     {
@@ -337,7 +398,9 @@
         "en": "arm",
         "es-ES": "brazo",
         "de-DE": "Arm",
-        "da-DK": "arm"
+        "da-DK": "arm",
+        "fr-FR": "bras",
+        "it-IT": "braccio"
       }
     },
     {
@@ -347,7 +410,9 @@
         "en": "leg",
         "es-ES": "pierna",
         "de-DE": "Bein",
-        "da-DK": "ben"
+        "da-DK": "ben",
+        "fr-FR": "jambe",
+        "it-IT": "gamba"
       }
     },
     {
@@ -357,7 +422,9 @@
         "en": "finger",
         "es-ES": "dedo",
         "de-DE": "Finger",
-        "da-DK": "finger"
+        "da-DK": "finger",
+        "fr-FR": "doigt",
+        "it-IT": "dito"
       }
     },
     {
@@ -367,7 +434,9 @@
         "en": "hair",
         "es-ES": "pelo",
         "de-DE": "Haar",
-        "da-DK": "hår"
+        "da-DK": "hår",
+        "fr-FR": "cheveux",
+        "it-IT": "capelli"
       }
     },
     {
@@ -377,7 +446,9 @@
         "en": "tooth",
         "es-ES": "diente",
         "de-DE": "Zahn",
-        "da-DK": "tand"
+        "da-DK": "tand",
+        "fr-FR": "dent",
+        "it-IT": "dente"
       }
     },
     {
@@ -387,7 +458,9 @@
         "en": "school",
         "es-ES": "escuela",
         "de-DE": "Schule",
-        "da-DK": "skole"
+        "da-DK": "skole",
+        "fr-FR": "école",
+        "it-IT": "scuola"
       }
     },
     {
@@ -397,7 +470,9 @@
         "en": "book",
         "es-ES": "libro",
         "de-DE": "Buch",
-        "da-DK": "bog"
+        "da-DK": "bog",
+        "fr-FR": "livre",
+        "it-IT": "libro"
       }
     },
     {
@@ -407,7 +482,9 @@
         "en": "pencil",
         "es-ES": "lápiz",
         "de-DE": "Bleistift",
-        "da-DK": "blyant"
+        "da-DK": "blyant",
+        "fr-FR": "crayon",
+        "it-IT": "matita"
       }
     },
     {
@@ -417,7 +494,9 @@
         "en": "teacher",
         "es-ES": "profesor",
         "de-DE": "Lehrer",
-        "da-DK": "lærer"
+        "da-DK": "lærer",
+        "fr-FR": "professeur",
+        "it-IT": "insegnante"
       }
     },
     {
@@ -427,7 +506,9 @@
         "en": "student",
         "es-ES": "estudiante",
         "de-DE": "Schüler",
-        "da-DK": "elev"
+        "da-DK": "elev",
+        "fr-FR": "élève",
+        "it-IT": "studente"
       }
     },
     {
@@ -437,7 +518,9 @@
         "en": "desk",
         "es-ES": "escritorio",
         "de-DE": "Schreibtisch",
-        "da-DK": "skrivebord"
+        "da-DK": "skrivebord",
+        "fr-FR": "bureau",
+        "it-IT": "scrivania"
       }
     },
     {
@@ -447,7 +530,9 @@
         "en": "chair",
         "es-ES": "silla",
         "de-DE": "Stuhl",
-        "da-DK": "stol"
+        "da-DK": "stol",
+        "fr-FR": "chaise",
+        "it-IT": "sedia"
       }
     },
     {
@@ -457,7 +542,9 @@
         "en": "paper",
         "es-ES": "papel",
         "de-DE": "Papier",
-        "da-DK": "papir"
+        "da-DK": "papir",
+        "fr-FR": "papier",
+        "it-IT": "carta"
       }
     },
     {
@@ -467,7 +554,9 @@
         "en": "question",
         "es-ES": "pregunta",
         "de-DE": "Frage",
-        "da-DK": "spørgsmål"
+        "da-DK": "spørgsmål",
+        "fr-FR": "question",
+        "it-IT": "domanda"
       }
     },
     {
@@ -477,7 +566,9 @@
         "en": "answer",
         "es-ES": "respuesta",
         "de-DE": "Antwort",
-        "da-DK": "svar"
+        "da-DK": "svar",
+        "fr-FR": "réponse",
+        "it-IT": "risposta"
       }
     },
     {
@@ -487,7 +578,9 @@
         "en": "lesson",
         "es-ES": "lección",
         "de-DE": "Unterrichtsstunde",
-        "da-DK": "lektion"
+        "da-DK": "lektion",
+        "fr-FR": "leçon",
+        "it-IT": "lezione"
       }
     },
     {
@@ -497,7 +590,9 @@
         "en": "homework",
         "es-ES": "deberes",
         "de-DE": "Hausaufgaben",
-        "da-DK": "lektier"
+        "da-DK": "lektier",
+        "fr-FR": "devoirs",
+        "it-IT": "compiti"
       }
     },
     {
@@ -507,7 +602,9 @@
         "en": "house",
         "es-ES": "casa",
         "de-DE": "Haus",
-        "da-DK": "hus"
+        "da-DK": "hus",
+        "fr-FR": "maison",
+        "it-IT": "casa"
       }
     },
     {
@@ -517,7 +614,9 @@
         "en": "door",
         "es-ES": "puerta",
         "de-DE": "Tür",
-        "da-DK": "dør"
+        "da-DK": "dør",
+        "fr-FR": "porte",
+        "it-IT": "porta"
       }
     },
     {
@@ -527,7 +626,9 @@
         "en": "window",
         "es-ES": "ventana",
         "de-DE": "Fenster",
-        "da-DK": "vindue"
+        "da-DK": "vindue",
+        "fr-FR": "fenêtre",
+        "it-IT": "finestra"
       }
     },
     {
@@ -537,7 +638,9 @@
         "en": "table",
         "es-ES": "mesa",
         "de-DE": "Tisch",
-        "da-DK": "bord"
+        "da-DK": "bord",
+        "fr-FR": "table",
+        "it-IT": "tavolo"
       }
     },
     {
@@ -547,7 +650,9 @@
         "en": "bed",
         "es-ES": "cama",
         "de-DE": "Bett",
-        "da-DK": "seng"
+        "da-DK": "seng",
+        "fr-FR": "lit",
+        "it-IT": "letto"
       }
     },
     {
@@ -557,7 +662,9 @@
         "en": "kitchen",
         "es-ES": "cocina",
         "de-DE": "Küche",
-        "da-DK": "køkken"
+        "da-DK": "køkken",
+        "fr-FR": "cuisine",
+        "it-IT": "cucina"
       }
     },
     {
@@ -567,7 +674,9 @@
         "en": "bathroom",
         "es-ES": "baño",
         "de-DE": "Badezimmer",
-        "da-DK": "badeværelse"
+        "da-DK": "badeværelse",
+        "fr-FR": "salle de bain",
+        "it-IT": "bagno"
       }
     },
     {
@@ -577,7 +686,9 @@
         "en": "garden",
         "es-ES": "jardín",
         "de-DE": "Garten",
-        "da-DK": "have"
+        "da-DK": "have",
+        "fr-FR": "jardin",
+        "it-IT": "giardino"
       }
     },
     {
@@ -587,7 +698,9 @@
         "en": "lamp",
         "es-ES": "lámpara",
         "de-DE": "Lampe",
-        "da-DK": "lampe"
+        "da-DK": "lampe",
+        "fr-FR": "lampe",
+        "it-IT": "lampada"
       }
     },
     {
@@ -597,7 +710,9 @@
         "en": "floor",
         "es-ES": "suelo",
         "de-DE": "Boden",
-        "da-DK": "gulv"
+        "da-DK": "gulv",
+        "fr-FR": "sol",
+        "it-IT": "pavimento"
       }
     },
     {
@@ -607,7 +722,9 @@
         "en": "wall",
         "es-ES": "pared",
         "de-DE": "Wand",
-        "da-DK": "væg"
+        "da-DK": "væg",
+        "fr-FR": "mur",
+        "it-IT": "parete"
       }
     },
     {
@@ -617,7 +734,9 @@
         "en": "roof",
         "es-ES": "techo",
         "de-DE": "Dach",
-        "da-DK": "tag"
+        "da-DK": "tag",
+        "fr-FR": "toit",
+        "it-IT": "tetto"
       }
     },
     {
@@ -627,7 +746,9 @@
         "en": "sun",
         "es-ES": "sol",
         "de-DE": "Sonne",
-        "da-DK": "sol"
+        "da-DK": "sol",
+        "fr-FR": "soleil",
+        "it-IT": "sole"
       }
     },
     {
@@ -637,7 +758,9 @@
         "en": "moon",
         "es-ES": "luna",
         "de-DE": "Mond",
-        "da-DK": "måne"
+        "da-DK": "måne",
+        "fr-FR": "lune",
+        "it-IT": "luna"
       }
     },
     {
@@ -647,7 +770,9 @@
         "en": "tree",
         "es-ES": "árbol",
         "de-DE": "Baum",
-        "da-DK": "træ"
+        "da-DK": "træ",
+        "fr-FR": "arbre",
+        "it-IT": "albero"
       }
     },
     {
@@ -657,7 +782,9 @@
         "en": "flower",
         "es-ES": "flor",
         "de-DE": "Blume",
-        "da-DK": "blomst"
+        "da-DK": "blomst",
+        "fr-FR": "fleur",
+        "it-IT": "fiore"
       }
     },
     {
@@ -667,7 +794,9 @@
         "en": "river",
         "es-ES": "río",
         "de-DE": "Fluss",
-        "da-DK": "flod"
+        "da-DK": "flod",
+        "fr-FR": "rivière",
+        "it-IT": "fiume"
       }
     },
     {
@@ -677,7 +806,9 @@
         "en": "mountain",
         "es-ES": "montaña",
         "de-DE": "Berg",
-        "da-DK": "bjerg"
+        "da-DK": "bjerg",
+        "fr-FR": "montagne",
+        "it-IT": "montagna"
       }
     },
     {
@@ -687,7 +818,9 @@
         "en": "sea",
         "es-ES": "mar",
         "de-DE": "Meer",
-        "da-DK": "hav"
+        "da-DK": "hav",
+        "fr-FR": "mer",
+        "it-IT": "mare"
       }
     },
     {
@@ -697,7 +830,9 @@
         "en": "rain",
         "es-ES": "lluvia",
         "de-DE": "Regen",
-        "da-DK": "regn"
+        "da-DK": "regn",
+        "fr-FR": "pluie",
+        "it-IT": "pioggia"
       }
     },
     {
@@ -707,7 +842,9 @@
         "en": "snow",
         "es-ES": "nieve",
         "de-DE": "Schnee",
-        "da-DK": "sne"
+        "da-DK": "sne",
+        "fr-FR": "neige",
+        "it-IT": "neve"
       }
     },
     {
@@ -717,7 +854,9 @@
         "en": "wind",
         "es-ES": "viento",
         "de-DE": "Wind",
-        "da-DK": "vind"
+        "da-DK": "vind",
+        "fr-FR": "vent",
+        "it-IT": "vento"
       }
     },
     {
@@ -727,7 +866,9 @@
         "en": "forest",
         "es-ES": "bosque",
         "de-DE": "Wald",
-        "da-DK": "skov"
+        "da-DK": "skov",
+        "fr-FR": "forêt",
+        "it-IT": "foresta"
       }
     },
     {
@@ -737,7 +878,9 @@
         "en": "star",
         "es-ES": "estrella",
         "de-DE": "Stern",
-        "da-DK": "stjerne"
+        "da-DK": "stjerne",
+        "fr-FR": "étoile",
+        "it-IT": "stella"
       }
     },
     {
@@ -747,7 +890,9 @@
         "en": "red",
         "es-ES": "rojo",
         "de-DE": "rot",
-        "da-DK": "rød"
+        "da-DK": "rød",
+        "fr-FR": "rouge",
+        "it-IT": "rosso"
       }
     },
     {
@@ -757,7 +902,9 @@
         "en": "blue",
         "es-ES": "azul",
         "de-DE": "blau",
-        "da-DK": "blå"
+        "da-DK": "blå",
+        "fr-FR": "bleu",
+        "it-IT": "blu"
       }
     },
     {
@@ -767,7 +914,9 @@
         "en": "green",
         "es-ES": "verde",
         "de-DE": "grün",
-        "da-DK": "grøn"
+        "da-DK": "grøn",
+        "fr-FR": "vert",
+        "it-IT": "verde"
       }
     },
     {
@@ -777,7 +926,9 @@
         "en": "yellow",
         "es-ES": "amarillo",
         "de-DE": "gelb",
-        "da-DK": "gul"
+        "da-DK": "gul",
+        "fr-FR": "jaune",
+        "it-IT": "giallo"
       }
     },
     {
@@ -787,7 +938,9 @@
         "en": "black",
         "es-ES": "negro",
         "de-DE": "schwarz",
-        "da-DK": "sort"
+        "da-DK": "sort",
+        "fr-FR": "noir",
+        "it-IT": "nero"
       }
     },
     {
@@ -797,7 +950,9 @@
         "en": "white",
         "es-ES": "blanco",
         "de-DE": "weiß",
-        "da-DK": "hvid"
+        "da-DK": "hvid",
+        "fr-FR": "blanc",
+        "it-IT": "bianco"
       }
     },
     {
@@ -807,7 +962,9 @@
         "en": "orange",
         "es-ES": "naranja",
         "de-DE": "orange",
-        "da-DK": "orange"
+        "da-DK": "orange",
+        "fr-FR": "orange",
+        "it-IT": "arancione"
       }
     },
     {
@@ -817,7 +974,9 @@
         "en": "purple",
         "es-ES": "morado",
         "de-DE": "lila",
-        "da-DK": "lilla"
+        "da-DK": "lilla",
+        "fr-FR": "violet",
+        "it-IT": "viola"
       }
     },
     {
@@ -827,7 +986,9 @@
         "en": "pink",
         "es-ES": "rosa",
         "de-DE": "rosa",
-        "da-DK": "lyserød"
+        "da-DK": "lyserød",
+        "fr-FR": "rose",
+        "it-IT": "rosa"
       }
     },
     {
@@ -837,7 +998,9 @@
         "en": "brown",
         "es-ES": "marrón",
         "de-DE": "braun",
-        "da-DK": "brun"
+        "da-DK": "brun",
+        "fr-FR": "marron",
+        "it-IT": "marrone"
       }
     },
     {
@@ -847,7 +1010,9 @@
         "en": "grey",
         "es-ES": "gris",
         "de-DE": "grau",
-        "da-DK": "grå"
+        "da-DK": "grå",
+        "fr-FR": "gris",
+        "it-IT": "grigio"
       }
     },
     {
@@ -857,7 +1022,9 @@
         "en": "gold",
         "es-ES": "dorado",
         "de-DE": "golden",
-        "da-DK": "gylden"
+        "da-DK": "gylden",
+        "fr-FR": "doré",
+        "it-IT": "dorato"
       }
     },
     {
@@ -867,7 +1034,9 @@
         "en": "to eat",
         "es-ES": "comer",
         "de-DE": "essen",
-        "da-DK": "spise"
+        "da-DK": "spise",
+        "fr-FR": "manger",
+        "it-IT": "mangiare"
       }
     },
     {
@@ -877,7 +1046,9 @@
         "en": "to drink",
         "es-ES": "beber",
         "de-DE": "trinken",
-        "da-DK": "drikke"
+        "da-DK": "drikke",
+        "fr-FR": "boire",
+        "it-IT": "bere"
       }
     },
     {
@@ -887,7 +1058,9 @@
         "en": "to read",
         "es-ES": "leer",
         "de-DE": "lesen",
-        "da-DK": "læse"
+        "da-DK": "læse",
+        "fr-FR": "lire",
+        "it-IT": "leggere"
       }
     },
     {
@@ -897,7 +1070,9 @@
         "en": "to write",
         "es-ES": "escribir",
         "de-DE": "schreiben",
-        "da-DK": "skrive"
+        "da-DK": "skrive",
+        "fr-FR": "écrire",
+        "it-IT": "scrivere"
       }
     },
     {
@@ -907,7 +1082,9 @@
         "en": "to sleep",
         "es-ES": "dormir",
         "de-DE": "schlafen",
-        "da-DK": "sove"
+        "da-DK": "sove",
+        "fr-FR": "dormir",
+        "it-IT": "dormire"
       }
     },
     {
@@ -917,7 +1094,9 @@
         "en": "to run",
         "es-ES": "correr",
         "de-DE": "laufen",
-        "da-DK": "løbe"
+        "da-DK": "løbe",
+        "fr-FR": "courir",
+        "it-IT": "correre"
       }
     },
     {
@@ -927,7 +1106,9 @@
         "en": "to swim",
         "es-ES": "nadar",
         "de-DE": "schwimmen",
-        "da-DK": "svømme"
+        "da-DK": "svømme",
+        "fr-FR": "nager",
+        "it-IT": "nuotare"
       }
     },
     {
@@ -937,7 +1118,9 @@
         "en": "to sing",
         "es-ES": "cantar",
         "de-DE": "singen",
-        "da-DK": "synge"
+        "da-DK": "synge",
+        "fr-FR": "chanter",
+        "it-IT": "cantare"
       }
     },
     {
@@ -947,7 +1130,9 @@
         "en": "to dance",
         "es-ES": "bailar",
         "de-DE": "tanzen",
-        "da-DK": "danse"
+        "da-DK": "danse",
+        "fr-FR": "danser",
+        "it-IT": "ballare"
       }
     },
     {
@@ -957,7 +1142,9 @@
         "en": "to play",
         "es-ES": "jugar",
         "de-DE": "spielen",
-        "da-DK": "lege"
+        "da-DK": "lege",
+        "fr-FR": "jouer",
+        "it-IT": "giocare"
       }
     },
     {
@@ -967,7 +1154,9 @@
         "en": "to learn",
         "es-ES": "aprender",
         "de-DE": "lernen",
-        "da-DK": "lære"
+        "da-DK": "lære",
+        "fr-FR": "apprendre",
+        "it-IT": "imparare"
       }
     },
     {
@@ -977,7 +1166,9 @@
         "en": "to speak",
         "es-ES": "hablar",
         "de-DE": "sprechen",
-        "da-DK": "tale"
+        "da-DK": "tale",
+        "fr-FR": "parler",
+        "it-IT": "parlare"
       }
     }
   ]
