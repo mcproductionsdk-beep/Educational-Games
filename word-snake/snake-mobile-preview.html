@@ -68,6 +68,19 @@ body.studentMode #teacherGrid{display:none!important}
 
 /* Isolated portrait prototype: desktop production remains unchanged. */
 @media(max-width:760px) and (orientation:portrait){html,body{overflow:hidden;overscroll-behavior:none}.app{width:100vw;height:100dvh;margin:0;padding:3px;border:0;box-shadow:none}.logo{display:none}.screen.active#game{height:100%;display:flex;flex-direction:column;min-height:0}.hud{grid-template-columns:1fr auto;gap:3px;margin:2px 0;font-size:10px}.target{grid-column:1/-1;grid-row:1;font-size:clamp(16px,4.8vw,23px);padding:6px;min-height:42px}.progress{text-align:right}.wrap{height:auto;max-height:none;min-height:0;flex:1;touch-action:none;border-width:3px}.buttons{display:flex;justify-content:center;gap:2px;flex-wrap:wrap}.buttons button{padding:4px 6px;margin:2px;font-size:10px;border-width:2px}.tip{font-size:10px;margin:2px}.touchPad,.touch-pad,.dpad,.touchControls{display:none!important}#touchUp,#touchLeft,#touchDown,#touchRight{display:none!important}}
+
+/* Portrait v2: dedicate nearly all remaining height to the board. */
+@media(max-width:760px) and (orientation:portrait){
+ .app{padding:1px!important}
+ #game.active{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+ #game .hud{flex:0 0 auto!important;margin:0!important;gap:1px!important;font-size:10px!important}
+ #game .target{padding:3px!important;min-height:33px!important;font-size:clamp(16px,4.7vw,22px)!important}
+ #game .wrap{order:3!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important}
+ #game .mobile-controls,#game .touchPad{display:none!important}
+ #game .buttons{order:4!important;display:flex!important;flex:0 0 auto!important;margin:1px!important;gap:2px!important}
+ #game .buttons button{padding:3px 5px!important;margin:0!important;font-size:9px!important}
+ #game .tip{order:5!important;margin:0!important;font-size:9px!important}
+}
 </style></head><body><main class="app"><div class="logo">WORD SNAKE</div>
 <select id="language" hidden aria-hidden="true"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="en-US">English</option></select><div id="voiceCheck" hidden></div>
 <section id="game" class="screen"><div class="hud"><div>SCORE <span id="score">0</span> · <span id="lives">❤❤❤</span></div><div id="target" class="target"></div><div id="progress" class="progress"></div></div><div id="wrap" class="wrap"><canvas id="canvas"></canvas><div id="toast" class="toast"></div><div id="pauseOverlay" class="overlay"><div class="big" style="color:#f2d64b">PAUSED</div></div><div id="gameOver" class="overlay"><div><div class="big">GAME OVER</div><div class="msg">Nice try, your grandma would be proud</div><button id="again" class="primary">PLAY AGAIN</button><button id="overMenu" class="pink">MAIN MENU</button></div></div></div><div class="buttons"><button id="pause" class="yellow">PAUSE</button><button id="restart">RESTART</button><button id="mainMenu" class="pink">MAIN MENU</button><button id="fullscreen" class="yellow">⛶ EXPAND GAME</button><button id="sound">🔊 SOUND ON</button></div><div class="mobile-controls" aria-label="Snake touch steering">
@@ -86,10 +99,10 @@ function hud(){E("score").textContent=score;E("lives").textContent="❤".repeat(
 /* Food cards are full collision targets; placement reserves their entire visual footprint. */
 function foodGeometry(f){
  var cw=W/COLS,ch=H/ROWS,x=(f.x+.5)*cw,y=(f.y+.5)*ch;
- var font=Math.max(10,Math.min(17,W*.029,H*.029));
+ var font=Math.max(15,Math.min(24,W*.056,H*.036));
  ctx.font="900 "+font+"px Courier New";
  var measured=ctx.measureText(f.pair.target).width+18;
- var width=Math.min(Math.max(68,measured),W*.43),height=Math.max(27,Math.min(34,H*.055));
+ var width=Math.min(Math.max(94,measured),W*.62),height=Math.max(39,Math.min(48,H*.07));
  return{x:x-width/2,y:y-height/2,w:width,h:height,font:font};
 }
 function intersects(a,b,gap){
@@ -122,7 +135,7 @@ function ensureCorrectFood(){
  while(!addFood(current)&&foods.length)foods.pop();
 }
 function start(pairs,locale){if(!Array.isArray(pairs)||pairs.length<5)return false;lang=locale;vocab=pairs.map(function(p,i){return{id:i,target:p[0],prompt:p[1]}});score=0;lives=3;round=1;done=0;misses={};step=.18;snake=[{x:9,y:15},{x:8,y:15},{x:7,y:15},{x:6,y:15}];dir={x:1,y:0};nextDir={x:1,y:0};foods=[];invincible=0;running=true;paused=false;last=0;acc=0;build();current=queue.shift();hud();game.classList.add("active");E("gameOver").classList.remove("show");resize();fillFoods();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);return true;}
-function resetPosition(){snake=[{x:15,y:10},{x:14,y:10},{x:13,y:10},{x:12,y:10}];dir={x:1,y:0};nextDir={x:1,y:0};invincible=1}
+function resetPosition(){snake=[{x:9,y:15},{x:8,y:15},{x:7,y:15},{x:6,y:15}];dir={x:1,y:0};nextDir={x:1,y:0};invincible=1}
 function hurt(t){if(invincible>0)return;lives--;invincible=1;bad();flash(t,0);hud();if(lives<=0){running=false;E("gameOver").classList.add("show")}else resetPosition()}
 function move(){
  dir=nextDir;var h=snake[0],nh={x:(h.x+dir.x+COLS)%COLS,y:(h.y+dir.y+ROWS)%ROWS};
@@ -154,7 +167,7 @@ function drawFood(f){
  ctx.fillStyle="#15254a";ctx.textAlign="center";ctx.textBaseline="middle";
  /* Reduce font rather than crop the actual vocabulary answer. */
  ctx.font="900 "+font+"px Courier New";
- while(font>8&&ctx.measureText(f.pair.target).width>b.w-9){
+ while(font>11&&ctx.measureText(f.pair.target).width>b.w-9){
   font-=.5;ctx.font="900 "+font+"px Courier New";
  }
  ctx.fillText(f.pair.target,b.x+b.w/2,b.y+b.h/2);
