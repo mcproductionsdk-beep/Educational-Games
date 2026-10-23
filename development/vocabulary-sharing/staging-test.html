@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boring Teacher — Multilingual Sharing Staging Test</title>
+<style>body{font-family:system-ui,sans-serif;background:#0e1a31;color:#f4f7ff;max-width:720px;margin:3rem auto;padding:0 1rem}main{background:#203858;padding:1.5rem;border:2px solid #75a6d1;border-radius:12px}button{background:#ffe08a;border:2px solid #111b2c;box-shadow:4px 4px #09111f;padding:1rem;font-weight:800;cursor:pointer;margin:.5rem .5rem .5rem 0}button:disabled{opacity:.45;cursor:not-allowed}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#111e34;padding:1rem;border-radius:8px}a{color:#a8dfff}</style></head><body><main><h1>Multilingual Sharing — Staging Test</h1><p><strong>Prompt:</strong> Spanish (es-ES) &rarr; <strong>Target:</strong> Italian (it-IT)</p><p>gato &rarr; gatto · perro &rarr; cane · pájaro &rarr; uccello · pez &rarr; pesce · caballo &rarr; cavallo</p><p>This page connects only to the staging Worker and staging database. It does not modify published games.</p><button id="create">1. Create test set</button><button id="read" disabled>2. Retrieve and verify</button><pre id="output" role="status" aria-live="polite">Ready. No set created yet.</pre></main>
+<script>
+const api="https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev";
+const pairs=[["gatto","gato"],["cane","perro"],["uccello","pájaro"],["pesce","pez"],["cavallo","caballo"]];
+const create=document.getElementById("create"),read=document.getElementById("read"),output=document.getElementById("output");
+let id=null;const show=t=>output.textContent=t;
+create.onclick=async()=>{create.disabled=true;read.disabled=true;show("Sending POST to staging API...");
+try{const response=await fetch(api+"/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:"Spanish to Italian Test",promptLanguage:"es-ES",language:"it-IT",pairs})});const data=await response.json();if(!response.ok||!data.ok)throw Error("HTTP "+response.status+" "+JSON.stringify(data));id=data.id;read.disabled=false;show("CREATED ✓\nHTTP "+response.status+"\nID: "+id+"\nPrompt: "+data.promptLanguage+"\nTarget: "+data.language+"\nCount: "+data.wordCount+"\n\nClick button 2 to verify.");}
+catch(e){show("CREATE FAILED\n"+e.message+"\n\nIf this says Failed to fetch, open this hosted page directly in Chrome (not an embedded preview).");}finally{create.disabled=false;}};
+read.onclick=async()=>{if(!id)return;read.disabled=true;show("Retrieving "+id+"...");
+try{const response=await fetch(api+"/sets/"+encodeURIComponent(id));const data=await response.json();if(!response.ok||!data.ok)throw Error("HTTP "+response.status+" "+JSON.stringify(data));const set=data.set||{};const checks={"Spanish prompt":set.promptLanguage==="es-ES","Italian target":set.language==="it-IT","All 5 pairs":JSON.stringify(set.pairs)===JSON.stringify(pairs),"ID matches":set.id===id};show((Object.values(checks).every(Boolean)?"ALL CHECKS PASSED ✓":"CHECKS FAILED")+"\n\n"+Object.entries(checks).map(([k,v])=>(v?"✓ ":"✗ ")+k).join("\n")+"\n\n"+JSON.stringify(set,null,2));}
+catch(e){show("RETRIEVE FAILED\n"+e.message);}finally{read.disabled=false;}};
+</script></body></html>
