@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Word Warehouse Menu Preview</title><link rel="stylesheet" href="/word-racer/styles/menu.css"><style>body{margin:0;background:#10192e;color:#fff;font-family:monospace}#app{max-width:1100px;margin:8px auto}#warehouseFrame{display:none;width:100%;height:98vh;border:0}#warehouseFrame.playing{display:block}</style></head><body><main id="app"></main><iframe id="warehouseFrame" src="./game.html"></iframe><script type="module">
+import {mountTeacherMenu,mountStudentMenu} from "/word-racer/core/menu.js";
+import {createSharingClient,readStudentSetId} from "/word-racer/core/sharing.js";
+import {createVoiceService} from "/word-racer/core/voice.js";
+import {WAREHOUSE_CATEGORIES} from "/word-racer/core/warehouse-categories.js";
+const root=document.querySelector("#app"),frame=document.querySelector("#warehouseFrame"),sharing=createSharingClient({apiBaseUrl:"https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev"}),voice=createVoiceService();let menu;
+const opts={title:"WORD WAREHOUSE",instructions:"Arrows or WASD to move; SPACE to pick up a brick; deliver to the matching box.",categories:WAREHOUSE_CATEGORIES,defaultCategory:"Animals",previewGameUrl:"https://boringteacher.com/word-warehouse/",onPlay:start};
+function start(set){menu?.destroy();root.hidden=true;frame.classList.add("playing");frame.contentWindow.postMessage({type:"BT_WAREHOUSE_START",set},location.origin)}
+function showMenu(teacher=false){frame.classList.remove("playing");root.hidden=false;menu?.destroy();menu=(!teacher&&readStudentSetId(location.href))?mountStudentMenu(root,{sharing,voice},{...opts,studentUrl:location.href,onRecover:()=>showMenu(true)}):mountTeacherMenu(root,{sharing,voice},opts)}
+window.addEventListener("message",e=>{if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==="BT_WAREHOUSE_MENU")showMenu(true)});
+showMenu();
+</script></body></html>
