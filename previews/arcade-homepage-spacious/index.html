@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Educational Games Arcade</title>
+<style>
+:root{--sky:#63b7df;--navy:#102744;--cream:#fff3c4;--yellow:#f6d94b;--green:#79d85b;--pink:#ef6c88;--cyan:#5cc5d8;--white:#fffdf1}
+*{box-sizing:border-box}html{background:var(--sky)}body{margin:0;color:var(--navy);font-family:"Courier New",monospace;background:linear-gradient(#63b7df 0 78%,#4b9b62 78% 100%);min-height:100vh;image-rendering:pixelated}
+.shell{width:min(1180px,calc(100% - 20px));margin:10px auto 24px}
+header{background:var(--navy);color:#fff;border:5px solid var(--navy);box-shadow:0 0 0 4px var(--yellow);padding:14px 18px;text-align:center}
+h1{margin:0;font-size:clamp(25px,4vw,42px);letter-spacing:4px;text-shadow:4px 4px #000}.blink{color:var(--yellow);font-size:12px;font-weight:900;margin-top:6px;letter-spacing:2px;animation:blink 1.2s steps(1) infinite}@keyframes blink{50%{opacity:.35}}
+.section{margin-top:18px}.section-title{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#fff;text-shadow:3px 3px var(--navy);font-size:20px;letter-spacing:2px}.section-title:after{content:"";height:4px;background:var(--navy);flex:1;box-shadow:0 3px var(--yellow)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.card{position:relative;background:var(--cream);border:4px solid var(--navy);box-shadow:4px 4px 0 rgba(16,39,68,.8);text-decoration:none;color:var(--navy);min-height:178px;padding:12px;display:flex;flex-direction:column;transition:transform .08s}
+.card:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(16,39,68,.8);background:#fff8d9}.card:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--navy)}
+.icon{width:54px;height:54px;background:var(--cyan);border:3px solid var(--navy);display:grid;place-items:center;font-size:30px;box-shadow:inset -4px -4px #2e7c9a;margin-bottom:9px}.card:nth-child(4n+2) .icon{background:var(--yellow);box-shadow:inset -4px -4px #c19b25}.card:nth-child(4n+3) .icon{background:var(--green);box-shadow:inset -4px -4px #419438}.card:nth-child(4n+4) .icon{background:var(--pink);box-shadow:inset -4px -4px #b52f49}
+h3{margin:0 0 5px;font-size:16px;text-transform:uppercase}.desc{font-size:11px;font-weight:bold;line-height:1.3;color:#294361;flex:1}.play{align-self:flex-start;margin-top:10px;background:var(--green);border:3px solid var(--navy);padding:5px 9px;font-weight:900;font-size:11px;box-shadow:inset -2px -2px #419438}.card:hover .play{background:var(--yellow);box-shadow:inset -2px -2px #c19b25}
+.note{margin-top:18px;background:#d8eef0;border:4px solid var(--navy);padding:10px 13px;font-size:11px;font-weight:bold;line-height:1.45;box-shadow:4px 4px var(--navy)}footer{text-align:center;color:#fff;text-shadow:2px 2px var(--navy);font-size:10px;font-weight:bold;padding:18px 0}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{min-height:145px}.shell{width:min(100% - 12px,1180px)}header{padding:11px 8px}}
+
+/* Shared arcade geometry; retain distinct cream and navy visual identities. */
+.section:not(.sentence-section){background:var(--cream);border:3px solid var(--navy);border-radius:12px;padding:15px 17px 18px;box-shadow:4px 4px 0 #102744}
+.section:not(.sentence-section) .section-title{color:var(--navy);text-shadow:none}
+.section:not(.sentence-section) .section-title:after{background:#d3b753;box-shadow:none;height:2px}
+.section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.section .card{height:225px;min-height:225px;min-width:0;overflow:hidden}
+.section .icon{flex:none}
+.section .desc{flex:1;overflow:hidden}
+.section .play{margin-top:auto}
+@media(max-width:850px){.section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.section .grid{grid-template-columns:1fr}.section .card{height:auto;min-height:205px}}
+/* Sentence Games: the same restrained navy/cyan visual language as Sentence Invaders. */
+.sentence-section{background:#17243a;border:3px solid #3b5573;border-radius:12px;padding:15px 17px 18px;box-shadow:4px 4px 0 #102744}
+.sentence-section .section-title{color:#a5f3fc;text-shadow:none;letter-spacing:1px}
+.sentence-section .section-title:after{height:2px;background:#496482;box-shadow:none}
+.sentence-section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:850px){.sentence-section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.sentence-section .grid{grid-template-columns:1fr}}
+.sentence-section .card{background:#20314b;border:2px solid #496482;border-radius:8px;box-shadow:none;color:#f5f7ff}
+.sentence-section .card:hover{background:#283d59;transform:translateY(-2px);box-shadow:0 5px 0 #102033}
+.sentence-section .icon,.sentence-section .card:nth-child(n) .icon{background:#0c1627;border:1px solid #55708e;border-radius:6px;box-shadow:none}
+.sentence-section h3{color:#a5f3fc}
+.sentence-section .desc{color:#b9d4e8;font-weight:normal;font-size:12px}
+.sentence-section .play{background:#167c77;border:1px solid #6ee7b7;border-radius:6px;color:white;box-shadow:none;padding:8px 13px}
+.sentence-section .card:hover .play{background:#1b9189;box-shadow:none}
+
+
+/* Spacious V2 arcade: consistent geometry, distinct game-world identities. */
+.shell{width:min(1440px,calc(100% - 28px))}
+.section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.section .card{height:220px;min-height:220px;min-width:0}
+.section .icon{flex:none}
+.section .desc{flex:1}
+.section .play{margin-top:auto}
+.section:not(.sentence-section){padding:15px 17px 18px;border-radius:12px}
+.section:not(.sentence-section) .section-title{color:var(--navy);text-shadow:none}
+.section:not(.sentence-section) .section-title:after{height:2px;box-shadow:none}
+.section:not(.sentence-section):not(.conjugation-section):not(.adventure-section){background:#fff0ad;border:3px solid #d8b33e;box-shadow:4px 4px 0 #102744}
+.sentence-section .card{min-height:220px;height:220px}
+.conjugation-section{background:#21132c;border:3px solid #e34b80;box-shadow:4px 4px 0 #102744}
+.conjugation-section .section-title{color:#ff83ab!important}
+.conjugation-section .section-title:after{background:#e34b80!important}
+.conjugation-section .card{background:#2c1c40;color:#f7ecff;border:2px solid #d84b82;border-radius:8px;box-shadow:none}
+.conjugation-section .card:hover{background:#3c2451}
+.conjugation-section .icon{background:#17223e!important;border:2px solid #d84b82;box-shadow:none!important}
+.conjugation-section h3{color:#ff91b8}
+.conjugation-section .desc{color:#e2c8e9}
+.conjugation-section .play{background:#ce3270;border-color:#f58db1;color:#fff;box-shadow:none}
+.conjugation-section .card:hover .play{background:#e84b89;box-shadow:none}
+.adventure-section{background:#0d2b31;border:3px solid #3ed9a2;box-shadow:4px 4px 0 #102744}
+.adventure-section .section-title{color:#75f5be!important}
+.adventure-section .section-title:after{background:#3ed9a2!important}
+.adventure-section .card{background:#173f44;color:#e7fff4;border:2px solid #3ed9a2;border-radius:8px;box-shadow:none}
+.adventure-section .card:hover{background:#205257}
+.adventure-section .icon{background:#184f47!important;border:2px solid #70e9bd;box-shadow:none!important}
+.adventure-section h3{color:#8af5c7}
+.adventure-section .desc{color:#c4eee0}
+.adventure-section .play{background:#178a74;border-color:#7de6bd;color:#fff;box-shadow:none}
+.adventure-section .card:hover .play{background:#1cae91;box-shadow:none}
+@media(max-width:850px){.section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.section .grid{grid-template-columns:1fr}.section .card,.sentence-section .card{height:auto;min-height:175px}.shell{width:calc(100% - 14px)}}
+</style></head>
+<body><div class="shell">
+<header><h1>EDUCATIONAL GAMES</h1><div class="blink">★ CHOOSE YOUR GAME ★</div></header>
+
+<section class="section"><h2 class="section-title">WORD GAMES</h2><div class="grid">
+<a class="card" href="/word-racer/" target="_blank" rel="noopener"><div class="icon">🏎️</div><h3>Word Racer</h3><div class="desc">Race through traffic and find the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/word-jumper/" target="_blank" rel="noopener"><div class="icon">🏃</div><h3>Word Jumper</h3><div class="desc">Jump, react and choose the right word as you run.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/frog-river/" target="_blank" rel="noopener"><div class="icon">🐸</div><h3>Word Frog</h3><div class="desc">Cross the river by landing on the correct answers.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/word-invaders/" target="_blank" rel="noopener"><div class="icon">👾</div><h3>Word Invaders</h3><div class="desc">Defend yourself by shooting the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/word-eater/" target="_blank" rel="noopener"><div class="icon">🟡</div><h3>Word Eater</h3><div class="desc">Navigate the maze, collect the correct words and dodge the ghosts.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/word-snake/" target="_blank" rel="noopener"><div class="icon">🐍</div><h3>Word Snake</h3><div class="desc">Guide the snake toward the correct word and build your score.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/word-warehouse/" target="_blank" rel="noopener"><div class="icon">📦</div><h3>Word Warehouse</h3><div class="desc">Carry vocabulary bricks to the matching translations with your Viking.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/matching-columns/" target="_blank" rel="noopener"><div class="icon">🔗</div><h3>Word Columns</h3><div class="desc">Match words and meanings as quickly as you can.</div><div class="play">▶ PLAY</div></a>
+</div></section>
+
+<section class="section sentence-section" id="sentence-games"><h2 class="section-title">SENTENCE GAMES</h2><div class="grid">
+<a class="card" href="/sentences-invaders/" target="_blank" rel="noopener"><div class="icon">👾</div><h3>Sentence Invaders</h3><div class="desc">Shoot the correct words in order to build sentences. Choose grammar topics or share your own.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/sentence-eater/" target="_blank" rel="noopener"><div class="icon">🟡</div><h3>Sentence Eater</h3><div class="desc">Collect the correct word ghosts in order. Choose grammar topics or share your own sentences.</div><div class="play">▶ PLAY</div></a>
+<a class="card" href="/sentence-warehouse/" target="_blank" rel="noopener"><div class="icon">👷</div><h3>Sentence Warehouse</h3><div class="desc">Carry word boxes to the right slots to build complete sentences. Choose grammar topics or share your own.</div><div class="play">▶ PLAY</div></a>
+</div></section>
+
+<section class="section conjugation-section"><h2 class="section-title">CONJUGATION GAMES</h2><div class="grid">
+<a class="card" href="/conjugation-shooter/" target="_blank" rel="noopener"><div class="icon">🎯</div><h3>Conjugation Shooter</h3><div class="desc">Find and shoot the correct verb conjugations.</div><div class="play">▶ PLAY</div></a>
+
+</div></section>
+
+<section class="section adventure-section"><h2 class="section-title">LANGUAGE ADVENTURES</h2><div class="grid">
+<a class="card" href="/conjugation-adventure/" target="_blank" rel="noopener"><div class="icon">🗺️</div><h3>Language Quest</h3><div class="desc">Explore an adventure world and master verb conjugations.</div><div class="play">▶ PLAY</div></a>
+</div></section>
+
+
+<div class="note">★ <b>MAKE IT YOURS:</b> Many language games let you paste your own vocabulary pairs and use them with different languages, units and classes.</div>
+<footer>EDUCATIONAL GAMES · LEARN BY PLAYING</footer>
+</div></body></html>
