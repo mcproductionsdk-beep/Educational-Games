@@ -35,9 +35,54 @@ h1{font:900 clamp(27px,4vw,44px) "Courier New",monospace;letter-spacing:4px;marg
 #menu #shareStudentLink{flex:2 1 190px}
 #menu #preview{font-size:12px;margin:8px 0}
 @media(max-width:760px){#menu .cols{grid-template-columns:1fr;gap:10px}#menu textarea{height:34vh;min-height:210px;font-size:16px}#menu select{font-size:16px}#menu .row button{min-height:56px}}
+
+/* Exact Word Racer menu structure and visual metrics (scoped to teacher menu) */
+body{background:#79bde2;color:#fff;font-family:"Courier New",monospace}
+.wrap{width:min(1120px,calc(100vw - 12px));max-width:none;margin:6px auto;padding:10px;background:#17365f;border:5px solid #102744;box-shadow:0 0 0 4px #f3d64e}
+h1{font:900 clamp(27px,4vw,44px) "Courier New";letter-spacing:4px;color:#fff;text-shadow:4px 4px #102744;margin:4px auto 18px}
+#menu .teacherMenu{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:12px;align-items:start}
+#menu .card{background:#f4e7bd;color:#152945;border:4px solid #152945;padding:12px;box-shadow:inset 0 0 0 3px #fff5d7;min-width:0}
+#menu h2{color:#b52f49;font-size:18px;margin:0 0 8px;text-transform:none}
+#menu .help{color:#294361;font-size:13px;font-weight:bold;line-height:1.4}
+#menu .settingsFields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#menu .fieldLabel{font:900 12px "Courier New";color:#294361;margin:0 0 5px;text-transform:uppercase}
+#menu select,#menu textarea{width:100%;background:#fff8d9;color:#152945;border:4px solid #152945;border-radius:0;padding:9px;font:700 14px "Courier New"}
+#menu textarea{height:min(38vh,285px);min-height:180px;line-height:normal;margin-top:10px}
+#menu button{font:900 14px "Courier New";padding:10px 14px;margin:4px;border:4px solid #152945;background:#5cc5d8;color:#102744;cursor:pointer;box-shadow:inset -3px -3px #2e7c9a,inset 3px 3px #b8f5ee;min-height:0}
+#menu button.yellow{background:#f3d64e}#menu button.pink{background:#ef6c88}#menu button.primary{background:#79d85b}
+#menu .menuButton{width:100%;margin:8px 0 0}
+#menu .voiceCheck,#menu .preview{margin-top:8px;padding:9px;background:#d8eef0;color:#19324e;border:3px solid #19324e;font-size:12px}
+#menu .teacherHowTo{margin-top:12px;padding:10px;background:#fff8d9;border:3px solid #152945}
+#menu .teacherHowTo summary{cursor:pointer;font:900 13px "Courier New";color:#152945}
+#menu .teacherHowTo div{font:700 11px "Courier New";line-height:1.5;margin-top:8px}
+#menu .shareBlock{margin-top:12px;padding-top:12px;border-top:3px solid #152945}
+#menu #shareStudentLink{font-size:16px;padding:12px}
+#menu .stepHint{font:700 11px "Courier New";line-height:1.35;margin:5px 0 8px;color:#294361}
+#menu .finalPlay{margin:14px 0 0;padding:14px;font-size:20px;width:100%}
+#menu .error{color:#b9223e;min-height:18px;font-weight:bold;font-size:12px}
+#menu .link{color:#17365f;overflow-wrap:anywhere}
+@media(max-width:760px){#menu .teacherMenu{grid-template-columns:1fr;gap:10px}#menu .settingsFields{grid-template-columns:1fr}#menu .card{padding:12px}#menu textarea{height:34vh;min-height:210px;font-size:16px}#menu select{min-height:48px;font-size:16px}#menu button{min-height:48px}#menu #shareStudentLink,#menu .finalPlay{min-height:56px}}
 </style></head><body><h1>WORD WAREHOUSE</h1><main class="wrap">
-<section id="menu"><div class="cols"><div class="panel"><h2>TEACHER · GAME SETTINGS</h2><label>Target language</label><select id="lang"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="en-US">English</option></select><label>Category</label><select id="category"><option value="custom">Custom vocabulary</option></select><p class="muted">Move with arrow keys or WASD. Press SPACE near the central brick, then walk into the correct English box. Deliver eight words per round; positions shuffle each round. No countdown!</p><button id="testVoice">🔊 TEST VOICE</button><details><summary>HOW TO PLAY</summary><p class="muted">The stopwatch runs while you play. Wrong deliveries send the brick back to the middle and add a mistake. Press P to pause.</p></details></div>
-<div class="panel"><h2>PASTE QUIZLET WORDS</h2><p class="muted">Paste English and target-language word pairs separated by TAB, one pair per line.</p><textarea id="words"></textarea><div class="row"><button id="swap">⇄ SWAP SIDES</button><button id="shareStudentLink">🔗 SHARE WITH STUDENTS</button><button id="play">▶ PLAY</button></div><p id="preview" class="muted"></p><p id="status" role="status"></p><div id="link"></div><button id="copyLink" type="button" hidden>📋 COPY LINK</button><p id="copyStatus" class="muted" role="status" hidden></p></div></div></section>
+<section id="menu"><div class="teacherMenu">
+<div class="card settingsCard"><h2>GAME SETTINGS</h2>
+<div class="help">Choose the language and vocabulary you want to practise.</div>
+<div class="settingsFields">
+<div><div class="fieldLabel">Language</div><select id="lang"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="en-US">English</option></select></div>
+<div><div class="fieldLabel">Vocabulary</div><select id="category"><option value="custom">Custom vocabulary</option></select></div>
+</div>
+<div class="voiceCheck"><b>VOICE:</b> ready to test</div>
+<button id="testVoice" class="yellow menuButton" type="button">🔊 TEST VOICE</button>
+<details class="teacherHowTo"><summary>▶ HOW TO PLAY</summary><div>ARROWS / WASD = move · SPACE = pick up brick · P = pause. Carry each brick to its matching English box. Eight words per round.</div></details>
+</div>
+<div class="card vocabCard"><h2>YOUR VOCABULARY</h2>
+<div class="help">Use a ready-made list above, or paste/edit your own Quizlet-style term and definition pairs.</div>
+<textarea id="words"></textarea>
+<button id="swap" class="menuButton" type="button">⇄ SWAP SIDES</button>
+<div id="preview" class="preview"></div>
+<div id="status" class="error" role="status"></div>
+<div class="shareBlock"><button id="shareStudentLink" class="pink menuButton" type="button">🔗 SHARE WITH STUDENTS</button><div class="stepHint">Creates a permanent student link for exactly the vocabulary shown above.</div><div id="link"></div><button id="copyLink" type="button" hidden>📋 COPY LINK</button><p id="copyStatus" class="help" role="status" hidden></p></div>
+<button id="play" class="primary wide finalPlay" type="button">PLAY</button>
+</div></div></section>
 <section id="student" hidden><div class="panel"><h2 id="studentTitle">Loading vocabulary…</h2><p id="studentMeta"></p><p id="studentStatus" role="status"></p><button id="studentPlay" disabled>▶ PLAY</button><details><summary>HOW TO PLAY</summary><p class="muted">Move with arrows/WASD. SPACE picks up a brick. Walk into its matching English translation box.</p></details></div></section>
 <section id="game" hidden><div id="hud" class="hud"></div><div class="stage"><canvas id="canvas" width="900" height="610"></canvas><div id="overlay" class="overlay" hidden></div></div><p id="notice" class="notice"></p><div class="row" style="justify-content:center"><button id="pause">PAUSE (P)</button><button id="restart">RESTART</button><button id="back">MENU</button><button id="repeat">🔊 WORD</button><button id="fullscreen">FULLSCREEN</button></div><div class="pad"><span></span><button data-key="arrowup">↑</button><span></span><button data-key="arrowleft">←</button><button id="pickup">SPACE</button><button data-key="arrowright">→</button><span></span><button data-key="arrowdown">↓</button><span></span></div></section></main>
 <script>
