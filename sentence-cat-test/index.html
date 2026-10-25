@@ -245,7 +245,7 @@ $('shareSentences').addEventListener('click',async()=>{
  if(invalid.length||valid.length<2){status.textContent='Enter at least two valid sentence pairs before sharing.';return}
  if(location.protocol==='file:'){status.textContent='Open this prototype at a hosted HTTPS preview URL to create a usable student link. No set was saved.';return}
  const btn=$('shareSentences');btn.disabled=true;status.textContent='Saving sentence set to staging…';
- try{const payload={title:$('setTitle').value.trim()||'Sentence Cat sentences',language:selectedLocale,sentences:valid.map(([en,tl])=>[tl,en])};
+ try{const payload={title:$('setTitle').value.trim()||'Sentence Cat sentences',language:selectedLocale,pairs:valid.map(([en,tl])=>[tl,en])};
  const res=await fetch(API+'/sentence-sets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
  const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||data.message||'HTTP '+res.status);
  const {id}=extractSet(data);if(!/^S[A-Za-z0-9]{8}$/.test(id||''))throw Error('The API returned an unexpected set ID. The set may have saved, but no link was created.');
@@ -258,7 +258,7 @@ async function loadStudent(){
  const match=location.hash.match(/^#set=(S[A-Za-z0-9]{8})$/);if(!match)return false;
  document.body.classList.add('student-mode');showMenu();$('studentTitle').textContent='Loading shared sentences…';$('studentMeta').textContent='';$('studentPlay').disabled=true;
  try{const res=await fetch(API+'/sentence-sets/'+encodeURIComponent(match[1]),{cache:'no-store'});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||data.message||'HTTP '+res.status);
- const {object}=extractSet(data);const locale=object?.language;const pairs=object?.sentences;
+ const {object}=extractSet(data);const locale=object?.language;const pairs=object?.pairs;
  if(!['es-ES','de-DE','da-DK','fr-FR','it-IT'].includes(locale)||!Array.isArray(pairs)||pairs.length<2||pairs.some(p=>!Array.isArray(p)||p.length!==2||p.some(x=>typeof x!=='string'||!x.trim())))throw Error('Malformed or unsupported sentence set');
  studentPairs=pairs.map(([tl,en])=>[en,tl]);studentTitle=object.title||'Sentence Cat sentences';selectedLocale=locale;$('localeSelect').value=locale;updateVoice();$('studentTitle').textContent=studentTitle;$('studentMeta').textContent=`${$('localeSelect').selectedOptions[0].text} · ${studentPairs.length} sentences`;$('studentPlay').disabled=false;
  }catch(e){$('studentTitle').textContent='Unable to load shared sentences';$('studentMeta').textContent=e.message+'. Ask your teacher for a valid link.'}
