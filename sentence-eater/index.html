@@ -265,7 +265,7 @@ document.body.classList.add('menu-open');const sharedId=new URL(location.href).h
  const items=[['👾 Sentence Invaders','sentences-invaders'],['🟡 Sentence Eater','sentence-eater'],['📦 Sentence Warehouse','sentence-warehouse'],['🐈 Sentence Cat (Test)','sentence-cat-test']];
  const heading=document.createElement('h3');heading.textContent='CHOOSE ANOTHER SENTENCE GAME';
  const links=document.createElement('div');links.className='crossLinks';
- items.forEach(([label,route])=>{const a=document.createElement('a');a.textContent=label;a.href='https://boringteacher.com/'+route+'/#set='+encodeURIComponent(id);links.append(a)});
+ items.forEach(([label,route])=>{const a=document.createElement('a');a.textContent=label;a.href='https://boringteacher.com/'+route+'/?autoplay=1#set='+encodeURIComponent(id);links.append(a)});
  host.append(heading,links);
  const menu=document.getElementById('teacherMenu');
  const show=()=>{host.style.display=menu?.classList.contains('student-mode')?'block':'none'};
