@@ -217,7 +217,21 @@ function updateLibrary(){
  updateTopicCount();
  $('libraryNotice').textContent=library?`Published V1 library loaded from ${LIBRARY_URL}.`: `Published V1 library unavailable${libraryError?': '+libraryError:''}. Built-in play disabled; custom sets remain available.`;
 }
-function updateTopicCount(){const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];$('topicCount').textContent=Array.isArray(pairs)?`${pairs.length} sentence pairs in this topic`:'No built-in topic available'}
+let lastAutoFilledText=null;
+function fillEditorFromTopic(){
+ const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];
+ if(!Array.isArray(pairs))return;
+ const editor=$('sentenceEditor');
+ const next=pairs.filter(p=>Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='string')).map(([en,tl])=>en+' | '+tl).join('\n');
+ if(editor.value===next)return;
+ if(editor.value.trim()&&editor.value!==lastAutoFilledText&&!window.confirm('Replace the sentences currently in the editor with the selected grammar topic? Your edits will be lost.'))return;
+ editor.value=next;lastAutoFilledText=next;refreshPairs();
+}
+function updateTopicCount(){
+ const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];
+ $('topicCount').textContent=Array.isArray(pairs)?`${pairs.length} sentence pairs in this topic`:'No built-in topic available';
+ fillEditorFromTopic();
+}
 $('topicSelect').addEventListener('change',updateTopicCount);
 function updateVoice(){const voices='speechSynthesis' in window?speechSynthesis.getVoices():[];const match=voices.find(v=>v.lang.toLowerCase().startsWith(selectedLocale.slice(0,2).toLowerCase()));$('voiceStatus').textContent=match?'Device voice: '+match.name+' ('+match.lang+')':('speechSynthesis' in window?'Device speech available; matching voice not listed (browser fallback may apply).':'Speech synthesis unavailable on this device.')}
 if('speechSynthesis' in window)speechSynthesis.addEventListener('voiceschanged',updateVoice);
