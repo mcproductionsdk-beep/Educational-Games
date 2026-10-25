@@ -283,7 +283,7 @@ async function loadStudent(){
  try{const res=await fetch(API+'/sentence-sets/'+encodeURIComponent(match[1]),{cache:'no-store'});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||data.message||'HTTP '+res.status);
  const {object}=extractSet(data);const locale=object?.language;const pairs=object?.pairs;
  if(!['es-ES','de-DE','da-DK','fr-FR','it-IT'].includes(locale)||!Array.isArray(pairs)||pairs.length<2||pairs.some(p=>!Array.isArray(p)||p.length!==2||p.some(x=>typeof x!=='string'||!x.trim())))throw Error('Malformed or unsupported sentence set');
- studentPairs=pairs.map(([tl,en])=>[en,tl]);studentTitle=object.title||'Sentence Cat sentences';selectedLocale=locale;$('localeSelect').value=locale;updateVoice();$('studentTitle').textContent=studentTitle;$('studentMeta').textContent=`${$('localeSelect').selectedOptions[0].text} · ${studentPairs.length} sentences`;$('studentPlay').disabled=false;updateStudentGameLinks(match[1]);
+ studentPairs=pairs.map(([tl,en])=>[en,tl]);studentTitle=object.title||'Sentence Cat sentences';selectedLocale=locale;$('localeSelect').value=locale;updateVoice();$('studentTitle').textContent=studentTitle;$('studentMeta').textContent=`${$('localeSelect').selectedOptions[0].text} · ${studentPairs.length} sentences`;$('studentPlay').disabled=false;updateStudentGameLinks(match[1]);if(new URLSearchParams(location.search).get('autoplay')==='1')$('studentPlay').click();
  }catch(e){$('studentTitle').textContent='Unable to load shared sentences';$('studentMeta').textContent=e.message+'. Ask your teacher for a valid link.'}
  return true;
 }
