@@ -1,0 +1,325 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sentence Warehouse — V1.1 Library & Sharing Preview</title><style>
+*{box-sizing:border-box}body{margin:0;background:#10192e;color:#f2f7ff;font:700 13px 'Courier New',monospace}button,select,textarea,input{font:inherit}button{cursor:pointer;color:#e9f9ff;background:#243a55;border:2px solid #6486a8;padding:9px 11px;border-radius:3px}button:hover{filter:brightness(1.15)}button:disabled{opacity:.5;cursor:default}.primary{background:#167c77;border-color:#6ee7b7;color:white}.wrap{max-width:1430px;margin:auto;padding:12px 14px}h1{color:#55dcff;font-size:28px;text-shadow:3px 3px #071323;margin:0 0 12px}h2{font-size:18px;color:#f2f7ff;margin:0 0 10px}p{line-height:1.5}.muted{font-size:13px;color:#afc5dc}.menu{border:3px solid #3b5573;background:#17243a;border-radius:18px;padding:20px 21px;margin:clamp(12px,7vh,70px) auto 0;max-width:1404px}.cols{display:grid;grid-template-columns:1fr 1.2fr;gap:9px}.panel{background:#20314b;border:3px solid #526f90;border-radius:12px;padding:17px 17px}.field{margin:12px 0}.field label{display:block;font-size:13px;color:#9fddff;margin-bottom:5px}select,textarea,input{width:100%;background:#0e192d;color:#f2f7ff;border:1px solid #647d9d;border-radius:3px;padding:11px 15px}textarea{height:168px;resize:vertical;white-space:pre}.buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.buttons button{flex:1}.status{min-height:20px;color:#bcead8;margin:8px 0}.error{color:#ff9ba6}.hint{color:#b8cee5;font-size:13px}.game{margin:0 auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.top h1{margin:0}.hud{font-size:12px;color:#ffdf83;text-align:right;line-height:1.5}.stage{border:4px solid #3984b8;box-shadow:0 0 0 3px #07182d;position:relative;background:#12243c}canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.overlay{position:absolute;inset:0;background:#10192ee9;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:18px}.overlay[hidden],[hidden]{display:none!important}.notice{text-align:center;color:#ffe082;min-height:25px;padding-top:8px}.gamebar{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:0 0 12px}.touch{display:none;grid-template-columns:repeat(3,54px);gap:4px;justify-content:center;margin-top:12px}.touch button{min-height:45px;padding:5px}.pill{color:#7cdbff}details{margin-top:10px}summary{cursor:pointer;color:#a9e3f9}@media(max-width:700px){.cols{grid-template-columns:1fr}.menu{margin-top:12px}.wrap{padding:8px}.top{align-items:flex-start}.top h1{font-size:17px}.hud{font-size:10px}.touch{display:grid}.gamebar button{font-size:11px;padding:7px}}
+/* Fit the complete play area into a typical school-laptop viewport. */
+.game{width:min(100%,calc((100dvh - 154px)*1000/660));max-width:1000px}
+.game .top{margin-bottom:5px}.game .top h1{font-size:clamp(15px,2vw,21px)}
+.gamebar{margin-bottom:7px;gap:5px}.gamebar button{padding:6px 9px;font-size:clamp(10px,1.1vw,12px)}
+.game .notice{min-height:19px;padding-top:4px;font-size:11px}
+@media(max-height:760px){.wrap{padding-top:5px;padding-bottom:5px}.game{width:min(100%,calc((100dvh - 120px)*1000/660))}.gamebar button{padding:4px 7px}.game .top{margin-bottom:3px}.gamebar{margin-bottom:5px}}
+@media(max-width:700px){.game{width:100%}.gamebar{gap:4px}.gamebar button{padding:5px 6px;font-size:10px}}
+:fullscreen .game{width:min(100%,calc((100dvh - 130px)*1000/660))}
+
+/* V0.9 — Master Menu V1.2 + Sentence Games Menu V1.2 normative alignment.
+   Overrides earlier prototype rules; no gameplay changes. */
+.menu{width:100%;max-width:1404px;margin:0 auto;padding:12px 14px;border:3px solid #3b5573;background:#17243a;border-radius:18px}
+.wrap:has(> #menu:not([hidden])){padding-top:clamp(12px,8vh,80px)}
+.menu h1{font-size:22px;margin:0 0 6px;text-shadow:none}
+.menuIntro{font-size:12px;font-weight:400;line-height:1.35;color:#b8cee5;margin:0 0 8px}
+.menu .cols{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:9px}
+.menu .panel{min-width:0;min-height:0;padding:10px 11px;border:2px solid #496482;border-radius:10px;background:#20314b}
+.menu .panel h2{font-size:15px;margin:0 0 8px}
+.menu .field{margin:8px 0}
+.menu .field label{font-size:11px;margin-bottom:4px}
+.menu select,.menu input,.menu textarea{font-size:12px;padding:8px 10px}
+.menu textarea{height:112px;line-height:1.4}
+.menu .hint,.menu .muted{font-size:11px;line-height:1.4}
+.menu button{padding:8px 11px;font-size:12px}
+.menu .buttons{margin-top:8px;gap:7px}
+.menu .buttons button{flex:0 0 auto}
+.menu #playBuilt{min-width:0}
+.menu .swapRow{margin-top:10px}
+.menu .customRow{gap:6px}
+.menu .customRow button{white-space:normal}
+.menu #count{font-size:11px;color:#a8e3ff}
+.menu .status{min-height:16px;margin:5px 0}
+.menu details{margin-top:8px}
+@media(max-width:650px){
+ .wrap:has(> #menu:not([hidden])){padding-top:8px}
+ .menu{margin-top:0;padding:12px}
+ .menu .cols{grid-template-columns:1fr}
+ .menu .panel{min-height:0}
+}
+
+/* V1.0 menu viewport contract — approved decisions 1A 2C 3A 4A 5A.
+   This is a prototype implementation; the shared standard is authoritative. */
+:root{--bt-menu-max:1200px;--bt-menu-anchor:clamp(12px,8vh,80px)}
+.wrap:has(> #menu:not([hidden])){width:100%;max-width:none;padding:0 16px 20px;min-height:100dvh;display:flex;align-items:flex-start;justify-content:center}
+.menu{width:min(100%,var(--bt-menu-max));max-width:var(--bt-menu-max);margin:var(--bt-menu-anchor) auto 0;flex:0 1 var(--bt-menu-max);height:auto;min-height:0}
+.menu .cols{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:9px;align-items:stretch}
+.menu .panel{min-height:0}
+@media(max-height:750px) and (min-width:651px){
+ .menu{margin-top:clamp(12px,5vh,42px)}
+ .menu .field{margin:6px 0}
+ .menu .panel{padding:9px 10px}
+ .menu textarea{height:100px}
+ .menu .buttons{margin-top:6px}
+}
+@media(max-width:650px){
+ .wrap:has(> #menu:not([hidden])){display:block;padding:8px 10px 20px;min-height:0}
+ .menu{width:100%;margin:0 auto;padding:12px 14px}
+ .menu .cols{grid-template-columns:1fr}
+}
+/* Student view: hide teacher-only columns, show one compact full-width panel. 
+   The hidden attribute must not be overridden by .panel display rules. */
+#studentPanel[hidden]{display:none!important}
+#menu.student-mode .cols,#menu.student-mode .menuIntro{display:none!important}
+#menu.student-mode{max-width:960px}
+#menu.student-mode #studentPanel{display:block!important;width:100%;margin:12px 0 0;padding:18px 20px;border:2px solid #496482;border-radius:8px;background:#20314b;min-height:0}
+#menu.student-mode #studentTitle{color:#63d9ff;font-size:18px;margin:0 0 12px}
+#menu.student-mode #studentInfo{font-size:13px;color:#d6eaff;margin:0 0 8px}
+#menu.student-mode #studentStatus{font-size:12px;color:#6ee7b7;margin:0 0 12px;min-height:0}
+#menu.student-mode #studentPlay{display:block;background:#167c77;border:2px solid #6ee7b7;color:white;padding:12px 18px;min-width:230px;font-size:14px}
+#menu.student-mode #studentPlay:disabled{opacity:.55;cursor:not-allowed}
+#menu.student-mode #studentPanel details{margin-top:16px}
+@media(max-width:650px){#menu.student-mode #studentPanel{padding:12px}#menu.student-mode #studentPlay{width:100%;min-width:0}}#shareResult input{max-width:100%;margin:5px 0}#shareResult a{color:#89dfff;overflow-wrap:anywhere}#bankInfo.error{color:#ff9ba6}
+
+/* Boring Teacher Master Menu V1.3 — isolated alignment preview */
+.wrap:has(> #menu:not([hidden])){width:100%;max-width:none;padding:0 16px 20px;min-height:100dvh;display:flex;align-items:flex-start;justify-content:center}.menu{width:min(100%,1200px);max-width:1200px;flex:0 1 1200px;margin:clamp(12px,8vh,80px) auto 0;height:auto;min-height:0;padding:12px 14px;border-width:2px;border-radius:12px}.menu h1{font-size:22px;margin:0 0 3px}.menu h2{font-size:15px;margin:0 0 5px}.menu .cols{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:9px}.menu .panel{min-width:0;min-height:0;padding:10px 11px;border:2px solid #496482;border-radius:8px}.menu .field{margin:7px 0}.menu .field label{font-size:11px;margin-bottom:3px}.menu select,.menu input{padding:7px 8px}.menu textarea{height:112px;padding:7px 8px}.menu button{padding:8px 11px;font-size:12px}.menu .hint{font-size:11px;line-height:1.3}.menu details{margin-top:7px}@media(max-width:650px){.wrap:has(> #menu:not([hidden])){display:block;padding:8px 10px 20px;min-height:0}.menu{width:100%;margin:0 auto}.menu .cols{grid-template-columns:1fr}}
+#crossGameNav{display:none;margin-top:15px;padding-top:12px;border-top:2px dashed #526f90}#crossGameNav h3{font-size:14px;color:#67e8f9;margin:0 0 9px}#crossGameNav .crossLinks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#crossGameNav a{display:flex;align-items:center;justify-content:center;text-align:center;padding:10px 5px;min-height:55px;background:#172b47;border:2px solid #6ee7b7;border-radius:5px;color:#f2f7ff;text-decoration:none;font-size:11px}#crossGameNav a:hover{background:#274a61}@media(max-width:650px){#crossGameNav .crossLinks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Master Menu V1.4 — teacher menu presentation only; gameplay unchanged */
+@media(min-width:651px){body.menu-open #menu:not(.student-mode){max-width:1200px!important;width:calc(100% - 28px)!important;margin:clamp(12px,8vh,80px) auto 18px!important;min-height:0!important;height:auto!important}}
+#menu:not(.student-mode){font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-weight:400!important;background:#17243a!important;border-color:#3b5573!important}
+#menu .panel{background:#20314b!important;border-color:#496482!important;min-height:0!important}
+#menu textarea{white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:normal!important;overflow-x:hidden!important;resize:vertical!important}
+#menu input,#menu select,#menu textarea{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-size:13px!important;font-weight:400!important}
+#menu label,#menu .hint,#menu .mini,#menu .help{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-weight:400!important}
+#menu button{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-size:12px!important}
+@media(max-width:650px){#menu:not(.student-mode){width:calc(100% - 16px)!important;margin:8px auto!important}}
+</style></head><body><main class="wrap"><section id="menu" class="menu"><h1>SENTENCE WAREHOUSE</h1><p class="menuIntro">Choose a language and grammar topic, or paste your own English → target-language sentences.</p><div class="cols"><div class="panel"><h2>GAME SETTINGS</h2><div class="field"><label for="language">LANGUAGE</label><select id="language"><option value="es-ES">ES Spanish</option><option value="de-DE">DE German</option><option value="da-DK">DA Danish</option><option value="fr-FR">FR French</option><option value="it-IT">IT Italian</option></select></div><div class="field"><label for="topic">TOPICS</label><select id="topic"><option value="">Loading shared grammar library…</option></select></div><p id="bankInfo" class="hint">Loading V1.7 candidate library…</p><div id="voiceCheck" class="hint">VOICE: Device speech</div><button id="testVoice" type="button">🔊 TEST VOICE</button><div class="buttons"><button id="playBuilt" class="primary">▶ PLAY</button></div><details><summary>HOW TO PLAY</summary><p class="hint">Move with WASD or arrows. Press SPACE near a crate to pick it up. Bring the carried box near any empty numbered slot and press SPACE to deliver. Press SPACE while carrying outside a slot to put the word down. P pauses. Correct words lock into place; wrong deliveries return the word and count as mistakes.</p></details></div><div class="panel"><h2>YOUR SENTENCES</h2><div class="field"><label for="setTitle">NAME YOUR SENTENCE SET</label><input id="setTitle" maxlength="100" placeholder="e.g. Spanish Present Tense — M2"></div><div class="field"><label for="sentences">YOUR SENTENCES · English [TAB] Translation</label><textarea id="sentences" spellcheck="false" placeholder="The children eat apples. | Los niños comen manzanas."></textarea></div><div class="hint">Paste two-column pairs from a spreadsheet or use one pair per line separated by TAB or |. Use at least two sentence pairs to create a student link.</div><div class="buttons swapRow"><button id="swap">⇄ SWAP SIDES</button></div><div id="count" class="status"></div><div class="buttons customRow"><button id="share">🔗 SHARE WITH STUDENTS</button><button id="playCustom" class="primary">▶ PLAY CUSTOM SENTENCES</button></div><div id="shareResult" class="status" role="status"></div><div id="error" class="status error" role="alert"></div></div></div>
+<div id="studentPanel" class="panel" hidden><h2 id="studentTitle">SHARED SENTENCES</h2><p id="studentInfo" class="hint">Loading your teacher's sentences…</p><div id="studentStatus" class="status" role="status"></div><button id="studentPlay" class="primary" disabled>▶ PLAY SENTENCES</button><div id="crossGameNav"></div><details><summary>HOW TO PLAY</summary><p class="hint">Move with arrows or WASD. Pick up a word box with Space, then carry it over the correct blank and press Space again.</p></details></div></section><section id="game" class="game" hidden><div class="top"><h1>▣ SENTENCE WAREHOUSE</h1><div id="hud" class="hud"></div></div><div class="gamebar"><button id="pause">PAUSE (P)</button><button id="restart">RESTART</button><button id="back">MENU</button><button id="repeat">🔊 SENTENCE</button><button id="fullscreen">FULLSCREEN</button></div><div class="stage"><canvas id="canvas" width="1000" height="660"></canvas><div id="overlay" class="overlay" hidden></div></div><div id="notice" class="notice" role="status"></div><div class="touch"><span></span><button data-key="arrowup">↑</button><span></span><button data-key="arrowleft">←</button><button id="touchSpace">SPACE</button><button data-key="arrowright">→</button><span></span><button data-key="arrowdown">↓</button><span></span></div></section></main><script>
+'use strict';const E=id=>document.getElementById(id),c=E('canvas').getContext('2d'),keys=new Set();const W=1000,H=660,context=c;
+const DEMO={'es-ES':[['The children eat apples.','Los niños comen manzanas.'],['My sister reads a book.','Mi hermana lee un libro.'],['We live in a small house.','Vivimos en una casa pequeña.'],['The dog sleeps under the table.','El perro duerme debajo de la mesa.'],['Tomorrow I will study Spanish.','Mañana estudiaré español.'],['They are playing in the park.','Ellos están jugando en el parque.'],['I like to drink cold water.','Me gusta beber agua fría.'],['The teacher writes on the board.','El profesor escribe en la pizarra.'],['We visited our grandparents yesterday.','Visitamos a nuestros abuelos ayer.']], 'de-DE':[['The children eat apples.','Die Kinder essen Äpfel.'],['My sister reads a book.','Meine Schwester liest ein Buch.'],['We live in a small house.','Wir wohnen in einem kleinen Haus.']], 'da-DK':[['The children eat apples.','Børnene spiser æbler.'],['My sister reads a book.','Min søster læser en bog.'],['We live in a small house.','Vi bor i et lille hus.']], 'fr-FR':[['The children eat apples.','Les enfants mangent des pommes.'],['My sister reads a book.','Ma sœur lit un livre.'],['We live in a small house.','Nous habitons dans une petite maison.']], 'it-IT':[['The children eat apples.','I bambini mangiano mele.'],['My sister reads a book.','Mia sorella legge un libro.'],['We live in a small house.','Viviamo in una piccola casa.']]};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};const short=(t,n=13)=>[...t].length>n?[...t].slice(0,n-1).join('')+'…':t;const rect=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h)};function drawText(t,x,y,color='#fff',size=16){c.fillStyle=color;c.font='bold '+size+'px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(t,x,y)}
+let voices=[],state=null,raf=0,last=0,source=null;function voiceFor(lang){return voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||voices.find(v=>v.lang.toLowerCase().split('-')[0]===lang.split('-')[0])||null}function loadVoices(){if(!('speechSynthesis'in window))return;voices=speechSynthesis.getVoices();const lang=E('language').value,v=voiceFor(lang);E('voiceCheck').textContent='VOICE: Device speech · '+lang+' · '+(v?v.name:'Browser default')}function speak(text){if(!text||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=state?.lang||E('language').value;u.rate=.88;const v=voiceFor(u.lang);if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}function stopSpeech(){try{speechSynthesis.cancel()}catch(e){}}if('speechSynthesis'in window){loadVoices();speechSynthesis.addEventListener?.('voiceschanged',loadVoices);setTimeout(loadVoices,400)}
+
+const LIBRARY_URL='https://raw.githubusercontent.com/mcproductionsdk-beep/Educational-Games/content/sentence-library-v1-7-editorial/libraries/sentences/v1.7-candidate.json';
+const SENTENCE_API='https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
+const SHARE_BASE='https://boringteacher.com/sentence-games/';
+const LOCALES=['es-ES','de-DE','da-DK','fr-FR','it-IT'];
+let grammarLibrary=null,studentSet=null,studentPairs=null,studentMode=false,libraryReady=false;
+const validPairs=p=>Array.isArray(p)&&p.length>=2&&p.length<=100&&p.every(x=>Array.isArray(x)&&x.length===2&&x.every(t=>typeof t==='string'&&t.trim()&&t.length<=1000));
+function parse(){
+ let pairs=[],errors=[];
+ E('sentences').value.replace(/\r/g,'').split('\n').forEach((line,i)=>{
+  if(!line.trim())return;
+  const p=line.includes('\t')?line.split('\t'):line.split('|');
+  if(p.length!==2||!p[0].trim()||!p[1].trim())errors.push(i+1);
+  else pairs.push(p.map(t=>t.trim()));
+ });return {pairs,errors};
+}
+function updateCount(){
+ const p=parse();E('count').textContent=p.pairs.length+' valid sentence pairs'+(p.pairs[0]?' · '+p.pairs[0][0]+' → '+p.pairs[0][1]:'')+(p.errors.length?' · Invalid lines: '+p.errors.join(', '):'');
+}
+function showError(t){E('error').textContent=t}
+function currentTopicPairs(){
+ const lang=E('language').value,topic=E('topic').value;
+ return grammarLibrary?.languages?.[lang]?.[topic]||null;
+}
+function refreshTopics(keep=false){
+ const lang=E('language').value,sel=E('topic'),prior=keep?sel.value:null;
+ const topics=grammarLibrary?.languages?.[lang];
+ sel.replaceChildren();
+ if(!topics){sel.add(new Option('Library unavailable',''));sel.disabled=true;E('playBuilt').disabled=true;return}
+ Object.keys(topics).forEach(t=>sel.add(new Option(t,t)));
+ if(prior&&Object.hasOwn(topics,prior))sel.value=prior;
+ sel.disabled=false;E('playBuilt').disabled=false;updateTopicInfo();
+}
+function updateTopicInfo(){
+ const p=currentTopicPairs();
+ E('bankInfo').textContent=p?p.length+' sentences · Foundation 3 → Development 3 → Application 3 · V1.7 candidate':'Grammar topic unavailable.';
+}
+function loadTopicIntoEditor(){
+ const p=currentTopicPairs();if(!p)return;
+ E('sentences').value=p.map(x=>x.join('\t')).join('\n');
+ updateCount();showError('');E('shareResult').replaceChildren();
+}
+async function loadGrammar(){
+ E('playBuilt').disabled=true;
+ try{
+  const response=await fetch(LIBRARY_URL,{cache:'no-cache'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.schemaVersion!==1||!data.languages)throw Error('Invalid library schema');
+  let total=0;
+  for(const lang of LOCALES){
+   const topics=data.languages[lang];
+   if(!topics||!Object.keys(topics).length)throw Error('Missing '+lang);
+   for(const [name,pairs] of Object.entries(topics)){
+    if(!name.trim()||pairs.length!==9||!pairs.every(p=>Array.isArray(p)&&p.length===2&&p.every(x=>typeof x==='string'&&x.trim())))throw Error('Invalid topic '+lang+'/'+name);
+    total++;
+   }
+  }
+  if(total!==123)throw Error('Unexpected topic count '+total);
+  grammarLibrary=data;libraryReady=true;refreshTopics();loadTopicIntoEditor();
+ }catch(e){
+  libraryReady=false;E('bankInfo').textContent='V1.7 grammar library could not be loaded: '+e.message+'. Connect to the internet and reload.';
+  E('bankInfo').classList.add('error');E('topic').disabled=true;E('playBuilt').disabled=true;
+ }
+}
+E('sentences').addEventListener('input',()=>{updateCount();E('shareResult').replaceChildren()});
+E('swap').onclick=()=>{
+ const p=parse();if(p.errors.length){showError('Fix invalid lines before swapping.');return}
+ E('sentences').value=p.pairs.map(([a,b])=>b+'\t'+a).join('\n');updateCount();E('shareResult').replaceChildren();showError('');
+};
+E('language').onchange=()=>{loadVoices();refreshTopics();loadTopicIntoEditor()};
+E('topic').onchange=()=>{updateTopicInfo();loadTopicIntoEditor()};
+E('testVoice').onclick=()=>speak({'es-ES':'Hola','de-DE':'Guten Tag','da-DK':'Goddag','fr-FR':'Bonjour','it-IT':'Ciao'}[E('language').value]);
+E('playBuilt').onclick=()=>{
+ const p=currentTopicPairs();if(!p){showError('The grammar topic is not available.');return}
+ start(p,E('language').value);
+};
+E('playCustom').onclick=()=>{
+ const p=parse();if(p.errors.length||!validPairs(p.pairs)){showError('Enter 2–100 valid English | translation pairs; correct invalid lines first.');return}
+ start(p.pairs,E('language').value);
+};
+async function apiRequest(path,options={}){
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+ try{
+  const response=await fetch(SENTENCE_API+path,{...options,signal:controller.signal});
+  const data=await response.json();
+  if(!response.ok||!data.ok)throw Error(data.error||'Request failed ('+response.status+')');
+  return data;
+ }finally{clearTimeout(timeout)}
+}
+E('share').onclick=async()=>{
+ const btn=E('share'),output=E('shareResult'),p=parse();
+ if(p.errors.length||!validPairs(p.pairs)){showError('Sharing requires 2–100 valid sentence pairs and no invalid lines.');return}
+ showError('');btn.disabled=true;btn.textContent='SAVING SENTENCES…';output.textContent='Saving your sentences…';
+ try{
+  const stored=p.pairs.map(([english,target])=>[target,english]);
+  const data=await apiRequest('/sentence-sets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:E('setTitle').value.trim()||'Sentence Warehouse — Custom Sentences',language:E('language').value,pairs:stored})});
+  if(!/^S[A-HJ-NP-Z2-9]{8}$/i.test(data.id||''))throw Error('Invalid ID returned by sentence API');
+  const link=SHARE_BASE+'#set='+encodeURIComponent(data.id);
+  output.replaceChildren();
+  const title=document.createElement('div');title.textContent='Preview student link ready (for testing only):';
+  const a=document.createElement('a');a.href=link;a.textContent=link;a.target='_blank';a.rel='noopener noreferrer';
+  const field=document.createElement('input');field.readOnly=true;field.value=link;field.setAttribute('aria-label','Student link');
+  const copy=document.createElement('button');copy.textContent='COPY LINK';copy.onclick=async()=>{
+   try{await navigator.clipboard.writeText(link);copy.textContent='COPIED!'}
+   catch{field.focus();field.select();copy.textContent='SELECTED — COPY MANUALLY'}
+  };
+  output.append(title,a,field,copy);
+ }catch(e){output.textContent='Could not share sentences: '+(e.name==='AbortError'?'request timed out':e.message)}
+ finally{btn.disabled=false;btn.textContent='🔗 SHARE WITH STUDENTS'}
+};
+async function initStudent(){
+ const id=new URLSearchParams(location.hash.slice(1)).get('set');if(!id)return;
+ studentMode=true;E('menu').classList.add('student-mode');
+ E('studentPlay').disabled=true;E('studentStatus').textContent='Loading teacher sentences…';
+ try{
+  if(!/^S[A-HJ-NP-Z2-9]{8}$/i.test(id))throw Error('Invalid sharing link');
+  const data=await apiRequest('/sentence-sets/'+encodeURIComponent(id)),set=data.set;
+  if(!set||!LOCALES.includes(set.language)||!validPairs(set.pairs))throw Error('Invalid shared sentence set or language');
+  studentSet=set;studentPairs=set.pairs.map(([target,english])=>[english,target]);
+  E('studentTitle').textContent=set.title||'SHARED SENTENCES';
+  E('studentInfo').textContent=studentPairs.length+' sentences · '+set.language;
+  E('studentStatus').textContent='Ready to play.';
+  E('studentPlay').disabled=false;
+ }catch(e){E('studentStatus').textContent='Unable to load shared sentences: '+(e.name==='AbortError'?'request timed out':e.message)+'. Ask your teacher for a new link.'}
+}
+E('studentPlay').onclick=()=>{if(studentPairs&&studentSet)start(studentPairs,studentSet.language)};
+loadGrammar();initStudent();
+function wordsOf(t){return (t.match(/[^\s]+/gu)||[]).map(w=>w.replace(/^[.,!?;:¡¿"“”()]+|[.,!?;:¡¿"“”()]+$/gu,'')).filter(Boolean)}function layout(n){const max=8;const rows=Math.ceil(n/max),per=Math.min(max,n);const gap=7,width=Math.min(120,(570-(per-1)*gap)/per),height=54;const arr=[];for(let i=0;i<n;i++){let row=Math.floor(i/max),count=Math.min(max,n-row*max),left=500-(count*width+(count-1)*gap)/2;arr.push({x:left+(i%max)*(width+gap),y:349+row*64,w:width,h:height})}return arr}
+function spawn(n){const pts=[];const sides=[...Array(7)].map((_,i)=>({x:55+i*142,y:186})).concat([...Array(7)].map((_,i)=>({x:55+i*142,y:570})),[...Array(3)].map((_,i)=>({x:40,y:273+i*92})),[...Array(3)].map((_,i)=>({x:875,y:273+i*92})));return shuffle(sides).slice(0,n)}function start(pairs,lang){stop();source={pairs:pairs.map(x=>[...x]),lang};state={pairs:source.pairs,lang,idx:0,mistakes:0,elapsed:0,player:{x:500,y:520,walking:false,step:0,facing:'up',carrying:null},mode:'running',words:[],slots:[],filled:[],prompt:'',target:''};E('menu').hidden=true;E('game').hidden=false;E('overlay').hidden=true;nextSentence();last=performance.now();raf=requestAnimationFrame(tick)}function nextSentence(){const s=state;if(s.idx>=s.pairs.length){finish();return}const [en,target]=s.pairs[s.idx];const words=wordsOf(target);if(words.length>20){E('notice').textContent='This prototype supports up to 20 words per sentence. Skipping long sentence.';s.idx++;nextSentence();return}s.prompt=en;s.target=target;s.slots=layout(words.length);s.filled=words.map(()=>false);const extras=distractorsFor(s,words);const crates=shuffle(words.map((text,i)=>({id:i,text,decoy:false,done:false})).concat(extras.map((text,i)=>({id:words.length+i,text,decoy:true,done:false}))));const places=spawn(crates.length);s.words=crates.map((w,i)=>({...w,x:places[i]?.x??55+(i%7)*142,y:places[i]?.y??186}));s.player.x=500;s.player.y=510;s.player.carrying=null;E('notice').textContent='Collect the words you need. Extra crates are distractions! Press SPACE to deliver.';render()}
+// Target-language distractors: prefer words from other sentences in the selected set,
+// then supplement with a small locale-specific bank. Never use English prompt words.
+const DISTRACTOR_BANK={
+'es-ES':['perro','gatos','ayer','mañana','rápido','grande','escuela','nosotros','juegan','bonito','comemos','verde','siempre'],
+'de-DE':['Hund','Katzen','gestern','morgen','schnell','groß','Schule','wir','spielen','schön','essen','grün','immer'],
+'da-DK':['hund','katte','i går','i morgen','hurtigt','stor','skole','vi','leger','smuk','spiser','grøn','altid'],
+'fr-FR':['chien','chats','hier','demain','vite','grand','école','nous','jouent','joli','mangeons','vert','toujours'],
+'it-IT':['cane','gatti','ieri','domani','veloce','grande','scuola','noi','giocano','bello','mangiamo','verde','sempre']
+};
+function distractorsFor(s,correct){
+ const key=t=>t.normalize('NFC').toLocaleLowerCase(s.lang);
+ const excluded=new Set(correct.map(key)),used=new Set();
+ const candidates=shuffle(s.pairs.flatMap((pair,i)=>i===s.idx?[]:wordsOf(pair[1])))
+  .concat(shuffle(DISTRACTOR_BANK[s.lang]||[]));
+ const count=Math.min(4,Math.max(2,Math.ceil(correct.length/3)),Math.max(0,20-correct.length));
+ const result=[];
+ for(const text of candidates){
+  const k=key(text);
+  if(excluded.has(k)||used.has(k))continue;
+  used.add(k);result.push(text);
+  if(result.length>=count)break;
+ }
+ return result;
+}
+function nearestWord(){const p=state.player;let best=null,dist=75;for(const w of state.words){if(w.done)continue;let d=Math.hypot(p.x-(w.x+51),p.y-(w.y+23));if(d<dist){dist=d;best=w}}return best}function slotNear(){
+ // Delivery is based on the carried crate, not the worker's feet.
+ // The crate is drawn 110px above the worker, 110x50px wide.
+ const p=state.player,box={x:p.x-55,y:p.y-110,w:110,h:50};
+ const reach=19;let best=-1,bestDistance=Infinity;
+ for(let i=0;i<state.slots.length;i++){
+  if(state.filled[i])continue;
+  const b=state.slots[i],x=b.x,y=b.y+(state.slotShift||0);
+  // Expanded slot rectangle: forgiving even when only the box edge touches.
+  const dx=Math.max(x-reach-(box.x+box.w),box.x-(x+b.w+reach),0);
+  const dy=Math.max(y-reach-(box.y+box.h),box.y-(y+b.h+reach),0);
+  if(dx>0||dy>0)continue;
+  const d=Math.hypot(box.x+box.w/2-(x+b.w/2),box.y+box.h/2-(y+b.h/2));
+  if(d<bestDistance){bestDistance=d;best=i}
+ }
+ return best;
+}function action(){if(!state||state.mode!=='running')return;const s=state,p=s.player;if(!p.carrying){let w=nearestWord();if(!w){E('notice').textContent='Move closer to a word crate to pick it up.';return}p.carrying=w;speak(w.text);E('notice').textContent='Carrying '+w.text+' — walk to any empty sentence slot and press SPACE.';return}const slot=slotNear();if(slot<0){p.carrying=null;E('notice').textContent='Word returned to its crate.';return}const targetWords=wordsOf(s.target);if(!p.carrying.decoy&&targetWords[slot].normalize('NFC').toLocaleLowerCase(s.lang)===p.carrying.text.normalize('NFC').toLocaleLowerCase(s.lang)){const w=p.carrying;w.done=true;s.filled[slot]=w.text;p.carrying=null;if(!s.filled.every(Boolean))speak(w.text);E('notice').textContent='✓ Correct! '+s.filled.filter(Boolean).length+'/'+s.filled.length+' words placed.';if(s.filled.every(Boolean)){
+ s.mode='transition';E('notice').textContent='✓ SENTENCE COMPLETE!';
+ render();const panel=E('overlay');panel.replaceChildren();
+ const title=document.createElement('h2');title.textContent='SENTENCE COMPLETE!';
+ const phrase=document.createElement('p');phrase.textContent=s.target;phrase.style.cssText='font-size:clamp(22px,4vw,40px);color:#6ee7b7;line-height:1.35;margin:16px;text-align:center';
+ panel.append(title,phrase);panel.hidden=false;
+ let advanced=false;const advance=()=>{if(advanced||state!==s||s.mode!=='transition')return;advanced=true;panel.hidden=true;s.idx++;s.mode='running';nextSentence();last=performance.now();if(!raf)raf=requestAnimationFrame(tick)};
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s.target);u.lang=s.lang;u.rate=.88;const v=voiceFor(s.lang);if(v)u.voice=v;u.onend=()=>setTimeout(advance,350);u.onerror=()=>setTimeout(advance,800);speechSynthesis.speak(u)}catch(e){}
+ setTimeout(advance,Math.max(2600,Math.min(7000,1500+s.target.length*85)));
+}}else{const wasDecoy=p.carrying.decoy;s.mistakes++;s.nopeUntil=s.elapsed+850;p.carrying=null;E('notice').textContent=wasDecoy?'NOPE! That is a distraction word.':'NOPE! Wrong position. The word returned to its crate.'}render()}
+function pause(){if(!state||state.mode==='finished')return;if(state.mode==='running'){state.mode='paused';stopSpeech();cancelAnimationFrame(raf);raf=0;showOverlay('PAUSED','Take your time.',[['RESUME',pause]])}else if(state.mode==='paused'){state.mode='running';E('overlay').hidden=true;last=performance.now();raf=requestAnimationFrame(tick)}}function showOverlay(title,desc,buttons){let o=E('overlay');o.replaceChildren();let h=document.createElement('h2');h.textContent=title;let p=document.createElement('p');p.textContent=desc;o.append(h,p);for(const [label,fn] of buttons){let b=document.createElement('button');b.textContent=label;b.onclick=fn;o.append(b)}o.hidden=false}function finish(){state.mode='finished';cancelAnimationFrame(raf);raf=0;stopSpeech();showOverlay('WAREHOUSE COMPLETE!',state.pairs.length+' sentences · '+state.mistakes+' mistakes · '+Math.floor(state.elapsed/1000)+' seconds',[['REPLAY',()=>start(source.pairs,source.lang)],['MENU',back]])}function stop(){if(raf)cancelAnimationFrame(raf);raf=0;keys.clear();stopSpeech();state=null}function back(){stop();E('game').hidden=true;E('menu').hidden=false}function tick(now){raf=0;const s=state;if(!s||s.mode!=='running')return;const dt=Math.min(80,Math.max(0,now-last));last=now;s.elapsed+=dt;let dx=(keys.has('arrowright')||keys.has('d')?1:0)-(keys.has('arrowleft')||keys.has('a')?1:0),dy=(keys.has('arrowdown')||keys.has('s')?1:0)-(keys.has('arrowup')||keys.has('w')?1:0);let p=s.player;p.walking=!!(dx||dy);if(p.walking){p.step+=dt;if(Math.abs(dx)>Math.abs(dy))p.facing=dx>0?'right':'left';else p.facing=dy>0?'down':'up'}let m=Math.hypot(dx,dy)||1;p.x=Math.max(35,Math.min(965,p.x+dx/m*245*dt/1000));p.y=Math.max(175,Math.min(635,p.y+dy/m*245*dt/1000));render();raf=requestAnimationFrame(tick)}
+function drawWarehouse(){rect(0,0,W,H,'#12243d');for(let y=152;y<H;y+=42){c.strokeStyle='#213954';c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke()}for(let x=0;x<W;x+=48){c.strokeStyle='#1b314d';c.beginPath();c.moveTo(x,152);c.lineTo(x,H);c.stroke()}rect(0,0,W,148,'#0c1c31');for(let i=0;i<9;i++){let x=i*125+22;rect(x,20,6,128,'#233f5b');rect(x+55,25,46,7,'#314f6c');rect(x+72,32,12,12,'#ffe5a2')}for(let x of [0,956]){rect(x,152,44,508,'#1c3856');for(let y=170;y<620;y+=85){rect(x+5,y,32,44,'#7d4b27');rect(x+9,y+5,24,32,'#b77b3b')}}}
+function label(text,x,y,w,h){rect(x,y,w,h,'#10283f');rect(x+2,y+2,w-4,h-4,'#203c56');const size=Math.max(10,Math.min(17,Math.floor((w-10)*1.65/Math.max(1,[...text].length))));drawText(text,x+w/2,y+h/2,'#ffffff',size)}
+function crate(w){let x=w.x,y=w.y;rect(x+4,y+4,104,48,'#071323');rect(x,y,104,48,'#4b7896');rect(x+3,y+3,98,42,'#315470');label(w.text,x+5,y+6,94,35)}
+function assembly(s){const count=s.slots.length,rows=Math.ceil(count/8),height=158+Math.max(0,rows-1)*64,top=280-(rows-1)*25;rect(179,top,642,height,'#c99340');rect(186,top+7,628,height-14,'#18334f');rect(197,top+18,606,50,'#0c2239');drawText('SENTENCE ASSEMBLY ZONE',500,top+31,'#64d8ff',17);drawText(short(s.prompt,64),500,top+56,'#ffe6a3',Math.min(19,Math.max(12,850/Math.max(25,s.prompt.length))));s.slots.forEach((b,i)=>{let yy=b.y+(top-280);rect(b.x-2,yy-2,b.w+4,b.h+4,s.filled[i]?'#60d9a9':'#63baff');rect(b.x,yy,b.w,b.h,s.filled[i]?'#145345':'#10243b');drawText(''+(i+1),b.x+b.w/2,yy+9,'#83d8ff',10);drawText(s.filled[i]?short(s.filled[i],Math.max(4,Math.floor(b.w/9))):'___',b.x+b.w/2,yy+33,s.filled[i]?'#c5ffe0':'#bed6ec',Math.min(13,b.w/Math.max(3,(s.filled[i]||'___').length)*1.7))});s.slotShift=top-280}
+function render(){let s=state;if(!s)return;drawWarehouse();rect(0,0,1000,110,'#071629');drawText('SENTENCE WAREHOUSE',240,31,'#5adfff',25);drawText('TRANSLATE INTO '+({'es-ES':'SPANISH','de-DE':'GERMAN','da-DK':'DANISH','fr-FR':'FRENCH','it-IT':'ITALIAN'}[s.lang]||s.lang),250,70,'#a9d4ee',13);drawText('SENTENCE '+(s.idx+1)+'/'+s.pairs.length+'     TIME '+Math.floor(s.elapsed/1000)+'s     MISTAKES '+s.mistakes,735,33,'#ffe18a',15);assembly(s);for(const w of s.words)if(!w.done&&s.player.carrying!==w)crate(w);drawWorker(s.player);if(s.nopeUntil>s.elapsed){c.save();rect(340,278,320,120,'#22070bdc');c.strokeStyle='#ff465e';c.lineWidth=5;c.strokeRect(340,278,320,120);drawText('NOPE!',500,338,'#ff465e',62);c.restore()}E('hud').textContent='WORDS '+s.filled.filter(Boolean).length+'/'+s.filled.length+' · SPACE TO PICK / PLACE'}
+function drawWorker(s){
+ const c=context,phase=s.walking?Math.floor(s.step/90)%4:0,bob=s.walking?[0,2,0,-2][phase]:0;
+ const back=s.facing==='up',side=s.facing==='left'||s.facing==='right';
+ c.save();c.translate(Math.round(s.x),Math.round(s.y)+bob);
+ if(s.facing==='left')c.scale(-1,1);
+ const px=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x*3,y*3,w*3,h*3)};
+ rect(-22,29,44,5,'#07122288');
+ const stride=s.walking?[0,2,0,-2][phase]:0;
+ px(-6+stride,7,5,4,'#17283a');px(2-stride,7,5,4,'#17283a');
+ px(-6+stride,10,6,2,'#384e62');px(1-stride,10,6,2,'#384e62');
+ px(-7,-6,14,14,'#192a39');px(-6,-5,12,12,'#ff981f');
+ px(-2,-5,4,12,'#ffdd4d');px(-6,3,12,2,'#dce4e8');
+ px(-7,5,14,2,'#243b52');
+ px(-6,-17,12,12,'#1b2938');px(-5,-16,10,10,back?'#4b3227':'#d69a72');
+ if(!back){px(-3,-13,2,2,'#162638');px(2,-13,2,2,'#162638');px(-1,-10,2,1,'#8b543b')}
+ px(-7,-20,14,5,'#19293a');px(-6,-21,12,5,'#f2b919');px(-7,-18,14,2,'#ffd849');px(-4,-22,8,2,'#ffd849');
+ if(s.carrying){
+   // Arms extend upwards to support a real cargo box, with its label always facing the viewer.
+   px(-10,-15,3,12,'#ff981f');px(7,-15,3,12,'#ff981f');
+   px(-10,-18,3,4,'#d69a72');px(7,-18,3,4,'#d69a72');
+   // Keep cargo drawing outside the mirrored sprite coordinate system.
+   c.restore();
+   const x=Math.round(s.x)-55,y=Math.round(s.y)+bob-110;
+   rect(x+4,y+5,110,50,'#071323');rect(x,y,110,50,'#4b7896');rect(x+3,y+3,104,44,'#315470');
+   label(s.carrying.text,x+5,y+7,100,36);
+   return;
+ }
+ px(-10,-3,3,9,'#ff981f');px(7,-3,3,9,'#ff981f');
+ px(-10,4,3,3,'#d69a72');px(7,4,3,3,'#d69a72');
+ c.restore();
+}
+window.addEventListener('keydown',e=>{if(E('game').hidden||['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName))return;let k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys.add(k);if(k===' '&&!e.repeat)action();if(k==='p'&&!e.repeat)pause()});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();if(state?.mode==='running')pause()});for(let b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(b.dataset.key);b.setPointerCapture(e.pointerId)});for(let ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>keys.delete(b.dataset.key))}E('touchSpace').onclick=action;E('pause').onclick=pause;E('restart').onclick=()=>{if(source)start(source.pairs,source.lang)};E('back').onclick=()=>{const id=new URLSearchParams(location.hash.slice(1)).get('set');if(id){location.assign('https://boringteacher.com/sentence-games/#set='+encodeURIComponent(id));return}back()};E('repeat').onclick=()=>{if(state)speak(state.target)};E('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();updateCount();
+(function(){
+ const host=document.getElementById('crossGameNav');
+ if(!host)return;
+ const id=new URLSearchParams(location.hash.slice(1)).get('set');
+ if(!/^S[A-HJ-NP-Z2-9]{8}$/i.test(id||''))return;
+ const items=[['👾 Sentence Invaders','sentences-invaders'],['🟡 Sentence Eater','sentence-eater'],['📦 Sentence Warehouse','sentence-warehouse'],['🐈 Sentence Cat (Test)','sentence-cat-test']];
+ const heading=document.createElement('h3');heading.textContent='CHOOSE ANOTHER SENTENCE GAME';
+ const links=document.createElement('div');links.className='crossLinks';
+ items.forEach(([label,route])=>{const a=document.createElement('a');a.textContent=label;a.href='https://boringteacher.com/'+route+'/#set='+encodeURIComponent(id);links.append(a)});
+ host.append(heading,links);
+ const menu=document.getElementById('menu');
+ const show=()=>{host.style.display=menu?.classList.contains('student-mode')?'block':'none'};
+ new MutationObserver(show).observe(menu,{attributes:true,attributeFilter:['class']});show();
+})();</script></body></html>
