@@ -75,3 +75,59 @@ Use `POST /sentence-sets`, `GET /sentence-sets/{id}`. Teacher editor uses `Engli
 ## 7. Future-maintenance checklist
 
 For each change, log: date; request; relevant canonical docs; source repo/branch/file/blob SHA; active route evidence; affected shared/duplicate copies; library/API versions; exact diff scope; commit SHA; tests and screenshots; acceptance classification; rollback SHA; next action. Update this overlay when a verified source/route/contract changes; preserve history with a new dated revision instead of retroactively claiming older releases were accepted.
+
+
+## 8. Menu customization, content and responsive/mobile implementation addendum (2026-10-25)
+
+This section records **implemented code changes separately from design requirements and observed acceptance**. It supplements Master Menu V1.4 and Sentence Games Menu & Sharing V1.3; it does not silently amend their approval status.
+
+### 8.1 Teacher-menu visual reference and fidelity
+
+The approved **Sentence Games** teacher menu is **not** the main arcade homepage, and the Word Games menu is a separate family. For the Sentence Games teacher menu, the approved design tokens are: max width 1200px; desktop upper-middle anchor `clamp(12px,8vh,80px)`; content-driven height; two columns `1fr 1.2fr` with 9px gap; single column at <=650px; menu background `#17243a`, panel `#20314b`, menu border `#3b5573`, panel border `#496482`; primary green `#167c77` / `#6ee7b7`, secondary blue-grey `#243a55` / `#6486a8`; teacher font `ui-monospace,Consolas,'Courier New',monospace`, regular weight where appropriate; heading 22px, panel heading 15px, labels/help 11px, inputs ~13px, buttons 12px. Source: Master Menu V1.4.
+
+**User-approved target (2026-10-25):** All **four** teacher menus should look virtually identical in geometry, typography, spacing, control sizing, and button placement, while retaining game name, gameplay, instructions and distinct art. This is a **target**, not a claim of completed pixel parity.
+
+**Implemented (GitHub):** menu-scoped V1.4-style CSS additions in Invaders, Eater, Warehouse and Cat; CSS overrides to normalize font weight, input/button fonts, colors, width, responsive layout and textarea wrapping. The earlier isolated preview routes were user-reported 404, so previews are not evidence of accepted visuals. Subsequent direct production/test commits were made. Because overrides were added atop different legacy selectors, they **must be audited for specificity, cascade and effective computed styles** before declaring full fidelity. The user later showed Cat's menu and requested text cleanup, confirming CSS alone did not finish alignment.
+
+### 8.2 Teacher-facing text and information hierarchy
+
+Preserve these controls and their semantics: GAME SETTINGS, language/grammar topic, sentence count, voice and TEST VOICE, PLAY, HOW TO PLAY; YOUR SENTENCES, optional set title, editable bilingual pairs, concise separator guidance, SWAP SIDES, valid count/compact preview, SHARE WITH STUDENTS, PLAY CUSTOM SENTENCES, share result, error and link/copy controls. Preserve natural target-language word order and Unicode accents.
+
+**Cat-specific implemented cleanup:** removed routine development-only display of long raw GitHub V1.7 URL, staging-preview announcement and prototype version banner; simplified duplicate four-pair preview to the first pair; made progress wording teacher-facing. Library-load errors remain visible; staging URL and V1.7 candidate designation remain in code/docs. The share-link container is intended to be hidden until successful sharing; verify actual CSS interaction with the HTML `hidden` attribute before claiming the button is invisible. The user's earlier screenshot showed COPY LINK before sharing, so treat this as a **regression to test**, not a resolved defect.
+
+**Topic-to-editor behavior:** Cat automatically loads all nine selected library pairs into the right editor. Switching to a new topic asks for confirmation before overwriting manually changed text. Verify the initial-load path, manual edits, locale switches, invalid lines, and long translations. Other games may implement topic loading differently; do not claim parity without inspecting their event handlers.
+
+### 8.3 Mobile: menu vs gameplay are different layout contracts
+
+**Teacher menu on mobile:** At <=650px, settings and editor stack vertically in a **scrollable document**. The user must be able to reach all controls, including optional title, textarea, preview, sharing errors and link copy, without horizontal clipping or inaccessible controls. Do not apply gameplay `overflow:hidden` to the teacher menu. Inputs and buttons should be touch-sized, and the keyboard must not trap the user. Avoid forced scaling or fixed viewport-height menu containers.
+
+**Student menu on mobile:** Must show the shared title, locale/count, PLAY, HOW TO PLAY and four-game choices, with readable wrapping, touchable links and vertical scrolling when needed. Do not expose teacher editing. Cross-game links retain the same `#set=` ID and should activate only **after actual set retrieval succeeds**, not merely when the ID matches a regex. Test invalid and unavailable IDs.
+
+**Gameplay on mobile:** A **separate, viewport-contained** contract applies when gameplay is active: game HUD, prompt, playfield, controls and feedback must fit the *visible* mobile viewport without vertical page scrolling or browser chrome hiding essential buttons. Use viewport-aware units and handle portrait orientation, resize, browser address-bar expansion and soft keyboard only where relevant. Do not use menu breakpoints to shrink or alter game mechanics. Desktop arrow/WASD/space and mobile touch controls must remain game-specific.
+
+**Sentence Cat-specific approved mechanics:** 3x3 grid, animated orange pixel-art cat, eight mice/options, swipe up/down/left/right on mobile and arrow keys desktop. Correct selection walks to adjacent mouse, speaks target word, appends word and respawns options; wrong selection approaches, shows sad cat and red NOPE, then returns; the correct next word must be adjacent. Completed sentence is displayed and spoken. Cat gameplay was designed to fit mobile viewport with no vertical scrolling, while its teacher menu must scroll vertically. The current Cat code contains viewport-fit CSS and touch handlers; **this is implementation evidence, not a completed cross-device acceptance test**.
+
+**Other games:** Preserve Invaders' shooting/keyboard/touch controls, Eater's maze controls and Warehouse's pick-up/place controls; test actual on-screen affordances on mobile rather than assuming desktop controls are available. The canonical documents do not prove that every mobile interaction has been tested in the current deployed version.
+
+### 8.4 Required visual and device test matrix
+
+At minimum, inspect each game in:
+- Desktop 1440x900 and a smaller laptop around 1366x768, at **100% zoom**; compare outer menu top, width, columns, title, labels, textarea, button hierarchy and visible errors.
+- Tablet 768x1024 in portrait and landscape; check two-column behavior above the 650px breakpoint and no clipping.
+- Mobile 390x844 and 360x740 portrait; check one-column **scrollable teacher menu**, student-only menu, touch targets, textarea wrapping and onscreen keyboard.
+- Mobile landscape / short-height screen; verify game viewport, HUD, playfield, controls and no unintended page scroll.
+- For each device: built-in nine pairs, topic switching, custom pairs, accents, swap, voice, share/create/copy/retrieve, four-way navigation, gameplay, pause/restart/menu, wrong/correct feedback, and accessible error messages.
+
+Record **observed** pass/fail with browser/device/viewport, date, exact URL, SHA and screenshot. Never mark a test passed merely because CSS/JS code exists or a GitHub commit succeeded.
+
+### 8.5 Outstanding asymmetries to resolve
+
+1. Cat teacher-menu DOM/CSS structure differs from Eater, Warehouse and Invaders; CSS overrides alone do not ensure identical geometry or placement.
+2. The Cat student menu uses its own `#studentGames` navigation; three other games use the injected `#crossGameNav`. Functionally similar, but not a canonical reusable component.
+3. The main Sentence Games launcher has a four-tile layout; the three other game menus and Cat student menu use different card/grid styles. Review against student-navigation standard before claiming identical student UI.
+4. Cat's V1.7 success/status wording has been simplified; compare all four for consistency without hiding actionable errors.
+5. The second Sentence Eater repo lacks the latest four-game menu updates and needs route-confirmed reconciliation.
+6. The V1.7 candidate dependency and staging API are still pre-release boundaries; do not label the entire four-game family production-approved on the strength of menu changes.
+7. The existing documentation has no completed evidence-backed four-game mobile QA matrix; schedule and record real-device verification before release.
+
+**Future development rule:** For any menu/mobile change, first compare the current HTML/CSS and approved reference, define exact visual/functional parity, patch only the relevant menu or viewport behavior, test all breakpoints and student sharing, and then update this addendum with observed results and SHAs. Do not replace gameplay CSS with teacher-menu rules.
