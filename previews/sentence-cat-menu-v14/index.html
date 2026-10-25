@@ -1,0 +1,293 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sentence Cat — Prototype V2.0</title><style>
+:root{font-family:ui-monospace,Consolas,'Courier New',monospace;color:#f0f7ff;background:#0b1424}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#203b56,#0b1424 68%)}button,select{font:inherit}button{cursor:pointer}main{max-width:850px;margin:0 auto;padding:18px 14px 35px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{font-weight:900;color:#6ee7db;font-size:21px}.muted{color:#a8c2d7;font-size:12px}.panel{background:#16273e;border:2px solid #3c6380;border-radius:12px;padding:16px;margin:14px 0;box-shadow:5px 5px 0 #07101d}.labels{font-size:11px;letter-spacing:1.3px;color:#8fb2d4;margin:0 0 8px}.prompt{font-size:clamp(19px,3.5vw,27px);font-weight:800;margin:0 0 14px}.sentence{display:flex;gap:7px;flex-wrap:wrap;min-height:45px;align-items:center}.token{padding:8px 10px;border:1px solid #4d7793;border-radius:6px;background:#233c55;font-size:clamp(15px,2.6vw,19px)}.token.done{background:#10545b;border-color:#6ee7b7;color:#a7ffe1}.game{position:relative;max-width:510px;margin:14px auto}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;touch-action:none;overscroll-behavior:contain}.tile{aspect-ratio:1.35;min-height:75px;display:grid;place-items:center;text-align:center;padding:5px;background:#283f5d;border:2px solid #557391;border-radius:9px;font-size:clamp(14px,3vw,22px);font-weight:800;overflow-wrap:anywhere;user-select:none}.tile.player{background:#087f9c;border:3px solid #82e9ff;box-shadow:0 0 17px #00d5ff80;color:#fff}.tile.reachable:not(.player){border-color:#85a6bf}.tile.wrong{background:#702b3e}.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#09172be6;border-radius:10px;z-index:3;text-align:center;padding:18px}.overlay[hidden]{display:none}.overlay .big{font-size:clamp(35px,7vw,58px);font-weight:1000;color:#6ee7b7;text-shadow:3px 4px #04121d}.overlay .nope{color:#ff4b67;font-size:clamp(42px,9vw,72px)}.overlay .complete{font-size:clamp(19px,4vw,31px);line-height:1.45;margin-top:15px}.controls{display:grid;grid-template-columns:repeat(3,64px);gap:5px;justify-content:center;margin:15px 0}.controls button{height:50px;border:2px solid #77a9c5;background:#234562;color:white;border-radius:8px;font-size:24px;font-weight:bold}.controls .blank{visibility:hidden}.controls button:active{background:#157d94}.actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}.actions button,.actions select{border:2px solid #6487a9;background:#233d59;color:#fff;padding:10px 12px;border-radius:7px}.actions .primary{background:#167c77;border-color:#6ee7b7}.status{text-align:center;min-height:22px;color:#b8d2e4;font-size:13px}.foot{font-size:12px;color:#a9c1d7;text-align:center;line-height:1.6}.progress{color:#9deac8;font-weight:bold}button:focus-visible{outline:3px solid #fff;outline-offset:3px}@media(max-width:450px){.tile{min-height:68px}.panel{padding:12px}.controls button{height:47px}}
+
+/* Fit the complete game into the visible mobile viewport, including browser chrome. */
+html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+main{height:100vh;height:100dvh;max-width:850px;display:flex;flex-direction:column;gap:clamp(5px,1.1dvh,12px);padding:clamp(7px,1.2dvh,14px) 12px;overflow:hidden}
+.top{flex:0 0 auto}.logo{font-size:clamp(15px,2.5dvh,21px)}.muted{font-size:10px}
+.panel{flex:0 0 auto;margin:0;padding:clamp(8px,1.4dvh,14px)}.labels{margin:0 0 3px;font-size:10px}.prompt{font-size:clamp(16px,2.8dvh,26px);margin:0 0 clamp(5px,1dvh,10px)}
+.sentence{min-height:0;gap:5px}.token{padding:clamp(4px,.8dvh,8px) 7px;font-size:clamp(12px,2.1dvh,18px)}
+.game{flex:1 1 0;min-height:0;width:100%;max-width:510px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.grid{width:100%;height:100%;min-height:0;grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(4px,.8dvh,8px)}
+.tile{min-height:0;aspect-ratio:auto;font-size:clamp(12px,2.6dvh,22px);padding:3px}
+.status{flex:0 0 auto;min-height:0;font-size:clamp(10px,1.8dvh,13px);line-height:1.25}
+.actions{flex:0 0 auto;gap:clamp(3px,1vw,8px);flex-wrap:nowrap}
+.actions button{flex:1 1 0;min-width:0;padding:clamp(5px,.9dvh,9px) 2px;font-size:clamp(8px,1.6dvh,12px);white-space:nowrap;border-width:1px}
+@media(max-width:450px){.panel{padding:8px}.tile{min-height:0}.actions{gap:3px}}
+@media(max-height:590px){.muted{display:none}.labels{font-size:9px}.panel{padding:6px}.actions button{padding:4px 1px}}
+
+/* Sentence Cat: crisp, self-contained pixel characters. */
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(180deg,#294260,#1d3048);border-radius:8px;transition:background .12s,border-color .12s}
+.tile.player{background:linear-gradient(180deg,#174c61,#0d3447)}
+.tile .sprite{height:clamp(24px,5.5dvh,52px);width:clamp(30px,7dvh,62px);flex:0 1 auto;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 #0a1528)}
+.tile .word{font-size:clamp(11px,2.2dvh,19px);line-height:1.1;max-width:100%;overflow-wrap:anywhere;color:#f4f9ff;text-shadow:1px 2px #101c2d}
+.tile.player .sprite{animation:catIdle 1.25s steps(2,end) infinite}
+.tile.pounce .sprite{animation:catPounce .2s steps(2,end) 1}
+.tile.escape .sprite{animation:mouseEscape .23s steps(2,end) 1}
+@keyframes catIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes catPounce{50%{transform:translateY(-10px) scale(1.08)}}
+@keyframes mouseEscape{50%{transform:translateX(7px) rotate(8deg)}}
+@media(max-height:620px){.tile .sprite{height:clamp(19px,4dvh,35px);width:clamp(23px,5dvh,40px)}.tile .word{font-size:clamp(10px,1.9dvh,15px)}}
+
+/* High-resolution crisp pixel sprites and actual cell-to-cell walking. */
+.tile .sprite{width:clamp(38px,8dvh,76px);height:clamp(36px,7dvh,68px)}
+.game{isolation:isolate}.walker{position:absolute;z-index:5;pointer-events:none;display:grid;place-items:center;will-change:left,top;transform:translate(-50%,-50%)}
+.walker .sprite{width:clamp(44px,9dvh,82px);height:clamp(42px,8dvh,76px);image-rendering:pixelated;filter:drop-shadow(3px 4px 0 #081320);animation:walkingFeet .13s steps(2,end) infinite}
+.walker.left .sprite{transform:scaleX(-1)}
+@keyframes walkingFeet{0%,100%{margin-top:0}50%{margin-top:-5px}}
+.tile.player.walking .sprite{visibility:hidden}
+.nope-face{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.nope-face .sadcat{width:clamp(85px,22vw,145px);height:auto;image-rendering:pixelated;filter:drop-shadow(4px 5px 0 #071020)}
+@media(max-height:620px){.tile .sprite{width:clamp(26px,5dvh,48px);height:clamp(26px,5dvh,48px)}}
+@media(prefers-reduced-motion:reduce){.walker .sprite{animation:none}}
+
+html:has(body.menu-open){height:auto;min-height:100%;overflow-y:auto;overscroll-behavior-y:auto}
+body.menu-open{overflow-y:auto;overflow-x:hidden;height:auto;min-height:100dvh;overscroll-behavior-y:auto;-webkit-overflow-scrolling:touch}
+body.menu-open main{display:none}
+#teacherMenu{display:none;max-width:1200px;margin:clamp(12px,8vh,80px) auto 28px;padding:12px 14px;background:#17243a;border:2px solid #3b5573;border-radius:10px;color:#e5efff;font-family:ui-monospace,Consolas,'Courier New',monospace;box-sizing:border-box}
+body.menu-open #teacherMenu{display:block}
+#teacherMenu *{box-sizing:border-box}
+.menuHead{font-size:22px;color:#67e8f9;font-weight:bold;margin:0 0 10px}
+.menuCols{display:grid;grid-template-columns:1fr 1.2fr;gap:9px;align-items:stretch}
+.menuPanel{background:#20314b;border:1px solid #496482;padding:10px 11px;border-radius:7px}
+.menuPanel h2{font-size:15px;color:#67e8f9;margin:0 0 12px}
+.menuPanel label,.menuPanel .fieldLabel{display:block;font-size:11px;color:#d6e5f5;margin:9px 0 5px;font-weight:normal}
+.menuPanel select,.menuPanel input,.menuPanel textarea{width:100%;background:#122137;border:1px solid #57708e;color:#fff;padding:8px;border-radius:4px;font:13px ui-monospace,Consolas,monospace}
+.menuPanel textarea{height:112px;resize:vertical;line-height:1.5}
+.menuPanel button{border:1px solid #6486a8;background:#243a55;color:#fff;padding:8px 11px;font:12px ui-monospace,Consolas,monospace;cursor:pointer;border-radius:4px;min-height:34px}
+.menuPanel button.green{background:#167c77;border-color:#6ee7b7}
+.menuPanel button:disabled{opacity:.55;cursor:not-allowed}
+.menuPanel .menuRow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.menuPanel .help{font-size:11px;color:#adc2d9;line-height:1.45;margin:6px 0}
+.menuPanel .notice{font-size:11px;color:#facc15;margin:9px 0;line-height:1.5}
+.menuPanel details{font-size:12px;margin-top:13px;line-height:1.5}
+.menuPanel summary{cursor:pointer;color:#a5f3fc}
+#previewPairs{max-height:104px;overflow:auto;font-size:11px;color:#c7d9ee;white-space:pre-wrap}
+@media(max-width:650px){#teacherMenu{margin:8px;padding:12px 14px}.menuCols{grid-template-columns:1fr}}
+
+#studentMenu{display:none;max-width:720px;margin:12vh auto;padding:22px;background:#20314b;border:2px solid #67e8f9;border-radius:10px;color:#e5efff;font-family:ui-monospace,monospace}
+#studentMenu h1{color:#67e8f9;font-size:22px}#studentMenu button{background:#167c77;color:white;padding:12px 20px;border:1px solid #6ee7b7;border-radius:5px;font:inherit}#studentMenu button:disabled{opacity:.5}#studentMenu details{margin-top:18px}
+#studentGames{margin-top:20px;border-top:2px dashed #526f90;padding-top:14px}
+#studentGames h2{font-size:16px;color:#67e8f9;margin:0 0 12px}
+#studentGameLinks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+#studentGameLinks a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:105px;padding:12px 8px;text-align:center;background:#172b47;border:2px solid #6ee7b7;border-radius:5px;color:#f0f7ff;text-decoration:none;font-size:12px}
+#studentGameLinks a:hover,#studentGameLinks a:focus-visible{background:#274a61;outline:2px solid #67e8f9}
+#studentGameLinks a[aria-disabled="true"]{pointer-events:none;opacity:.45}
+#studentGameLinks .gameIcon{font-size:27px}
+@media(max-width:650px){#studentGameLinks{grid-template-columns:1fr}#studentGameLinks a{min-height:55px;flex-direction:row;justify-content:flex-start;text-align:left}}
+body.student-mode.menu-open #teacherMenu{display:none}body.student-mode.menu-open #studentMenu{display:block}
+@media(max-width:650px){#studentMenu{margin:10px}}
+
+/* Master Menu V1.4 — teacher menu presentation only; gameplay unchanged */
+@media(min-width:651px){body.menu-open #teacherMenu:not(.student-mode){max-width:1200px!important;width:calc(100% - 28px)!important;margin:clamp(12px,8vh,80px) auto 18px!important;min-height:0!important;height:auto!important}}
+#teacherMenu:not(.student-mode){font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-weight:400!important;background:#17243a!important;border-color:#3b5573!important}
+#teacherMenu .menuPanel{background:#20314b!important;border-color:#496482!important;min-height:0!important}
+#teacherMenu textarea{white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:normal!important;overflow-x:hidden!important;resize:vertical!important}
+#teacherMenu input,#teacherMenu select,#teacherMenu textarea{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-size:13px!important;font-weight:400!important}
+#teacherMenu label,#teacherMenu .hint,#teacherMenu .mini,#teacherMenu .help{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-weight:400!important}
+#teacherMenu button{font-family:ui-monospace,Consolas,'Courier New',monospace!important;font-size:12px!important}
+@media(max-width:650px){#teacherMenu:not(.student-mode){width:calc(100% - 16px)!important;margin:8px auto!important}}
+</style></head><body>
+<section id="teacherMenu" aria-label="Sentence Cat teacher menu">
+ <div class="menuHead">▣ SENTENCE CAT</div>
+ <div class="menuCols">
+ <section class="menuPanel"><h2>GAME SETTINGS</h2>
+ <label for="localeSelect">LANGUAGE</label><select id="localeSelect"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
+ <label for="topicSelect">GRAMMAR TOPIC</label><select id="topicSelect"><option>Prototype examples</option></select>
+ <div class="help" id="topicCount">5 demonstration sentences</div>
+ <label>VOICE</label><div class="help" id="voiceStatus">Checking device speech support…</div>
+ <div class="menuRow"><button id="testVoice">🔊 TEST VOICE</button><button class="green" id="playBuilt">▶ PLAY</button></div>
+ <details><summary>HOW TO PLAY</summary><p>Swipe up, down, left or right on the 3 × 3 board (or use arrow keys). The cat walks toward the mouse. Correct words are spoken and added to the sentence. Wrong mice escape, NOPE appears, and the cat returns. Finish the sentence to hear it spoken in full.</p></details>
+ <div class="notice" id="libraryNotice">Local menu preview: only the original five Spanish demonstration sentences are bundled. Other languages require the approved sentence library.</div>
+ </section>
+ <section class="menuPanel"><h2>YOUR SENTENCES</h2>
+ <label for="setTitle">NAME YOUR SENTENCE SET (OPTIONAL)</label><input id="setTitle" maxlength="100" placeholder="My sentence set">
+ <label for="sentenceEditor">YOUR SENTENCES · English [TAB] Translation</label>
+ <textarea id="sentenceEditor" spellcheck="false" placeholder="I have many cats. | Yo tengo muchos gatos.&#10;She eats an apple. | Ella come una manzana."></textarea>
+ <div class="help">One pair per line. Separate English and translation using a TAB or | character. Keep the target sentence in natural word order.</div>
+ <div class="menuRow"><button id="swapSides">⇄ SWAP SIDES</button></div>
+ <div class="help" id="pairCount">0 valid sentence pairs</div><div id="previewPairs" aria-live="polite"></div>
+ <div class="menuRow"><button id="shareSentences">SHARE WITH STUDENTS</button><button class="green" id="playCustom">▶ PLAY CUSTOM SENTENCES</button></div>
+ <div class="notice" id="shareStatus" aria-live="polite">Staging sharing: a hosted preview URL is required for usable student links.</div><div id="shareLinkArea" class="menuRow" hidden><a id="shareLink" target="_blank" rel="noopener" style="color:#67e8f9;overflow-wrap:anywhere"></a><button id="copyShare">COPY LINK</button></div>
+ <div class="notice" id="editorStatus" aria-live="polite"></div>
+ </section></div>
+</section>
+<section id="studentMenu" aria-label="Student sentence menu"><h1 id="studentTitle">Shared sentences</h1><p id="studentMeta"></p><button id="studentPlay" disabled>▶ PLAY SENTENCES</button><details><summary>HOW TO PLAY</summary><p>Swipe toward the correct mouse to build the translated sentence. Correct answers move the cat and pronounce the word; wrong answers show NOPE.</p></details><nav id="studentGames" aria-label="Other sentence games"><h2>CHOOSE A SENTENCE GAME</h2><div id="studentGameLinks"><a data-sentence-game="sentences-invaders" aria-disabled="true"><span class="gameIcon">👾</span><span>Sentence Invaders</span></a><a data-sentence-game="sentence-eater" aria-disabled="true"><span class="gameIcon">🟡</span><span>Sentence Eater</span></a><a data-sentence-game="sentence-warehouse" aria-disabled="true"><span class="gameIcon">📦</span><span>Sentence Warehouse</span></a><a data-sentence-game="sentence-cat-test" aria-disabled="true"><span class="gameIcon">🐈</span><span>Sentence Cat</span></a></div></nav></section>
+<main><header class="top"><div><div class="logo">▣ SENTENCE CAT</div><div class="muted">BORING TEACHER · INTEGRATED PREVIEW · V1</div></div><div class="progress" id="progress">1 / 5</div></header><section class="panel"><div class="labels">ENGLISH · PROMPT</div><p class="prompt" id="english"></p><div class="labels">TARGET LANGUAGE · BUILD THE SENTENCE</div><div class="sentence" id="sentence"></div></section><section class="game"><div class="grid" id="grid" aria-label="3 by 3 word selection grid"></div><div class="overlay" id="overlay" hidden aria-live="assertive"><div id="overlayContent"></div></div></section><div class="status" id="status" aria-live="polite">Swipe to help the cat catch the correct mouse.</div><div class="actions"><button id="pause">PAUSE (P)</button><button class="primary" id="restart">RESTART</button><button id="menu">MENU</button><button id="sound" aria-pressed="true">🔊 SENTENCE</button><button id="fullscreen">FULLSCREEN</button></div></main><script>
+'use strict';
+let examples=[
+{en:'I have many cats.',es:'Yo tengo muchos gatos.',words:['Yo','tengo','muchos','gatos'],distractors:['tienes','somos','perros','gato','tiene','hay','unas','grandes','soy','ellos','pocos','casa','tenemos']},
+{en:'She eats an apple.',es:'Ella come una manzana.',words:['Ella','come','una','manzana'],distractors:['Él','comen','un','manzanas','bebe','ellos','tengo','la','comemos','peras','comer','soy']},
+{en:'We live in Denmark.',es:'Nosotros vivimos en Dinamarca.',words:['Nosotros','vivimos','en','Dinamarca'],distractors:['Yo','vivo','son','de','Alemania','vivir','tenemos','ellos','viven','un','estamos','casa']},
+{en:'Tomorrow I will study Spanish.',es:'Mañana estudiaré español.',words:['Mañana','estudiaré','español'],distractors:['ayer','estudio','inglés','estudiamos','hoy','hablaré','estudias','francés','soy','estudiaba','mañanas']},
+{en:'The children are playing in the park.',es:'Los niños juegan en el parque.',words:['Los','niños','juegan','en','el','parque'],distractors:['Las','niñas','juega','con','la','casa','somos','jugamos','están','árbol','ellos','de']}
+];
+const $=id=>document.getElementById(id);let round=0,step=0,pos=4,board=[],busy=false,voiceOn=true,timeout=null,epoch=0,paused=false;
+function shuffled(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function neighbors(p){const r=Math.floor(p/3),c=p%3;return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([y,x])=>y>=0&&y<3&&x>=0&&x<3).map(([y,x])=>y*3+x)}
+function makeBoard(){const ex=examples[round];const adj=neighbors(pos);const answerCell=adj[Math.floor(Math.random()*adj.length)];const choices=shuffled((ex.distractors||[]).filter(w=>w!==ex.words[step]));board=Array(9).fill('');let k=0;for(let i=0;i<9;i++){if(i===pos)continue;board[i]=i===answerCell?ex.words[step]:choices.length?choices[k++%choices.length]:"…"}render()}
+const catSVG=`<svg class="sprite" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" shape-rendering="crispEdges"><path fill="#d97722" d="M5 7h5v4h3V8h6v3h3V7h5v13h-2v5h-4v3H9v-3H5z"/><path fill="#f5a34d" d="M8 12h16v11H8z"/><path fill="#152238" d="M10 15h4v4h-4zm9 0h4v4h-4z"/><path fill="#fce6bb" d="M14 20h5v4h-5z"/><path fill="#ee7e93" d="M15 20h3v2h-3z"/><path fill="#f2b5ad" d="M7 9h2v3H7zm17 0h2v3h-2z"/><path fill="#e68b35" d="M25 24h4v-3h2v7h-4v-2h-2z"/><path stroke="#ffe4bb" stroke-width="1" d="M12 22H4m17 0h8"/></svg>`;
+const mouseSVG=`<svg class="sprite" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" shape-rendering="crispEdges"><path fill="#8494ab" d="M5 8h7v4h7V8h7v8h2v9H4v-9h1z"/><path fill="#b9c7d8" d="M7 10h4v5H7zm13 0h4v5h-4zM7 16h18v8H7z"/><path fill="#233047" d="M10 17h3v3h-3zm10 0h3v3h-3z"/><path fill="#f2a1b2" d="M15 21h3v3h-3z"/><path stroke="#dbe7f1" stroke-width="1" d="M14 24H3m16 0h10"/><path fill="#9ba9bb" d="M26 24h4v2h2v3h-4v-2h-2z"/></svg>`;
+const sadCatSVG=`<svg class="sadcat" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-label="Sad orange pixel cat" xmlns="http://www.w3.org/2000/svg"><path fill="#512c28" d="M7 9h12v7h7v-4h12v4h7V9h12v32h-5v9h-8v5H18v-5h-8v-9H7z"/><path fill="#ee8a2b" d="M10 12h7v10h9v-6h12v6h9V12h7v29h-6v9H16v-9h-6z"/><path fill="#ffb35d" d="M15 26h34v17h-5v5H20v-5h-5z"/><path fill="#f6c29d" d="M12 15h5v8h-5zm35 0h5v8h-5z"/><path fill="#a94c37" d="M18 15h5v7h-5zm23 0h5v7h-5z"/><path fill="#513b40" d="M18 30h10v3H18zm18 0h10v3H36z"/><path fill="#241e31" d="M20 33h8v3h-8zm16 0h8v3h-8z"/><path fill="#f4f6fa" d="M21 36h6v5h-6zm16 0h6v5h-6z"/><path fill="#67d5f5" d="M24 39h5v9h-5zm12 0h5v9h-5z"/><path fill="#f9d2a8" d="M27 40h10v8H27z"/><path fill="#8b4d46" d="M29 41h6v3h-6zm-2 6h10v2H27z"/><path fill="#fff0ce" d="M12 43h9v3h-9zm31 0h9v3h-9z"/><path fill="#e56f28" d="M16 49h9v5h-9zm23 0h9v5h-9z"/></svg>`;
+function walkCat(from,to,dir){return new Promise(resolve=>{
+ const game=document.querySelector('.game'),grid=$('grid'),a=grid.children[from],b=grid.children[to];
+ if(!a||!b){resolve();return}
+ const root=game.getBoundingClientRect(),r1=a.getBoundingClientRect(),r2=b.getBoundingClientRect();
+ const x1=r1.left-root.left+r1.width/2,y1=r1.top-root.top+r1.height/2;
+ const x2=r2.left-root.left+r2.width/2,y2=r2.top-root.top+r2.height/2;
+ const walker=document.createElement('div');walker.className='walker'+(dir==='left'?' left':'');walker.innerHTML=catSVG;
+ walker.style.left=x1+'px';walker.style.top=y1+'px';game.append(walker);a.classList.add('walking');
+ const finish=()=>{walker.remove();a.classList.remove('walking');resolve()};
+ if(walker.animate){const anim=walker.animate([{left:x1+'px',top:y1+'px'},{left:x2+'px',top:y2+'px'}],{duration:350,easing:'ease-in-out',fill:'forwards'});anim.onfinish=finish;anim.oncancel=finish}
+ else{walker.style.transition='left .35s ease-in-out,top .35s ease-in-out';requestAnimationFrame(()=>{walker.style.left=x2+'px';walker.style.top=y2+'px'});setTimeout(finish,370)}
+})}
+function render(){const ex=examples[round];$('english').textContent=ex.en;$('progress').textContent=`${round+1} / ${examples.length} · ${step}/${ex.words.length}`;$('sentence').replaceChildren();ex.words.forEach((w,i)=>{const span=document.createElement('span');span.className='token'+(i<step?' done':'');span.textContent=i<step?w:'?';$('sentence').append(span)});$('grid').replaceChildren();for(let i=0;i<9;i++){const d=document.createElement('div');d.className='tile'+(i===pos?' player':'')+(neighbors(pos).includes(i)?' reachable':'');d.innerHTML=(i===pos?catSVG:mouseSVG)+(i===pos?'':`<span class="word"></span>`);if(i!==pos)d.querySelector('.word').textContent=board[i];$('grid').append(d)}}
+function speak(text){if(!voiceOn||!('speechSynthesis' in window))return Promise.resolve();return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang=selectedLocale;const match=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase()===selectedLocale.toLowerCase())||speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith(selectedLocale.slice(0,2).toLowerCase()));if(match)u.voice=match;u.rate=.84;let done=false;const finish=()=>{if(!done){done=true;resolve()}};u.onend=finish;u.onerror=finish;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);setTimeout(finish,Math.max(2500,text.length*180))})}
+function overlay(content){$('overlayContent').replaceChildren();$('overlayContent').append(content);$('overlay').hidden=false}
+function hideOverlay(){$('overlay').hidden=true}
+function showNope(){const el=document.createElement('div');el.className='nope-face';el.innerHTML=sadCatSVG+'<span class="big nope">NOPE</span>';overlay(el);clearTimeout(timeout);timeout=setTimeout(hideOverlay,430)}
+async function finishSentence(lastWord){busy=true;const token=++epoch;const ex=examples[round];const wrap=document.createElement('div');const line=document.createElement('div');line.className='complete';line.textContent=ex.es;wrap.append(line);overlay(wrap);$('status').textContent='Listening to the final word…';await speak(lastWord);if(token!==epoch)return;await new Promise(r=>setTimeout(r,300));if(token!==epoch)return;$('status').textContent='Listening to the full sentence…';await speak(ex.es);if(token!==epoch)return;await new Promise(r=>setTimeout(r,1300));if(token!==epoch)return;round=(round+1)%examples.length;step=0;pos=4;busy=false;hideOverlay();makeBoard();$('status').textContent='New sentence. Find the first word!'}
+async function move(dir){
+ if(busy||paused)return;
+ const r=Math.floor(pos/3),c=pos%3;
+ const delta={up:[-1,0],down:[1,0],left:[0,-1],right:[0,1]}[dir];if(!delta)return;
+ const y=r+delta[0],x=c+delta[1];if(y<0||y>2||x<0||x>2)return;
+ const dest=y*3+x,word=board[dest],good=word===examples[round].words[step];
+ busy=true;const token=epoch,origin=pos;
+ await walkCat(origin,dest,dir);if(token!==epoch)return;
+ if(good){pos=dest;step++;$('status').textContent=`✓ ${word}`;
+  if(step>=examples[round].words.length){render();finishSentence(word)}
+  else{makeBoard();await speak(word);if(token===epoch)busy=false}
+ }else{
+  const target=$('grid').children[dest];target?.classList.add('escape');
+  showNope();$('status').textContent='Wrong mouse! Try another direction.';
+  await new Promise(resolve=>setTimeout(resolve,440));if(token!==epoch)return;
+  await walkCat(dest,origin,dir==='left'?'right':dir==='right'?'left':dir==='up'?'down':'up');
+  if(token===epoch){busy=false;render()}
+ }
+}
+function restart(){paused=false;$('pause').textContent='PAUSE (P)';epoch++;if('speechSynthesis' in window)window.speechSynthesis.cancel();clearTimeout(timeout);hideOverlay();busy=false;round=0;step=0;pos=4;makeBoard();$('status').textContent='Catch the correct mouse to build the sentence.'}
+document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='p'){e.preventDefault();togglePause();return}const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};if(map[e.key]){e.preventDefault();move(map[e.key])}});// Swipe on the grid: one cardinal move per gesture, never diagonal.
+let touchStart=null;
+$('grid').addEventListener('touchstart',e=>{
+  if(e.touches.length!==1){touchStart=null;return}
+  touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+},{passive:true});
+$('grid').addEventListener('touchend',e=>{
+  if(!touchStart||!e.changedTouches.length)return;
+  const dx=e.changedTouches[0].clientX-touchStart.x;
+  const dy=e.changedTouches[0].clientY-touchStart.y;
+  touchStart=null;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));
+},{passive:true});
+$('grid').addEventListener('touchcancel',()=>{touchStart=null});
+function togglePause(){
+ if(busy)return;
+ paused=!paused;
+ $('pause').textContent=paused?'RESUME (P)':'PAUSE (P)';
+ $('status').textContent=paused?'Paused':'Swipe to help the cat catch the correct mouse.';
+ if(paused){const el=document.createElement('div');el.className='big';el.textContent='PAUSED';overlay(el)}
+ else hideOverlay();
+}
+$('pause').addEventListener('click',togglePause);
+$('menu').addEventListener('click',()=>{showMenu()});
+$('fullscreen').addEventListener('click',async()=>{
+ try{
+  if(document.fullscreenElement)await document.exitFullscreen();
+  else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();
+ }catch(e){$('status').textContent='Fullscreen is not available in this browser.'}
+});
+document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'EXIT FULLSCREEN':'FULLSCREEN'});
+$('restart').addEventListener('click',restart);$('sound').addEventListener('click',()=>{voiceOn=!voiceOn;$('sound').textContent=voiceOn?'🔊 SENTENCE':'🔇 MUTED';$('sound').setAttribute('aria-pressed',String(voiceOn));if(!voiceOn&&'speechSynthesis'in window)window.speechSynthesis.cancel();else if(voiceOn)speak(examples[round].words.slice(0,step).join(' ')||examples[round].es)});makeBoard();
+
+let selectedLocale='es-ES';
+const spanishDemo=examples.map(x=>({...x,words:[...x.words],distractors:[...x.distractors]}));
+function showMenu(){epoch++;if('speechSynthesis' in window)speechSynthesis.cancel();busy=false;paused=false;hideOverlay();document.body.classList.add('menu-open');document.documentElement.style.overflowY='auto';document.documentElement.style.height='auto';window.scrollTo(0,0)}
+function showGame(data){if(!data.length)return;examples=data;round=0;step=0;pos=4;epoch++;busy=false;paused=false;hideOverlay();document.body.classList.remove('menu-open');document.documentElement.style.overflowY='hidden';document.documentElement.style.height='100%';makeBoard();$('status').textContent='Swipe to help the cat catch the correct mouse.'}
+function parsePairs(){
+ const rows=$('sentenceEditor').value.split(/\r?\n/),valid=[],invalid=[];
+ rows.forEach((row,i)=>{if(!row.trim())return;const parts=row.includes('\t')?row.split('\t'):row.split('|');if(parts.length!==2||!parts[0].trim()||!parts[1].trim())invalid.push(i+1);else valid.push([parts[0].trim(),parts[1].trim()])});
+ return {valid,invalid};
+}
+function refreshPairs(){const {valid,invalid}=parsePairs();$('pairCount').textContent=valid.length+' valid sentence pair(s)'+(invalid.length?' · invalid line(s): '+invalid.join(', '):'');$('previewPairs').textContent=valid.slice(0,4).map(([en,tl])=>en+' → '+tl).join('\n');return {valid,invalid}}
+$('sentenceEditor').addEventListener('input',refreshPairs);
+$('swapSides').addEventListener('click',()=>{$('sentenceEditor').value=$('sentenceEditor').value.split(/\r?\n/).map(row=>{if(!row.trim())return row;const p=row.includes('\t')?row.split('\t'):row.split('|');return p.length===2?p[1].trim()+' | '+p[0].trim():row}).join('\n');refreshPairs()});
+$('localeSelect').addEventListener('change',()=>{selectedLocale=$('localeSelect').value;updateLibrary();updateVoice()});
+const LIBRARY_URL='https://raw.githubusercontent.com/mcproductionsdk-beep/Educational-Games/content/sentence-library-v1-7-editorial/libraries/sentences/v1.7-candidate.json';
+const API='https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
+let library=null,libraryError='',studentPairs=null,studentTitle='';
+const cleanWords=text=>(text.match(/[\p{L}\p{N}]+(?:[’'\-][\p{L}\p{N}]+)*/gu)||[]);
+function toGame(pairs){
+ const pool=[...new Set(pairs.flatMap(p=>cleanWords(p[1])))];
+ return pairs.map(([en,tl])=>({en,es:tl,words:cleanWords(tl),distractors:pool.filter(w=>!cleanWords(tl).includes(w))})).filter(e=>e.words.length);
+}
+async function loadLibrary(){
+ $('libraryNotice').textContent='Loading the V1.7 candidate library…';
+ try{const res=await fetch(LIBRARY_URL,{cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);
+ const data=await res.json();if(data.schemaVersion!==1||!data.languages||typeof data.languages!=='object')throw Error('Unexpected library schema');
+ library=data;libraryError='';}catch(e){libraryError=e.message;library=null}updateLibrary();
+}
+function updateLibrary(){
+ const topics=library?.languages?.[selectedLocale]||{};const select=$('topicSelect');const old=select.value;select.replaceChildren();
+ for(const topic of Object.keys(topics)){const opt=document.createElement('option');opt.value=topic;opt.textContent=topic;select.append(opt)}
+ if(Object.hasOwn(topics,old))select.value=old;
+ $('playBuilt').disabled=!select.options.length;
+ updateTopicCount();
+ $('libraryNotice').textContent=library?`V1.7 candidate library loaded from ${LIBRARY_URL}.`: `V1.7 candidate library unavailable${libraryError?': '+libraryError:''}. Built-in play disabled; custom sets remain available.`;
+}
+let lastAutoFilledText=null;
+function fillEditorFromTopic(){
+ const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];
+ if(!Array.isArray(pairs))return;
+ const editor=$('sentenceEditor');
+ const next=pairs.filter(p=>Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='string')).map(([en,tl])=>en+' | '+tl).join('\n');
+ if(editor.value===next)return;
+ if(editor.value.trim()&&editor.value!==lastAutoFilledText&&!window.confirm('Replace the sentences currently in the editor with the selected grammar topic? Your edits will be lost.'))return;
+ editor.value=next;lastAutoFilledText=next;refreshPairs();
+}
+function updateTopicCount(){
+ const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];
+ $('topicCount').textContent=Array.isArray(pairs)?`${pairs.length} sentence pairs in this topic`:'No built-in topic available';
+ fillEditorFromTopic();
+}
+$('topicSelect').addEventListener('change',updateTopicCount);
+function updateVoice(){const voices='speechSynthesis' in window?speechSynthesis.getVoices():[];const match=voices.find(v=>v.lang.toLowerCase().startsWith(selectedLocale.slice(0,2).toLowerCase()));$('voiceStatus').textContent=match?'Device voice: '+match.name+' ('+match.lang+')':('speechSynthesis' in window?'Device speech available; matching voice not listed (browser fallback may apply).':'Speech synthesis unavailable on this device.')}
+if('speechSynthesis' in window)speechSynthesis.addEventListener('voiceschanged',updateVoice);
+$('testVoice').addEventListener('click',()=>{const sample={'es-ES':'Hola, ¿cómo estás?','de-DE':'Guten Tag.','da-DK':'Goddag.','fr-FR':'Bonjour.','it-IT':'Buongiorno.'}[selectedLocale];speak(sample)});
+$('playBuilt').addEventListener('click',()=>{const pairs=library?.languages?.[selectedLocale]?.[$('topicSelect').value];if(!Array.isArray(pairs)||!pairs.length)return;const good=pairs.filter(p=>Array.isArray(p)&&p.length===2&&p.every(x=>typeof x==='string'&&x.trim()));if(good.length!==pairs.length){$('libraryNotice').textContent='This topic contains malformed sentence pairs.';return}showGame(toGame(good))});
+$('playCustom').addEventListener('click',()=>{const {valid,invalid}=refreshPairs();if(invalid.length||valid.length<2){$('editorStatus').textContent='Enter at least two valid sentence pairs and correct any invalid lines.';return}if(valid.some(p=>!cleanWords(p[1]).length)){$('editorStatus').textContent='Each translation must contain playable words.';return}$('editorStatus').textContent='';showGame(toGame(valid))});
+function shareUrl(id){const u=new URL(location.href);u.hash='set='+encodeURIComponent(id);return u.href}
+function extractSet(data){const obj=data?.set||data?.data||data;const id=obj?.id||obj?.setId||obj?.sentenceSetId;return {id,object:obj}}
+$('shareSentences').addEventListener('click',async()=>{
+ const {valid,invalid}=refreshPairs();const status=$('shareStatus');$('shareLinkArea').hidden=true;
+ if(invalid.length||valid.length<2){status.textContent='Enter at least two valid sentence pairs before sharing.';return}
+ if(location.protocol==='file:'){status.textContent='Open this prototype at a hosted HTTPS preview URL to create a usable student link. No set was saved.';return}
+ const btn=$('shareSentences');btn.disabled=true;status.textContent='Saving sentence set to staging…';
+ try{const payload={title:$('setTitle').value.trim()||'Sentence Cat sentences',language:selectedLocale,pairs:valid.map(([en,tl])=>[tl,en])};
+ const res=await fetch(API+'/sentence-sets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||data.message||'HTTP '+res.status);
+ const {id}=extractSet(data);if(!/^S[A-Za-z0-9]{8}$/.test(id||''))throw Error('The API returned an unexpected set ID. The set may have saved, but no link was created.');
+ const link=shareUrl(id);$('shareLink').href=link;$('shareLink').textContent=link;$('shareLinkArea').hidden=false;status.textContent='Saved to staging. Copy the student link below.';
+ }catch(e){status.textContent='Could not share: '+e.message}finally{btn.disabled=false}
+});
+$('copyShare').addEventListener('click',async()=>{const link=$('shareLink').href;try{await navigator.clipboard.writeText(link);$('shareStatus').textContent='Student link copied.'}catch(e){$('shareStatus').textContent='Copy the displayed link manually.'}});
+function updateStudentGameLinks(id){
+ document.querySelectorAll('[data-sentence-game]').forEach(link=>{
+  if(id){link.href='https://boringteacher.com/'+link.dataset.sentenceGame+'/#set='+encodeURIComponent(id);link.removeAttribute('aria-disabled')}
+  else{link.removeAttribute('href');link.setAttribute('aria-disabled','true')}
+ });
+}
+function showStudentMenu(){document.body.classList.add('student-mode');$('studentTitle').textContent=studentTitle;$('studentMeta').textContent=`${$('localeSelect').selectedOptions[0].text} · ${studentPairs.length} sentences`;showMenu()}
+async function loadStudent(){
+ const match=location.hash.match(/^#set=(S[A-Za-z0-9]{8})$/);if(!match)return false;
+ document.body.classList.add('student-mode');showMenu();$('studentTitle').textContent='Loading shared sentences…';$('studentMeta').textContent='';$('studentPlay').disabled=true;updateStudentGameLinks(null);
+ try{const res=await fetch(API+'/sentence-sets/'+encodeURIComponent(match[1]),{cache:'no-store'});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.error||data.message||'HTTP '+res.status);
+ const {object}=extractSet(data);const locale=object?.language;const pairs=object?.pairs;
+ if(!['es-ES','de-DE','da-DK','fr-FR','it-IT'].includes(locale)||!Array.isArray(pairs)||pairs.length<2||pairs.some(p=>!Array.isArray(p)||p.length!==2||p.some(x=>typeof x!=='string'||!x.trim())))throw Error('Malformed or unsupported sentence set');
+ studentPairs=pairs.map(([tl,en])=>[en,tl]);studentTitle=object.title||'Sentence Cat sentences';selectedLocale=locale;$('localeSelect').value=locale;updateVoice();$('studentTitle').textContent=studentTitle;$('studentMeta').textContent=`${$('localeSelect').selectedOptions[0].text} · ${studentPairs.length} sentences`;$('studentPlay').disabled=false;updateStudentGameLinks(match[1]);
+ }catch(e){$('studentTitle').textContent='Unable to load shared sentences';$('studentMeta').textContent=e.message+'. Ask your teacher for a valid link.'}
+ return true;
+}
+$('studentPlay').addEventListener('click',()=>{if(studentPairs)showGame(toGame(studentPairs))});
+updateVoice();refreshPairs();showMenu();loadLibrary();loadStudent();
+</script></body></html>
