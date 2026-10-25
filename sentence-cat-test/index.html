@@ -195,7 +195,7 @@ function refreshPairs(){const {valid,invalid}=parsePairs();$('pairCount').textCo
 $('sentenceEditor').addEventListener('input',refreshPairs);
 $('swapSides').addEventListener('click',()=>{$('sentenceEditor').value=$('sentenceEditor').value.split(/\r?\n/).map(row=>{if(!row.trim())return row;const p=row.includes('\t')?row.split('\t'):row.split('|');return p.length===2?p[1].trim()+' | '+p[0].trim():row}).join('\n');refreshPairs()});
 $('localeSelect').addEventListener('change',()=>{selectedLocale=$('localeSelect').value;updateLibrary();updateVoice()});
-const LIBRARY_URL='https://boringteacher.com/libraries/sentences/v1.json';
+const LIBRARY_URL='https://raw.githubusercontent.com/mcproductionsdk-beep/Educational-Games/content/sentence-library-v1-7-editorial/libraries/sentences/v1.7-candidate.json';
 const API='https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
 let library=null,libraryError='',studentPairs=null,studentTitle='';
 const cleanWords=text=>(text.match(/[\p{L}\p{N}]+(?:[’'\-][\p{L}\p{N}]+)*/gu)||[]);
@@ -204,7 +204,7 @@ function toGame(pairs){
  return pairs.map(([en,tl])=>({en,es:tl,words:cleanWords(tl),distractors:pool.filter(w=>!cleanWords(tl).includes(w))})).filter(e=>e.words.length);
 }
 async function loadLibrary(){
- $('libraryNotice').textContent='Loading the published V1 library…';
+ $('libraryNotice').textContent='Loading the V1.7 candidate library…';
  try{const res=await fetch(LIBRARY_URL,{cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);
  const data=await res.json();if(data.schemaVersion!==1||!data.languages||typeof data.languages!=='object')throw Error('Unexpected library schema');
  library=data;libraryError='';}catch(e){libraryError=e.message;library=null}updateLibrary();
@@ -215,7 +215,7 @@ function updateLibrary(){
  if(Object.hasOwn(topics,old))select.value=old;
  $('playBuilt').disabled=!select.options.length;
  updateTopicCount();
- $('libraryNotice').textContent=library?`Published V1 library loaded from ${LIBRARY_URL}.`: `Published V1 library unavailable${libraryError?': '+libraryError:''}. Built-in play disabled; custom sets remain available.`;
+ $('libraryNotice').textContent=library?`V1.7 candidate library loaded from ${LIBRARY_URL}.`: `V1.7 candidate library unavailable${libraryError?': '+libraryError:''}. Built-in play disabled; custom sets remain available.`;
 }
 let lastAutoFilledText=null;
 function fillEditorFromTopic(){
