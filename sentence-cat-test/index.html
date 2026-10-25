@@ -272,7 +272,7 @@ $('shareSentences').addEventListener('click',async()=>{
 $('copyShare').addEventListener('click',async()=>{const link=$('shareLink').href;try{await navigator.clipboard.writeText(link);$('shareStatus').textContent='Student link copied.'}catch(e){$('shareStatus').textContent='Copy the displayed link manually.'}});
 function updateStudentGameLinks(id){
  document.querySelectorAll('[data-sentence-game]').forEach(link=>{
-  if(id){link.href='https://boringteacher.com/'+link.dataset.sentenceGame+'/#set='+encodeURIComponent(id);link.removeAttribute('aria-disabled')}
+  if(id){link.href='https://boringteacher.com/'+link.dataset.sentenceGame+'/?autoplay=1#set='+encodeURIComponent(id);link.removeAttribute('aria-disabled')}
   else{link.removeAttribute('href');link.setAttribute('aria-disabled','true')}
  });
 }
