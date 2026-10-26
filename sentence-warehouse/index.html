@@ -328,7 +328,7 @@ function mobilePoint(e){const r=E('canvas').getBoundingClientRect();return {x:(e
 function clearMobileTouch(){mobileTouch.active=false;for(const k of ['arrowleft','arrowright','arrowup','arrowdown'])keys.delete(k)}
 if(mobilePortrait){const canvas=E('canvas');
 canvas.addEventListener('pointerdown',e=>{if(E('game').hidden||state?.mode!=='running')return;e.preventDefault();canvas.setPointerCapture(e.pointerId);const p=mobilePoint(e);Object.assign(mobileTouch,{active:true,x:p.x,y:p.y,originX:p.x,originY:p.y});},{passive:false});
-canvas.addEventListener('pointermove',e=>{if(!mobileTouch.active)return;e.preventDefault();const p=mobilePoint(e);mobileTouch.x=p.x;mobileTouch.y=p.y;const dx=p.x-mobileTouch.originX,dy=p.y-mobileTouch.originY;clearMobileTouchKeys();if(Math.hypot(dx,dy)>14){if(Math.abs(dx)>Math.abs(dy))keys.add(dx>0?'arrowright':'arrowleft');else keys.add(dy>0?'arrowdown':'arrowup')}},{passive:false});
+canvas.addEventListener('pointermove',e=>{if(!mobileTouch.active)return;e.preventDefault();const p=mobilePoint(e);mobileTouch.x=p.x;mobileTouch.y=p.y;const dx=p.x-mobileTouch.originX,dy=p.y-mobileTouch.originY;clearMobileTouchKeys();if(Math.hypot(dx,dy)>14){if(Math.abs(dx)>9)keys.add(dx>0?'arrowright':'arrowleft');if(Math.abs(dy)>9)keys.add(dy>0?'arrowdown':'arrowup')}},{passive:false});
 canvas.addEventListener('pointerup',e=>{if(!mobileTouch.active)return;const p=mobilePoint(e),travel=Math.hypot(p.x-mobileTouch.originX,p.y-mobileTouch.originY);clearMobileTouch();if(travel<20&&state?.mode==='running'){
  const game=state,player=game.player;
  if(!player.carrying){
