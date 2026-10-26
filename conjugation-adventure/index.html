@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>El complot contra el rey — RPG</title>
+<title>Language Quests — Prototype</title>
 <style>
 :root{--ink:#241f2d;--paper:#fff9df;--gold:#ffd85a;--red:#e64f5f;--blue:#3477c7}
 *{box-sizing:border-box}html,body{margin:0;background:#15131d;color:white;font-family:ui-monospace,"Courier New",monospace;overflow:hidden}
 #shell{position:relative;width:min(1100px,100vw);aspect-ratio:16/9;margin:auto;background:#000;overflow:hidden}
 canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
 #hud{position:absolute;inset:12px 16px auto;display:flex;justify-content:space-between;z-index:5;font-weight:900;font-size:18px;text-shadow:2px 2px #111;pointer-events:none}
-#objective{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:5;background:#241f2ddd;border:2px solid #fff7;padding:7px 12px;border-radius:8px;font-size:14px;pointer-events:none}
+#objective{position:absolute;left:16px;top:48px;transform:none;z-index:5;background:#241f2ddd;border:2px solid #fff7;padding:7px 12px;border-radius:8px;font-size:14px;pointer-events:none}
 .overlay{position:absolute;inset:0;z-index:20;background:#15131dee;display:flex;align-items:center;justify-content:center}
-.card{width:min(760px,90%);background:#24202f;border:4px solid #f5e8c8;box-shadow:0 0 0 5px #0e0c12;padding:24px}
+.card{width:min(900px,94%);max-height:94%;overflow:auto;background:#24202f;border:4px solid #f5e8c8;box-shadow:0 0 0 5px #0e0c12;padding:22px}.setupGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}.panel{background:#1b1825;border:3px solid #4b4459;padding:14px}.panel h2{margin:0 0 10px;color:var(--gold);font-size:15px}.field label{display:block;font-size:12px;color:#d8d0e0;margin-bottom:5px}.field select{width:100%;font:inherit;font-size:16px;padding:10px;background:#fff9df;color:#241f2d;border:3px solid #756d84}.vocabBox{width:100%;height:210px;resize:none;background:#111019;color:#f5f1e8;border:3px solid #4b4459;padding:10px;font:14px/1.45 monospace}.startRow{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:14px}.primary{background:#b74655;border-bottom-color:#762b36;padding:11px 20px}.heroChoice{position:relative;overflow:hidden;min-height:118px;background:linear-gradient(#353047,#211e2c);border:3px solid #756d84!important;color:#f5e8c8!important;opacity:1!important;filter:none!important;box-shadow:inset 0 0 0 2px #17141f,0 4px 0 #111;transition:transform .08s,border-color .08s}.heroChoice canvas{display:block!important;opacity:1!important;filter:none!important;image-rendering:pixelated;margin:auto}.heroChoice.selected{border-color:var(--gold)!important;background:linear-gradient(#4a4051,#282230);box-shadow:inset 0 0 0 2px #17141f,0 0 0 2px #e7bd62,0 4px 0 #111}.heroChoice.selected:after{content:"SELECTED";position:absolute;left:5px;right:5px;bottom:5px;font-size:8px;color:#1c1820;background:#e7bd62;padding:2px}.heroChoice:hover{opacity:1!important;filter:none!important;transform:translateY(-1px)}#menuBtn{position:absolute;z-index:7;right:16px;bottom:14px;background:#332e42;border:2px solid #fff;border-bottom:4px solid #111;padding:7px 10px;font-size:12px}#premise{position:absolute;inset:0;z-index:20;background:rgba(18,16,25,.78);display:flex;align-items:center;justify-content:center;padding:28px}#premise.hidden{display:none}#premiseCard{position:relative;width:min(650px,88%);background:#fff5d8;color:#1b1720;border:5px solid #17131b;box-shadow:0 0 0 4px #fff,0 10px 0 rgba(0,0,0,.35);padding:26px 30px}#premiseCard h2{margin:0 36px 14px 0;color:#7d3040;font-size:22px}#premiseCard p{font-size:16px;line-height:1.55;margin:0}#closePremise{position:absolute;right:10px;top:10px;width:34px;height:34px;padding:0;font-size:20px;background:#2c2734;color:#fff;border:3px solid #17131b}.numberGrid{display:flex;gap:12px;justify-content:center;margin:12px 0}.numberChoice{font-size:22px;min-width:55px;min-height:56px;background:#8a633d;border:3px solid #e9c88e;border-bottom:6px solid #4d3327}.numberChoice:hover,.numberChoice:focus{background:#b98a51}.reconLine{font-size:16px;line-height:1.55;margin:10px 0}.reconInput{width:170px;font:inherit;font-weight:bold;padding:5px 7px;border:3px solid #27212d;background:#fffdf4;color:#17131b}.reconInput.ok{background:#dff3d8}.finalOptions{display:grid;gap:8px;margin-top:14px}@media(max-width:700px){.setupGrid{grid-template-columns:1fr}.heroes{flex-wrap:wrap}.heroChoice{width:105px}.vocabBox{height:130px}.card{padding:14px}}
 h1{margin:0 0 10px;color:var(--gold);font-size:30px}.sub{color:#d8d0e0;line-height:1.45}
 .heroes{display:flex;gap:16px;margin:22px 0;justify-content:center}.heroChoice{width:120px;height:125px;background:#332e42;border:3px solid #756d84;cursor:pointer;color:#fff;font:inherit}.heroChoice:hover,.heroChoice:focus{border-color:var(--gold);outline:none}
 .preview{display:block;width:52px;height:70px;margin:0 auto 7px;image-rendering:pixelated}
@@ -32,79 +32,522 @@ button:hover{filter:brightness(1.12)}button:active{transform:translateY(2px);bor
 .progress{color:var(--gold);font-weight:1000}
 #bossPrompt{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);background:#241f2de8;border:3px solid #fff;padding:9px 14px;font-size:14px;text-align:center}
 .kbd{display:inline-block;border:1px solid #aaa;background:#eee;color:#222;padding:1px 5px;border-radius:3px}
-#touchControls{position:absolute;bottom:8px;left:12px;right:12px;z-index:7;display:none;justify-content:space-between;align-items:end;pointer-events:none}.pad{display:grid;grid-template-columns:repeat(3,44px);gap:4px}#touchControls button{pointer-events:auto;touch-action:none;padding:10px;user-select:none}.up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}
-@media(pointer:coarse){#touchControls{display:flex}}
-@media(max-width:760px){html,body{overflow:auto}#shell{height:100svh;aspect-ratio:auto}canvas#game{object-fit:contain}.card{padding:12px;max-height:95%;overflow:auto}h1{font-size:22px}.heroes{gap:5px;flex-wrap:wrap;margin:12px 0}.heroChoice{width:100px;height:110px}#hud{font-size:13px;inset:8px}#objective{top:35px;font-size:10px;width:max-content;max-width:95%;text-align:center}#bubble{max-width:calc(100% - 24px);max-height:calc(100% - 90px);overflow:auto}.line{font-size:16px}.accents{display:flex;margin:6px 0;flex-wrap:wrap}#answer{width:100%}#recon{max-height:90%;overflow:auto;padding:12px}#bossPrompt{bottom:120px;font-size:11px}#touchControls{display:flex}}
+ .numberChoice:disabled{opacity:1!important;background:#777!important;color:#d6d6d6!important;filter:grayscale(1);cursor:not-allowed;border-color:#555!important;border-bottom-color:#444!important;box-shadow:none!important;transform:none!important} 
+:root{--ink:#2c2527;--paper:#f8e8ba;--gold:#f5cf7d;--blue:#8d5a36}
+#shell{border:5px solid #372a30;box-shadow:0 0 0 5px #a27a4b}
+#bubble{background:#f9e9be;border:5px solid #302b34;border-radius:3px;box-shadow:0 6px 0 #6a4738;max-width:none;padding:14px 20px}
+#speaker{color:#a63f42;font-size:19px;text-transform:uppercase}
+#recon,.card{background:#302b3b;border:5px solid #c49c63;box-shadow:0 0 0 4px #171924}
+.choice,.numberChoice{background:#855839;border-bottom:4px solid #49332e;color:#fff2d2}
+.numberChoice:not(:disabled):hover{background:#b17845}
+.numberChoice:disabled{background:#777!important;color:#ddd!important;cursor:not-allowed!important}
+#objective{background:#eac992;color:#2d2427;border:4px solid #382e30;text-shadow:none;font-weight:900}
+#bossPrompt{background:#f2d9a9;color:#32272a;border:4px solid #47312f;max-width:90%}
+#hud{color:#fff2cb}
+#skipBattleBtn{position:absolute;z-index:7;right:16px;top:62px;background:#88502c;border:3px solid #e8cb89;border-bottom:5px solid #43291c;color:#fff1d0;font-size:12px;max-width:230px}
+#skipBattleBtn:hover{background:#ac6835}
+#skipBattleBtn.hidden{display:none!important}
+.reconLine select{display:inline-block;max-width:100%;margin-left:8px}
+.heroName{display:block;font-size:12px;font-weight:900;letter-spacing:.4px;color:#f7dc9d;margin-top:3px}.heroChoice{height:135px!important}.heroChoice.selected:after{font-size:7px;padding:1px;bottom:1px}.heroChoice.selected .heroName{color:#fff2bb}
+#storyEditor{margin-top:14px;background:#211c27;border:3px solid #b18b54;padding:12px}#storyEditor summary{cursor:pointer;color:#f8d78f;font-weight:bold}#storyEditor label{display:block;margin:9px 0 4px;font-size:12px}#storyEditor input,#storyEditor textarea{width:100%;background:#fff4d8;color:#251b19;border:2px solid #94764b;font:13px/1.4 monospace;padding:7px}#storyEditor textarea{height:128px;resize:vertical;white-space:pre;overflow:auto}#storyEditor .editorActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}#editorStatus{margin-top:8px;font-size:12px;line-height:1.5;color:#f5d39a;white-space:pre-wrap}#storyEditor .editorGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}#start .card{max-height:94%;overflow-y:auto}
+
+/* Language Quests menu prototype */
+#start{background:#131820f2}#start .questMenu{width:min(1070px,98%);height:min(96%,950px);max-height:96%;padding:14px 18px;background:#1d222c;border:2px solid #526071;box-shadow:0 0 0 5px #0f1218;overflow:auto;font-family:system-ui,Arial,sans-serif}
+.questMenu h1{font:800 26px/1.1 system-ui;color:#f3f5f8;letter-spacing:1.5px;margin:0 0 3px}.questMenu .sub{font:12px/1.45 system-ui;color:#aeb9ca}.menuHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.prototypeTag{font:700 10px system-ui;color:#f0c77b;border:1px solid #685d48;padding:5px 8px;border-radius:4px}.questMenu .setupGrid{grid-template-columns:1fr 1fr;gap:12px;margin:0}.questMenu .panel{background:#272e3a;border:1px solid #424c5d;border-radius:7px;padding:12px;min-width:0}.questMenu h2{font:800 13px system-ui;color:#f0c77b;margin:0 0 10px;letter-spacing:.6px}.questMenu h3{font:700 11px system-ui;color:#e4e9f2;margin:12px 0 7px}.questMenu label{display:block;font:600 10px system-ui;color:#c3cbd8;margin:6px 0 4px}.questMenu input,.questMenu textarea,.questMenu select{box-sizing:border-box;width:100%;min-width:0;background:#171d27;color:#f1f4fa;border:1px solid #495467;border-radius:4px;padding:7px 8px;font:12px/1.3 system-ui}.questMenu select{cursor:pointer}.questMenu textarea{resize:vertical}.questMenu .vocabBox{height:190px;line-height:1.7;resize:none}.questMenu .adventureDescription{margin-top:9px;max-height:105px;overflow:auto}.questMenu .modeNote{font:11px/1.4 system-ui;color:#e2bc7b;margin-top:14px}.questMenu .editorGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.questMenu .shortField{height:42px}.clueHeading{display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;font-size:11px;color:#f0c77b}.clueHeading span{color:#aeb9ca}.clueTabs{display:flex;gap:5px}.clueTab{flex:1;background:#384353;border:1px solid #526073;border-radius:4px;padding:6px;color:white;font-size:12px}.clueTab.active{background:#4775aa;border-color:#a6c6ec}.clueTab.complete:after{content:' ✓';color:#a6f3bc}.clueFields{margin-top:6px}.answerGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.questMenu .editorActions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.questMenu button{font:700 11px system-ui;border-radius:4px;background:#3a4d65;border:1px solid #66778f;padding:7px 9px}.questMenu button:hover{filter:brightness(1.2)}.questMenu #saveStory{background:#426f9d}.questMenu #editorStatus{font:11px/1.35 system-ui;margin-top:5px;min-height:13px}.characterSection{margin-top:10px;padding:9px 12px;background:#272e3a;border:1px solid #424c5d;border-radius:7px}.characterSection h2{margin-bottom:5px}.questMenu .heroes{display:flex;gap:10px;margin:0;justify-content:center}.questMenu .heroChoice{width:100px;height:86px!important;min-height:0;border:1px solid #566277!important;background:#303a49;border-radius:5px;padding:3px}.questMenu .heroChoice.selected{border:2px solid #f0c77b!important;background:#38465a}.questMenu .heroChoice.selected:after{display:none}.questMenu .preview{height:56px;width:48px;margin:0 auto}.questMenu .heroName{font:700 10px system-ui;margin:0;color:#e7edf8}.questMenu .embeddedCharacters{margin-top:12px;padding:9px 5px}.questMenu .embeddedCharacters .heroes{gap:5px;justify-content:space-between}.questMenu .embeddedCharacters .heroChoice{flex:1;width:24%;height:104px!important;min-width:0;padding:3px 1px}.questMenu .embeddedCharacters .preview{height:73px;width:52px}.questMenu .embeddedCharacters .heroName{font-size:9px;white-space:normal;line-height:1.1;position:relative;z-index:1}.questMenu .startRow{margin-top:10px}.questMenu #startGame{background:#386fac;border:1px solid #77a6db;padding:10px 24px;font-size:13px}.questMenu #customRows[hidden]{display:none!important}
+@media(max-width:740px){#start .questMenu{height:96%;padding:10px}.questMenu .setupGrid{grid-template-columns:1fr}.questMenu .vocabBox{height:110px}.questMenu .heroes{gap:3px}.questMenu .heroChoice{width:25%;font-size:9px}.prototypeTag{display:none}}
+
+.questMenu .embeddedCharacters .heroChoice{height:125px!important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;padding:5px 2px!important}
+.questMenu .embeddedCharacters .preview{position:static!important;display:block!important;flex:none;width:52px;height:78px;margin:0 auto 5px;object-fit:contain}
+.questMenu .embeddedCharacters .heroName{display:block;position:static!important;font-size:10px;line-height:1.2;min-height:25px;margin:0;text-align:center;z-index:2;color:#fff!important;text-shadow:0 1px 2px #111}
+.questMenu .vocabBox{height:130px}
+.questMenu .adventureDescription{max-height:65px}
+.questMenu #customFinalQuestion{width:100%}
 </style></head>
 <body>
 <div id="shell">
 <canvas id="game" width="960" height="540"></canvas>
-<div id="touchControls"><div class="pad"><button class="up" data-key="ArrowUp" aria-label="Arriba">▲</button><button class="left" data-key="ArrowLeft" aria-label="Izquierda">◀</button><button class="down" data-key="ArrowDown" aria-label="Abajo">▼</button><button class="right" data-key="ArrowRight" aria-label="Derecha">▶</button></div><button id="fire">DISPARAR</button></div>
 <div id="hud"><span id="health"></span><span id="status"></span></div>
 <div id="objective"></div>
 <div id="bubble" class="hidden"><div id="speaker"></div><div id="content"></div></div>
 <div id="toast" class="hidden"></div>
 <div id="recon" class="hidden"></div>
-<div id="bossPrompt" class="hidden"></div>
-<div id="start" class="overlay"><div class="card">
-<h1>⚔ EL COMPLOT CONTRA EL REY</h1>
-<div class="sub">Interroga a los habitantes. Conjuga en futuro, comprende sus respuestas y gana balas. Después reconstruye el complot y detén a Mario.</div>
-<div class="heroes">
-<button class="heroChoice" data-h="0"><canvas class="preview" width="52" height="70"></canvas>Aventurera</button>
-<button class="heroChoice" data-h="1"><canvas class="preview" width="52" height="70"></canvas>Explorador</button>
-<button class="heroChoice" data-h="2"><canvas class="preview" width="52" height="70"></canvas>Guardiana</button>
-<button class="heroChoice" data-h="3"><canvas class="preview" width="52" height="70"></canvas>Pícaro</button>
-</div>
-<div class="sub">Movimiento: <span class="kbd">WASD</span> o flechas. Acércate a un habitante para hablar. <span class="kbd">Enter</span> envía respuestas.</div>
+<div id="bossPrompt" class="hidden"></div><div id="premise" class="hidden"><div id="premiseCard"><button id="closePremise" aria-label="Close">×</button><h2 id="premiseTitle"></h2><p id="premiseText"></p></div></div>
+<button id="menuBtn" class="hidden">MAIN MENU</button><button id="skipBattleBtn" class="hidden" type="button">⚔ GO STRAIGHT INTO BATTLE</button>
+<div id="start" class="overlay"><div class="card questMenu">
+<header class="menuHeader"><div><h1>LANGUAGE QUESTS</h1><div class="sub">Mysteries · Riddles · Adventures</div></div><span class="prototypeTag">MENU PROTOTYPE</span></header>
+<div class="setupGrid">
+<section class="panel"><h2>BUILT-IN ADVENTURES</h2>
+<div class="field"><label for="languageSelect">LANGUAGE</label><select id="languageSelect"><option value="en-GB">English</option><option value="es-ES">Español</option><option value="de-DE">Deutsch</option></select></div>
+<div class="field"><label for="adventureSelect">CHOOSE AN ADVENTURE</label><select id="adventureSelect"></select></div>
+<h3>TERMS & DESCRIPTIONS</h3><textarea id="vocabPreview" class="vocabBox" readonly></textarea><div class="sub adventureDescription" id="adventureBlurb"></div>
+
+<div class="characterSection embeddedCharacters"><h2>CHOOSE YOUR CHARACTER</h2><div class="heroes">
+<button class="heroChoice selected" data-h="0"><canvas class="preview" width="52" height="70"></canvas><span class="heroName">Scientist</span></button>
+<button class="heroChoice" data-h="1"><canvas class="preview" width="52" height="70"></canvas><span class="heroName">Metalhead</span></button>
+<button class="heroChoice" data-h="2"><canvas class="preview" width="52" height="70"></canvas><span class="heroName">Worker</span></button>
+<button class="heroChoice" data-h="3"><canvas class="preview" width="52" height="70"></canvas><span class="heroName">Flying Princess</span></button>
 </div></div>
+</section>
+<section class="panel"><h2>STORY DETAILS & EDITOR</h2>
+<div class="editorGrid"><div><label>Story title</label><input id="customTitle" value="The Lost Secret"></div><div><label>Correct mystery answer</label><input id="customIdentity" value="Thyra"></div></div>
+<label>Final mystery question</label><input id="customFinalQuestion" value="Who is the mysterious person?">
+<label>Story introduction</label><textarea id="customIntro" class="shortField">Five witnesses know clues about a mystery. Discover the answer.</textarea>
+<label>Two incorrect mystery answers (one per line)</label><textarea id="customWrong" class="shortField">Harald Bluetooth
+Cnut the Great</textarea>
+<div class="clueHeading"><strong>FIVE CLUES</strong><span id="clueCounter">Clue 1 / 5</span></div>
+<div class="clueTabs" id="clueTabs"></div>
+<div class="clueFields">
+<label>Question to ask the witness</label><textarea id="clueQuestion" class="shortField" placeholder="What happened here?"></textarea>
+<label>Witness answer / clue</label><textarea id="clueAnswer" class="shortField" placeholder="I saw a mysterious figure near the laboratory."></textarea>
+<label>Knowledge-check question</label><input id="clueCheck" placeholder="Where was the figure seen?">
+<div class="answerGrid"><div><label>Answer A</label><input id="clueA" placeholder="Laboratory"></div><div><label>Answer B</label><input id="clueB" placeholder="Forest"></div><div><label>Answer C</label><input id="clueC" placeholder="Harbor"></div></div>
+<label>Correct answer</label><select id="clueCorrect"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
 </div>
+<div class="editorActions"><button type="button" id="loadExample">LOAD EXAMPLE</button><button type="button" id="validateStory">CHECK FORMAT</button><button type="button" id="saveStory">SAVE & SELECT</button><button type="button" id="exportStory">COPY SCRIPT</button></div>
+<div id="editorStatus" role="status"></div>
+<textarea id="customRows" hidden></textarea>
+</section></div>
+<div class="startRow"><div class="sub">WASD / arrows to move · Click answers · Space to fire</div><button id="startGame" class="primary">START ADVENTURE →</button></div>
+</div></div>
 <script>
 "use strict";
-const cv=document.getElementById("game"),ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+const cv=document.getElementById("game");let ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
 const $=id=>document.getElementById(id), bubble=$("bubble"), content=$("content"), speaker=$("speaker");
-let state="menu", heroStyle=0, lives=5, ammo=0, clues=[], completed=new Set(), current=-1, phase="", invuln=0;
+let state="menu", heroStyle=0, lives=5, ammo=0, clues=[], completed=new Set(), current=-1, phase="", invuln=0, selectedAdventure=null, villagers=[];
 const player={x:470,y:290,r:11,dir:"down",moving:false,step:0,speed:150};
 const keys={}; let last=performance.now(), audioCtx=null;
-const villagers=[
- {x:310,y:205,name:"Granjero",style:4,q:"¿Dónde ____ Mario mañana?",inf:"trabajar",form:"trabajará",a:"Mario ____ mañana en el castillo.",clue:"Mario trabajará mañana en el castillo.",check:"¿Dónde trabajará Mario mañana?",opts:["En el castillo","En el mercado","En su casa"],correct:0,label:"DÓNDE"},
- {x:650,y:205,name:"Cocinera",style:5,q:"¿Con quién ____ Mario esta noche?",inf:"hablar",form:"hablará",a:"Mario ____ esta noche con el guardia.",clue:"Mario hablará esta noche con el guardia.",check:"¿Con quién hablará Mario?",opts:["Con el rey","Con el guardia","Con el herrero"],correct:1,label:"CON QUIÉN"},
- {x:310,y:375,name:"Herrero",style:6,q:"¿Qué ____ Mario al castillo?",inf:"llevar",form:"llevará",a:"Mario ____ una botella al castillo.",clue:"Mario llevará una botella al castillo.",check:"¿Qué llevará Mario?",opts:["Una corona","Una botella","Una espada"],correct:1,label:"QUÉ"},
- {x:650,y:375,name:"Anciana",style:7,q:"¿Cuándo ____ Mario al castillo?",inf:"entrar",form:"entrará",a:"Mario ____ mañana por la noche.",clue:"Mario entrará mañana por la noche.",check:"¿Cuándo entrará Mario?",opts:["Esta mañana","Mañana por la noche","La próxima semana"],correct:1,label:"CUÁNDO"},
- {x:475,y:190,name:"Guardia",style:8,q:"¿Cómo ____ Mario al rey?",inf:"matar",form:"matará",a:"Mario ____ al rey con veneno.",clue:"Mario matará al rey con veneno.",check:"¿Cómo matará Mario al rey?",opts:["Con una espada","Con fuego","Con veneno"],correct:2,label:"CÓMO"}
+const ADVENTURES=[
+ {
+  "id": "harald",
+  "group": "DANISH VIKING AGE",
+  "title": "Who Was the Viking King?",
+  "premise": "A mysterious ruler changed Denmark's history. Explore this Viking settlement and question five witnesses. Collect evidence about the king's family, achievements and legacy. Then decide which historical figure the clues describe.",
+  "vocab": [
+   [
+    "Jelling",
+    "Royal monument site in Jutland"
+   ],
+   [
+    "runestone",
+    "Stone monument carved with runes"
+   ],
+   [
+    "Gorm the Old",
+    "A Danish king"
+   ],
+   [
+    "Christianity",
+    "Religion adopted by the Danish monarchy"
+   ],
+   [
+    "ring fortress",
+    "Circular Viking Age fortification"
+   ],
+   [
+    "10th century",
+    "The years AD 900–999"
+   ]
+  ],
+  "facts": [
+   {
+    "name": "The Skald",
+    "style": 4,
+    "label": "TIME",
+    "q": "What period did the mysterious king rule in?",
+    "a": "He ruled Denmark during the 10th century.",
+    "check": "Which century did this king rule in?",
+    "opts": [
+     "The 8th century",
+     "The 10th century",
+     "The 13th century"
+    ],
+    "correct": 1,
+    "clue": "The mysterious king ruled Denmark during the 10th century."
+   },
+   {
+    "name": "The Runecarver",
+    "style": 5,
+    "label": "STONE",
+    "q": "Which monument is linked to this ruler?",
+    "a": "He raised the great Jelling runestone, which celebrates his parents and his achievements.",
+    "check": "Where is the famous runestone associated with this king?",
+    "opts": [
+     "Roskilde",
+     "Jelling",
+     "Copenhagen"
+    ],
+    "correct": 1,
+    "clue": "He raised the great Jelling runestone."
+   },
+   {
+    "name": "The Storykeeper",
+    "style": 6,
+    "label": "FAMILY",
+    "q": "Who was this king’s father?",
+    "a": "His father was Gorm the Old, an earlier Danish king.",
+    "check": "Who was the ruler’s father?",
+    "opts": [
+     "Cnut the Great",
+     "Sweyn Forkbeard",
+     "Gorm the Old"
+    ],
+    "correct": 2,
+    "clue": "His father was Gorm the Old."
+   },
+   {
+    "name": "The Merchant",
+    "style": 7,
+    "label": "RELIGION",
+    "q": "What religious change is linked to this king?",
+    "a": "His Jelling inscription claims that he made the Danes Christian. This was part of Denmark’s conversion to Christianity.",
+    "check": "Which religion is associated with this ruler’s Jelling inscription?",
+    "opts": [
+     "Christianity",
+     "Buddhism",
+     "Islam"
+    ],
+    "correct": 0,
+    "clue": "His Jelling inscription claims that he made the Danes Christian."
+   },
+   {
+    "name": "The Builder",
+    "style": 8,
+    "label": "FORTS",
+    "q": "What type of fortifications are associated with his reign?",
+    "a": "Large circular Viking fortresses, called ring fortresses, are associated with his reign.",
+    "check": "Which structures are associated with this ruler?",
+    "opts": [
+     "Roman aqueducts",
+     "Gothic cathedrals",
+     "Viking ring fortresses"
+    ],
+    "correct": 2,
+    "clue": "Viking ring fortresses are associated with his reign."
+   }
+  ],
+  "reconstruction": [
+   [
+    "He ruled Denmark during the ____.",
+    [
+     "8th century",
+     "10th century",
+     "13th century"
+    ],
+    1
+   ],
+   [
+    "He raised a famous runestone at ____.",
+    [
+     "Jelling",
+     "Ribe",
+     "Aarhus"
+    ],
+    0
+   ],
+   [
+    "His father was ____.",
+    [
+     "Cnut the Great",
+     "Gorm the Old",
+     "Sweyn Forkbeard"
+    ],
+    1
+   ],
+   [
+    "His inscription says he made the Danes ____.",
+    [
+     "Christian",
+     "Roman",
+     "Frankish"
+    ],
+    0
+   ],
+   [
+    "His reign is associated with Viking ____.",
+    [
+     "pyramids",
+     "ring fortresses",
+     "aqueducts"
+    ],
+    1
+   ]
+  ],
+  "fullStory": "The mysterious king ruled Denmark during the 10th century. He raised the great Jelling runestone. His father was Gorm the Old. His inscription claims that he made the Danes Christian. Viking ring fortresses are associated with his reign.",
+  "finalQuestion": "Who was the mysterious Viking king?",
+  "finalOptions": [
+   "Cnut the Great",
+   "Harald Bluetooth",
+   "Sweyn Forkbeard"
+  ],
+  "finalCorrect": 1,
+  "finale": [
+   {
+    "question": "Who was Harald Bluetooth’s father?",
+    "opts": [
+     "Gorm the Old",
+     "Cnut the Great",
+     "Ragnar Lodbrok"
+    ],
+    "correct": 0
+   },
+   {
+    "question": "Where did Harald raise a famous runestone?",
+    "opts": [
+     "Jelling",
+     "London",
+     "Paris"
+    ],
+    "correct": 0
+   },
+   {
+    "question": "Which century did Harald rule in?",
+    "opts": [
+     "10th century",
+     "6th century",
+     "14th century"
+    ],
+    "correct": 0
+   },
+   {
+    "question": "Which religion did Harald’s inscription promote?",
+    "opts": [
+     "Christianity",
+     "Buddhism",
+     "Islam"
+    ],
+    "correct": 0
+   },
+   {
+    "question": "Which fortifications are linked to Harald’s reign?",
+    "opts": [
+     "Ring fortresses",
+     "Stone pyramids",
+     "Roman aqueducts"
+    ],
+    "correct": 0
+   }
+  ]
+ }
 ];
-const buildings=[{x:45,y:55,w:220,h:115,roof:"#c95460"},{x:690,y:50,w:220,h:120,roof:"#397fca"},{x:55,y:360,w:205,h:115,roof:"#d2764f"},{x:700,y:355,w:205,h:120,roof:"#6b62aa"}];
-const ponds=[{x:0,y:0,w:300,h:75},{x:660,y:0,w:300,h:70}];
-const trees=[[28,95],[310,75],[610,85],[915,95],[315,450],[620,455],[20,470],[920,465]];
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+
+const QUEST_STORIES={
+ "en-GB":[
+ {id:"curie-en",title:"Who Discovered Radium?",answer:"Marie Curie",wrong:["Ada Lovelace","Jane Goodall"],intro:"Five researchers have clues about a pioneering scientist. Find out who she was.",rows:[
+ ["What did this scientist study?","She investigated radioactivity.","What did she investigate?",["Volcanoes","Radioactivity","Ocean currents"],1],
+ ["Which elements did she discover?","She discovered polonium and radium with Pierre Curie.","Which pair of elements?",["Polonium and radium","Gold and silver","Hydrogen and helium"],0],
+ ["Where was she born?","She was born in Warsaw, Poland.","Which city was her birthplace?",["Paris","Berlin","Warsaw"],2],
+ ["Which major award did she receive?","She received two Nobel Prizes.","How many Nobel Prizes?",["One","Two","Three"],1],
+ ["Where did she conduct much of her research?","She worked in Paris, France.","In which city did she work?",["Paris","Rome","Oslo"],0]]},
+ {id:"beethoven-en",title:"Who Composed the Ninth Symphony?",answer:"Ludwig van Beethoven",wrong:["Wolfgang Mozart","Johann Sebastian Bach"],intro:"Investigate the life of a famous composer through five musical clues.",rows:[
+ ["Where was the composer born?","He was born in Bonn.","Where was he born?",["Vienna","Bonn","Hamburg"],1],
+ ["Which instrument did he play?","He was a skilled pianist.","Which instrument?",["Piano","Trumpet","Harp"],0],
+ ["What hearing problem did he experience?","He progressively lost his hearing.","What did he lose?",["His sight","His voice","His hearing"],2],
+ ["Where did he live for much of his career?","He lived in Vienna.","Which city?",["Vienna","Madrid","London"],0],
+ ["What famous symphony did he compose?","His Ninth Symphony includes the Ode to Joy.","Which symphony includes Ode to Joy?",["Third","Ninth","First"],1]]}
+ ],
+ "es-ES":[
+ {id:"curie-es",title:"¿Quién descubrió el radio?",answer:"Marie Curie",wrong:["Ada Lovelace","Jane Goodall"],intro:"Cinco investigadores conocen pistas sobre una científica pionera. Descubre quién fue.",rows:[
+ ["¿Qué estudiaba?","Investigaba la radiactividad.","¿Qué investigaba?",["Los volcanes","La radiactividad","Las corrientes marinas"],1],
+ ["¿Qué elementos descubrió?","Descubrió el polonio y el radio con Pierre Curie.","¿Qué elementos?",["Polonio y radio","Oro y plata","Hidrógeno y helio"],0],
+ ["¿Dónde nació?","Nació en Varsovia, Polonia.","¿En qué ciudad nació?",["París","Berlín","Varsovia"],2],
+ ["¿Qué premios recibió?","Recibió dos premios Nobel.","¿Cuántos premios Nobel?",["Uno","Dos","Tres"],1],
+ ["¿Dónde trabajó?","Trabajó en París, Francia.","¿En qué ciudad trabajó?",["París","Roma","Oslo"],0]]},
+ {id:"beethoven-es",title:"¿Quién compuso la Novena Sinfonía?",answer:"Ludwig van Beethoven",wrong:["Wolfgang Mozart","Johann Sebastian Bach"],intro:"Investiga la vida de un compositor famoso a través de cinco pistas musicales.",rows:[
+ ["¿Dónde nació?","Nació en Bonn.","¿Dónde nació el compositor?",["Viena","Bonn","Hamburgo"],1],
+ ["¿Qué instrumento tocaba?","Era un pianista extraordinario.","¿Qué instrumento tocaba?",["Piano","Trompeta","Arpa"],0],
+ ["¿Qué problema tuvo?","Perdió progresivamente la audición.","¿Qué sentido perdió?",["La vista","El olfato","La audición"],2],
+ ["¿Dónde vivió durante gran parte de su carrera?","Vivió en Viena.","¿En qué ciudad vivió?",["Viena","Madrid","Londres"],0],
+ ["¿Qué sinfonía compuso?","Su Novena Sinfonía incluye la Oda a la alegría.","¿Qué sinfonía incluye la Oda a la alegría?",["La tercera","La novena","La primera"],1]]}
+ ],
+ "de-DE":[
+ {id:"curie-de",title:"Wer entdeckte Radium?",answer:"Marie Curie",wrong:["Ada Lovelace","Jane Goodall"],intro:"Fünf Forschende kennen Hinweise auf eine bedeutende Wissenschaftlerin. Finde heraus, wer sie war.",rows:[
+ ["Was erforschte sie?","Sie erforschte die Radioaktivität.","Was erforschte sie?",["Vulkane","Radioaktivität","Meeresströmungen"],1],
+ ["Welche Elemente entdeckte sie?","Sie entdeckte Polonium und Radium mit Pierre Curie.","Welche Elemente?",["Polonium und Radium","Gold und Silber","Wasserstoff und Helium"],0],
+ ["Wo wurde sie geboren?","Sie wurde in Warschau in Polen geboren.","In welcher Stadt wurde sie geboren?",["Paris","Berlin","Warschau"],2],
+ ["Welche Preise erhielt sie?","Sie erhielt zwei Nobelpreise.","Wie viele Nobelpreise?",["Einen","Zwei","Drei"],1],
+ ["Wo arbeitete sie?","Sie arbeitete in Paris in Frankreich.","In welcher Stadt arbeitete sie?",["Paris","Rom","Oslo"],0]]},
+ {id:"beethoven-de",title:"Wer komponierte die Neunte Sinfonie?",answer:"Ludwig van Beethoven",wrong:["Wolfgang Mozart","Johann Sebastian Bach"],intro:"Erforsche das Leben eines berühmten Komponisten anhand von fünf musikalischen Hinweisen.",rows:[
+ ["Wo wurde er geboren?","Er wurde in Bonn geboren.","Wo wurde er geboren?",["Wien","Bonn","Hamburg"],1],
+ ["Welches Instrument spielte er?","Er war ein hervorragender Pianist.","Welches Instrument spielte er?",["Klavier","Trompete","Harfe"],0],
+ ["Welches gesundheitliche Problem hatte er?","Er verlor nach und nach sein Gehör.","Was verlor er?",["Sein Augenlicht","Seine Stimme","Sein Gehör"],2],
+ ["Wo lebte er während eines großen Teils seiner Karriere?","Er lebte in Wien.","In welcher Stadt lebte er?",["Wien","Madrid","London"],0],
+ ["Welche Sinfonie komponierte er?","Seine Neunte Sinfonie enthält die Ode an die Freude.","Welche Sinfonie enthält die Ode an die Freude?",["Die dritte","Die neunte","Die erste"],1]]}
+ ]
+};
+function makeQuestStory(t,lang){
+ const names=lang==="es-ES"?["Investigadora","Archivista","Testigo","Especialista","Historiadora"]:lang==="de-DE"?["Forscherin","Archivar","Zeugin","Experte","Historikerin"]:["Researcher","Archivist","Witness","Expert","Historian"];
+ const facts=t.rows.map((r,i)=>({name:names[i],style:4+i,label:"CLUE "+(i+1),q:r[0],a:r[1],check:r[2],opts:r[3],correct:r[4],clue:r[1]}));
+ const reconstruction=t.rows.map(r=>[r[2].replace(/[?¿]/g,"")+" — ____",r[3],r[4]]);
+ return {id:t.id,language:lang,group:lang==="es-ES"?"MISTERIOS":lang==="de-DE"?"RÄTSEL":"MYSTERIES",title:t.title,premise:t.intro,vocab:t.rows.map((r,i)=>[lang==="es-ES"?"Pista "+(i+1):lang==="de-DE"?"Hinweis "+(i+1):"Clue "+(i+1),r[1]]),facts,reconstruction,fullStory:t.rows.map(r=>r[1]).join(" "),finalQuestion:lang==="es-ES"?"¿Quién es la persona misteriosa?":lang==="de-DE"?"Wer ist die gesuchte Person?":"Who is the mystery person?",finalOptions:[t.wrong[0],t.answer,t.wrong[1]],finalCorrect:1,finale:t.rows.map(r=>({question:r[2],opts:r[3],correct:r[4]}))};
+}
+Object.entries(QUEST_STORIES).forEach(([lang,stories])=>stories.forEach(t=>ADVENTURES.push(makeQuestStory(t,lang))));
+function filterAdventuresByLanguage(){const lang=$("languageSelect").value;const current=$("adventureSelect").value;const available=ADVENTURES.filter(a=>a.id==="custom-story"||a.language===lang||(a.id==="harald"&&lang==="en-GB"));const sel=$("adventureSelect");sel.innerHTML="";let lastGroup="";available.forEach(a=>{if(a.group!==lastGroup){let g=document.createElement("optgroup");g.label=a.group;sel.appendChild(g);lastGroup=a.group;}let o=document.createElement("option");o.value=a.id;o.textContent=a.title;sel.lastElementChild.appendChild(o)});sel.value=available.some(a=>a.id===current)?current:(available[0]?.id||"");updatePreview();}
+
+const POS=[[310,205],[650,205],[310,375],[650,375],[475,190]];
+function loadAdventure(id){
+ selectedAdventure=ADVENTURES.find(a=>a.id===id)||ADVENTURES[0];
+ villagers=selectedAdventure.facts.map((f,i)=>({x:POS[i][0],y:POS[i][1],...f}));
+}
+const buildings=[{x:44,y:44,w:216,h:126},{x:696,y:38,w:218,h:132},{x:52,y:366,w:208,h:116},{x:700,y:362,w:212,h:120}];
+const trees=[[22,92],[302,58],[608,60],[935,88],[302,466],[646,462],[18,460],[932,458],[364,80],[588,82]];
+const paletteColors=[['#366d91','#efb786','#8b4a29'],['#3d7656','#e7ad80','#a67a3c'],['#85568e','#eab184','#6e4235'],['#a54742','#dba077','#4b3429'],['#637f3c','#e3a678','#8a4d30'],['#a45460','#e8b589','#c18a43'],['#695b98','#d69b72','#52362d'],['#9a6d30','#e3ad7e','#d0b07a'],['#406681','#dda87b','#563c2f'],['#a34b3b','#e6af80','#bb7535']];
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function poly(points,color){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
+function seedNoise(n){let x=Math.sin(n*127.1+39.73)*43758.5453;return x-Math.floor(x)}
+const terrain=document.createElement('canvas');terrain.width=960;terrain.height=540;
+function buildTerrain(){const main=ctx;ctx=terrain.getContext('2d');ctx.imageSmoothingEnabled=false;
+ rect(0,0,960,540,'#9cae62');
+ for(let i=0;i<1800;i++){let x=Math.floor(seedNoise(i*2)*960/5)*5,y=Math.floor(seedNoise(i*2+1)*540/5)*5;rect(x,y,5+(i%3)*3,3+(i%2)*3,['#aebc70','#7e995b','#b4b875','#799254','#c4bf7b'][i%5])}
+ // winding, walkable settlement paths
+ poly([[0,230],[320,232],[410,248],[540,238],[960,230],[960,336],[555,323],[405,328],[0,340]],'#c9a36d');
+ poly([[419,0],[534,0],[526,540],[424,540]],'#c4a06b');
+ for(let i=0;i<370;i++){let x=Math.floor(seedNoise(i+500)*960),y=Math.floor(seedNoise(i+1300)*540);if((y>227&&y<341)||(x>417&&x<539))rect(x,y,3+i%4,2+i%3,['#a78760','#e0ba7e','#9b8059'][i%3])}
+ // distant sea, shore, docks
+ rect(0,0,960,28,'#287c9c');rect(0,24,960,9,'#3a9eb6');
+ for(let i=0;i<50;i++)rect((i*79)%960,(i*13)%26,13,2,'#76c7cf');
+ for(let x=0;x<960;x+=21){rect(x,32,5,14,'#61452f');rect(x+3,34,15,4,'#b68a55')}
+ ctx=main;
+}
+// Canvas is deliberately assigned after initialization; terrain is a pre-rendered background.
 function drawWorld(){
- rect(0,0,960,540,"#79cf72");rect(0,245,960,82,"#a56b4e");rect(438,0,86,540,"#a56b4e");
- ponds.forEach(p=>rect(p.x,p.y,p.w,p.h,"#4ca0d9"));
- buildings.forEach(b=>drawHouse(b));
+ ctx.drawImage(terrain,0,0);
+ // palisade and distant pier
+ for(let x=0;x<960;x+=17){if(x>412&&x<548)continue;rect(x,38,12,34,'#68462e');rect(x+2,40,8,24,'#a16b42');poly([[x,38],[x+6,27],[x+12,38]],'#3e2d28')}
+ drawLongship(825,30,.72);
+ buildings.forEach(drawHouse);
  trees.forEach(t=>drawTree(t[0],t[1]));
- // castle gate unlock cue
- if(completed.size===villagers.length){rect(417,0,128,45,"#69616f");rect(432,12,98,33,"#2e2935");ctx.fillStyle="#ffe06a";ctx.font="bold 12px monospace";ctx.fillText("CASTILLO",446,33)}
+ drawWell(371,368);drawFire(576,375);if(completed.size===villagers.length)drawExitPortal();else drawRunestone(479,53);
+ drawFence(48,347,195);drawFence(702,344,200);
+ for(let i=0;i<5;i++){let x=75+i*178,y=335+(i%2)*5;rect(x,y,12,8,'#8a8d7a');rect(x+3,y-3,7,4,'#c1b8a0')}
  villagers.forEach((v,i)=>drawPerson(v.x,v.y,v.style,false,0,completed.has(i)));
  drawPerson(player.x,player.y,heroStyle,true,player.step,false);
 }
-function drawHouse(b){rect(b.x,b.y+22,b.w,b.h-22,"#ded1b2");rect(b.x-8,b.y,b.w+16,35,b.roof);rect(b.x+b.w/2-18,b.y+b.h-46,36,46,"#513529");rect(b.x+30,b.y+55,30,27,"#4b94cf");rect(b.x+b.w-60,b.y+55,30,27,"#4b94cf")}
-function drawTree(x,y){rect(x-4,y+20,8,25,"#70452f");ctx.fillStyle="#4e9c47";ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.fill();ctx.fillStyle="#70b94e";ctx.beginPath();ctx.arc(x-8,y-7,15,0,7);ctx.fill()}
-function palette(s){return [["#3e74b5","#e7a77b","#47352e"],["#4b9a62","#d9a176","#382e29"],["#8d59a8","#e5aa80","#3c302c"],["#c85b55","#dba27b","#332924"],["#719b3e","#e3aa7d","#57392d"],["#d45c65","#e8ad82","#6a3c2f"],["#72509a","#d99b72","#3a2d28"],["#c79339","#e2aa7d","#b8b4aa"],["#455b88","#d9a177","#2f2927"]][s%9]}
-function drawPerson(x,y,s,isHero,step,ghost){
- const [shirt,skin,hair]=palette(s), bob=isHero&&player.moving?Math.abs(Math.sin(step*7))*2:0, swing=isHero&&player.moving?Math.sin(step*7)*3:0;
- ctx.save();ctx.translate(Math.round(x),Math.round(y-bob));if(ghost)ctx.globalAlpha=.32;
- // shadow
- ctx.fillStyle="#0003";ctx.fillRect(-10,19,20,5);
- // legs
- ctx.fillStyle="#343046";ctx.fillRect(-8,8+swing,6,15);ctx.fillRect(2,8-swing,6,15);
- // torso + arms
- ctx.fillStyle=shirt;ctx.fillRect(-10,-10,20,20);ctx.fillRect(-14,-8-swing/2,5,15);ctx.fillRect(9,-8+swing/2,5,15);
- // head/hair
- ctx.fillStyle=skin;ctx.fillRect(-8,-26,16,16);ctx.fillStyle=hair;ctx.fillRect(-9,-30,18,7);ctx.fillRect(-9,-25,4,7);
- ctx.fillStyle="#222";ctx.fillRect(-4,-20,2,2);ctx.fillRect(4,-20,2,2);
- if(!ghost&&!isHero){ctx.fillStyle="#fff";ctx.fillRect(-3,-42,6,6);ctx.fillStyle="#222";ctx.font="bold 10px monospace";ctx.fillText("!",-3,-36)}
- ctx.restore()
+function drawHouse(b){
+ const {x,y,w,h}=b,roofY=y+12;
+ // cast shadow, log walls, structural beams
+ rect(x-12,y+25,w+26,h-12,'#3a3034');rect(x,y+32,w,h-30,'#925d43');
+ for(let yy=y+44;yy<y+h;yy+=12){rect(x+2,yy,w-4,4,'#bb7951');rect(x+2,yy+5,w-4,3,'#684039')}
+ for(let xx=x+12;xx<x+w;xx+=43){rect(xx,y+34,9,h-36,'#633b37');rect(xx+2,y+37,4,h-43,'#df9562')}
+ // imposing dark tiled roof with Viking dragon finials
+ poly([[x-19,y+31],[x+13,y-2],[x+w-13,y-2],[x+w+20,y+31],[x+w+15,y+51],[x-14,y+51]],'#2d293c');
+ poly([[x-10,y+29],[x+18,y+5],[x+w-18,y+5],[x+w+10,y+29]],'#45445d');
+ for(let yy=y+8;yy<y+42;yy+=9)for(let xx=x+7;xx<x+w-7;xx+=13){rect(xx+(yy%2)*4,yy,10,5,((xx+yy)%3===0)?'#656782':'#53536f');rect(xx+2,yy+5,9,2,'#292c43')}
+ rect(x-12,y+29,w+24,8,'#3b2939');rect(x-11,y+28,w+22,3,'#b97c5d');
+ // curling carved roof posts
+ for(const side of [x-12,x+w+4]){rect(side,y-12,9,52,'#8b493f');rect(side+2,y-14,5,45,'#d57d58');rect(side-7,y-20,16,7,'#4c3035');rect(side-14,y-26,12,8,'#b66a52');rect(side-20,y-31,9,7,'#3a2731')}
+ // central crossbeam, framed doorway and lit windows
+ poly([[x+w/2-45,y+51],[x+w/2,y+15],[x+w/2+45,y+51]],'#422b32');
+ poly([[x+w/2-32,y+49],[x+w/2,y+26],[x+w/2+32,y+49]],'#bd7353');
+ rect(x+w/2-18,y+59,36,h-59,'#372b30');rect(x+w/2-13,y+66,26,h-68,'#754334');
+ rect(x+w/2-2,y+69,4,h-74,'#d48b58');
+ for(let xx of [x+35,x+w-59]){rect(xx-4,y+70,31,32,'#442c34');rect(xx,y+74,23,25,'#edaa65');rect(xx+8,y+75,5,23,'#643f3d');rect(xx,y+85,23,4,'#643f3d')}
 }
-function update(dt){
+function drawTree(x,y){rect(x-8,y+12,17,41,'#513b2f');rect(x-3,y+14,5,35,'#98724b');for(let i=0;i<3;i++){let yy=y-34+i*17,wide=25-i*5;poly([[x,yy-29],[x-wide,yy+17],[x+wide,yy+17]],i===1?'#285b47':'#30694d');rect(x-6,yy+9,12,5,'#52815a')}rect(x-3,y-56,7,10,'#75a66d')}
+function drawFence(x,y,w){for(let xx=x;xx<x+w;xx+=22){rect(xx,y-9,8,35,'#54372f');rect(xx+2,y-10,4,29,'#b78253')}rect(x,y,w,7,'#79513d');rect(x,y+16,w,6,'#79513d')}
+function drawWell(x,y){rect(x-28,y+3,56,25,'#54565c');rect(x-25,y,50,10,'#9ca0a0');rect(x-18,y+3,36,9,'#273e51');rect(x-24,y-27,7,31,'#754b36');rect(x+17,y-27,7,31,'#754b36');poly([[x-33,y-26],[x,y-47],[x+33,y-26]],'#4c3541');rect(x-26,y-27,52,6,'#ad754d')}
+function drawFire(x,y){for(let i=0;i<7;i++)rect(x-22+i*7,y+17,7,5,'#6c5844');poly([[x-9,y+16],[x-5,y-5],[x+2,y+7],[x+8,y-18],[x+15,y+16]],'#ed873b');poly([[x-5,y+16],[x,y-2],[x+8,y+16]],'#ffe08a')}
+function drawRunestone(x,y){rect(x-25,y+9,50,10,'#635f60');poly([[x-16,y+10],[x-16,y-18],[x-6,y-32],[x+11,y-31],[x+18,y-18],[x+18,y+10]],'#7b7c7b');rect(x-5,y-20,5,23,'#b9a78d');rect(x+3,y-18,5,18,'#b9a78d');if(completed.size===5){ctx.fillStyle='#fff3b3';ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillText('ENTER',x,y-42);ctx.textAlign='left'}}
+function drawLongship(x,y,scale){ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);poly([[-110,0],[-85,18],[88,18],[112,0]],'#573b35');rect(-84,1,168,10,'#ad6c44');rect(-2,-71,6,77,'#483833');poly([[-3,-67],[64,-50],[64,-9],[-3,-9]],'#f2d9a2');for(let i=0;i<4;i++)rect(12+i*13,-62+i*3,8,50-i*3,'#b64d45');rect(-116,-16,7,23,'#80533d');rect(-119,-21,12,7,'#b27a4d');ctx.restore()}
+function palette(s){return paletteColors[s%paletteColors.length]}
+function drawQuestHero(x,y,s,isHero,step,ghost){
+ const bob=(s===3?Math.sin(performance.now()/260)*5: isHero&&player.moving?Math.abs(Math.sin(step*9))*2:0);
+ ctx.save();ctx.translate(Math.round(x),Math.round(y-bob));if(ghost)ctx.globalAlpha=.45;
+ const outline='#20202b', skin=['#edb68c','#d49b79','#b77e55','#e9ad91'][s];
+ // Distinct silhouette and palette for each playable class.
+ if(s===3){ // flying princess: cape, wide gown, crown and floating sparkles
+  poly([[-16,-10],[-27,16],[0,10],[27,16],[16,-10]],'#a455c8');
+  poly([[-13,1],[-23,24],[23,24],[13,1]],'#f09bc9');rect(-12,-12,24,21,outline);rect(-10,-10,20,20,'#a967d5');
+  rect(-11,-34,22,25,outline);rect(-9,-32,18,21,skin);rect(-12,-39,24,9,'#7a3c57');
+  poly([[-11,-40],[-11,-50],[-4,-45],[0,-55],[5,-45],[12,-50],[12,-40]],'#ffd66a');rect(-3,-46,6,5,'#64d6ee');
+  rect(-5,-24,3,3,outline);rect(4,-24,3,3,outline);rect(-25,0,8,5,'#f4dafa');rect(18,-7,8,5,'#f4dafa');
+ }else{
+  const shirt=['#f3f0df','#181b25','#e18b35'][s];
+  rect(-12,8,10,16,outline);rect(3,8,10,16,outline);rect(-13,20,12,6,s===1?'#17171c':'#513f35');rect(2,20,12,6,s===1?'#17171c':'#513f35');
+  rect(-17,-12,34,27,outline);rect(-14,-10,28,24,shirt);rect(-21,-8,7,20,shirt);rect(14,-8,7,20,shirt);
+  rect(-11,-34,22,25,outline);rect(-9,-32,18,21,skin);
+  if(s===0){ // scientist: huge white hair, glasses, cyan shirt and lab coat
+   rect(-15,-40,30,11,'#f0f0f5');rect(-18,-36,7,17,'#e5e5ed');rect(11,-36,7,17,'#e5e5ed');
+   rect(-9,-25,8,7,'#222a35');rect(2,-25,8,7,'#222a35');rect(-7,-23,5,3,'#7ed6e9');rect(4,-23,5,3,'#7ed6e9');rect(-1,-23,3,2,'#e5e5ed');
+   rect(-7,-10,14,21,'#46b5c8');rect(-15,-10,8,25,'#f5f3e8');rect(7,-10,8,25,'#f5f3e8');rect(15,0,8,13,'#71d8ef');
+  }else if(s===1){ // metalhead: long hair, black jacket, red band shirt, boots
+   rect(-14,-42,28,16,'#15131c');rect(-16,-31,7,35,'#17131b');rect(9,-31,7,35,'#17131b');
+   rect(-5,-24,3,3,'#15131b');rect(4,-24,3,3,'#15131b');rect(-10,-9,20,21,'#a32f48');
+   rect(-14,-9,6,23,'#181821');rect(8,-9,6,23,'#181821');rect(-4,-2,8,7,'#f0d8b1');rect(-13,22,12,7,'#101118');rect(2,22,12,7,'#101118');
+  }else{ // construction worker: hard hat, reflective vest, tool belt
+   rect(-13,-39,26,9,'#e8b528');rect(-16,-33,32,5,'#ffdc43');rect(-5,-24,3,3,outline);rect(4,-24,3,3,outline);
+   rect(-13,-10,26,24,'#ed9435');rect(-8,-9,5,20,'#e9f0a6');rect(4,-9,5,20,'#e9f0a6');rect(-13,7,26,5,'#53453b');rect(11,7,8,12,'#5b6470');
+  }
+ }
+ if(!ghost&&!isHero){rect(-5,-58,11,11,'#292c36');rect(-3,-56,7,7,'#fff0ac');ctx.fillStyle='#42342e';ctx.font='bold 9px monospace';ctx.fillText('!',-1,-50)}
+ ctx.restore();
+}
+function drawPerson(x,y,s,isHero,step,ghost){
+ if(s>=0&&s<4){drawQuestHero(x,y,s,isHero,step,ghost);return;}
+ const [shirt,skin,hair]=palette(s),walking=isHero&&player.moving,bob=walking?Math.abs(Math.sin(step*9))*2:0,swing=walking?Math.sin(step*9)*4:0;
+ ctx.save();ctx.translate(Math.round(x),Math.round(y-bob));if(ghost)ctx.globalAlpha=.45;
+ // outlined, layered 16-bit character; keep physical footprint similar to V1
+ rect(-15,19,30,6,'#3c423b88');
+ rect(-11,5+swing,9,18,'#2d2930');rect(3,5-swing,9,18,'#2d2930');
+ rect(-13,19+swing,12,6,'#51382d');rect(2,19-swing,12,6,'#51382d');
+ rect(-16,-12,32,27,'#29252d');rect(-13,-10,26,23,shirt);
+ rect(-12,-4,24,4,'#d5a466');rect(-11,8,22,5,'#523b33');rect(-3,8,6,5,'#dfc27b');
+ rect(-21,-10-swing/3,8,21,'#2f2a32');rect(-19,-8-swing/3,6,17,shirt);rect(-20,6-swing/3,8,6,skin);
+ rect(13,-10+swing/3,8,21,'#2f2a32');rect(15,-8+swing/3,6,17,shirt);rect(14,6+swing/3,8,6,skin);
+ rect(-11,-34,22,25,'#34272c');rect(-9,-32,18,21,skin);
+ rect(-10,-37,20,8,hair);rect(-12,-33,5,14,hair);rect(8,-33,5,13,hair);
+ rect(-5,-24,3,3,'#27252b');rect(4,-24,3,3,'#27252b');rect(-2,-18,5,2,'#a36c54');
+ if(s%3!==1){rect(-9,-14,18,7,hair);rect(-7,-8,14,4,hair);rect(-4,-4,8,3,hair)}
+ // headband, iron helm or braids: no horns, historically inspired
+ if(s%3===0||s===9){rect(-12,-39,24,7,'#6f7781');rect(-9,-41,18,4,'#a9a9a1');rect(-2,-40,4,13,'#d3bc87')}
+ else if(s%3===1){rect(-13,-35,26,5,'#c7a26a');rect(-14,-29,5,17,hair);rect(9,-29,5,17,hair)}
+ else{rect(-12,-35,24,4,'#a78d6b');rect(-15,-25,6,20,hair);rect(9,-25,6,20,hair)}
+ if(s%2===0){rect(16,-2,9,16,'#704c3a');rect(18,0,5,12,'#b3a36e')}
+ if(!ghost&&!isHero){rect(-5,-51,11,11,'#292c36');rect(-3,-49,7,7,'#fff0ac');ctx.fillStyle='#42342e';ctx.font='bold 9px monospace';ctx.fillText('!',-1,-43)}
+ ctx.restore();
+}
+// Gameplay localization follows the selected spoken language.
+const UI={
+ en:{menu:'MAIN MENU',skip:'⚔ GO STRAIGHT INTO BATTLE',goal:'GOAL: CATCH ALL FIVE WITNESSES',portal:'ALL CLUES FOUND! FOLLOW THE ARROW TO THE PORTAL',enter:'ENTER PORTAL',invaders:'MYSTERY INVADERS',choose:'Choose a mystery question. Grey numbers have already been asked.',ask:'YOU ASK',question:'Question',hear:'HEAR THE ANSWER →',check:'CHECK UNDERSTANDING →',repeat:'🔊 LISTEN AGAIN',clue:'CLUE',found:'FOUND',continue:'CONTINUE',nope:'WRONG!',gameover:'GAME OVER',evidence:'RECONSTRUCT THE EVIDENCE',qualification:'BATTLE QUALIFICATION — KNOWLEDGE CHECK',discovered:'What have you discovered?',prove:'Prove what you know',evidenceHelp:'Complete all five facts using the witnesses’ clues.',qualificationHelp:'Answer all five questions correctly to unlock the final battle. If you miss one, return and investigate.',chooseOption:'Choose…',checkEvidence:'CHECK THE EVIDENCE',more:'MORE EVIDENCE NEEDED',incorrect:'Not all answers were correct.',returnHelp:'Return to the village, question the witnesses, and try again.',return:'RETURN TO VILLAGE',checkClues:'CHECK YOUR CLUES',finalQualification:'FINAL QUALIFICATION',last:'One last answer before entering the arena.',qualified:'QUALIFIED FOR BATTLE!',qualifiedHelp:'All answers correct. Enter the arena!',enterBattle:'ENTER INVADERS →',notYet:'NOT YET QUALIFIED',investigate:'Investigate the mystery',investigateHelp:'Return to the village and gather more evidence.',profile:'THE COMPLETE MYSTERY',hearEvidence:'🔊 HEAR THE EVIDENCE AGAIN',notQuite:'NOT QUITE',solved:'MYSTERY SOLVED!',solvedHelp:'You solved the mystery! Now defend your knowledge.',move:'MOVE',fire:'FIRE',round:'ROUND',correct:'CORRECT!',complete:'🏆 LANGUAGE QUEST COMPLETE',completeHelp:'You uncovered the clues and proved your knowledge.',celebrate:'Mystery solved! Excellent work!',start:'START ADVENTURE →'},
+ es:{menu:'MENÚ PRINCIPAL',skip:'⚔ IR DIRECTAMENTE A LA BATALLA',goal:'OBJETIVO: ATRAPA A LOS CINCO TESTIGOS',portal:'¡TODAS LAS PISTAS! SIGUE LA FLECHA AL PORTAL',enter:'ENTRA AL PORTAL',invaders:'INVASORES DEL MISTERIO',choose:'Elige una pregunta. Los números grises ya se han usado.',ask:'TÚ PREGUNTAS',question:'Pregunta',hear:'ESCUCHAR LA RESPUESTA →',check:'COMPROBAR COMPRENSIÓN →',repeat:'🔊 ESCUCHAR OTRA VEZ',clue:'PISTA',found:'ENCONTRADA',continue:'CONTINUAR',nope:'¡INCORRECTO!',gameover:'FIN DEL JUEGO',evidence:'RECONSTRUYE LAS PISTAS',qualification:'PRUEBA DE CONOCIMIENTOS',discovered:'¿Qué has descubierto?',prove:'Demuestra lo que sabes',evidenceHelp:'Completa los cinco datos usando las pistas de los testigos.',qualificationHelp:'Responde correctamente a las cinco preguntas para desbloquear la batalla. Si fallas, vuelve a investigar.',chooseOption:'Elige…',checkEvidence:'COMPROBAR LAS PISTAS',more:'NECESITAS MÁS PISTAS',incorrect:'No todas las respuestas son correctas.',returnHelp:'Vuelve a investigar y después inténtalo de nuevo.',return:'VOLVER AL PUEBLO',checkClues:'REVISA TUS PISTAS',finalQualification:'PRUEBA FINAL',last:'Una última respuesta antes de entrar en la arena.',qualified:'¡LISTO PARA LA BATALLA!',qualifiedHelp:'¡Todas las respuestas son correctas!',enterBattle:'ENTRAR EN LA BATALLA →',notYet:'TODAVÍA NO',investigate:'Investiga el misterio',investigateHelp:'Vuelve al pueblo y busca más pistas.',profile:'EL MISTERIO COMPLETO',hearEvidence:'🔊 ESCUCHAR LAS PISTAS OTRA VEZ',notQuite:'NO ES CORRECTO',solved:'¡MISTERIO RESUELTO!',solvedHelp:'¡Has resuelto el misterio! Ahora defiende tus conocimientos.',move:'MOVER',fire:'DISPARAR',round:'RONDA',correct:'¡CORRECTO!',complete:'🏆 ¡AVENTURA COMPLETADA!',completeHelp:'Has descubierto las pistas y demostrado tus conocimientos.',celebrate:'¡Misterio resuelto! ¡Excelente trabajo!',start:'COMENZAR AVENTURA →'},
+ de:{menu:'HAUPTMENÜ',skip:'⚔ DIREKT ZUM KAMPF',goal:'ZIEL: FANGE ALLE FÜNF ZEUGEN',portal:'ALLE HINWEISE GEFUNDEN! FOLGE DEM PFEIL ZUM PORTAL',enter:'PORTAL BETRETEN',invaders:'RÄTSEL-INVADERS',choose:'Wähle eine Frage. Graue Zahlen wurden schon benutzt.',ask:'DU FRAGST',question:'Frage',hear:'ANTWORT ANHÖREN →',check:'WISSEN ÜBERPRÜFEN →',repeat:'🔊 NOCH EINMAL ANHÖREN',clue:'HINWEIS',found:'GEFUNDEN',continue:'WEITER',nope:'FALSCH!',gameover:'SPIEL VORBEI',evidence:'REKONSTRUIERE DIE HINWEISE',qualification:'WISSENSPRÜFUNG FÜR DEN KAMPF',discovered:'Was hast du herausgefunden?',prove:'Zeige dein Wissen',evidenceHelp:'Ergänze die fünf Fakten mithilfe der Hinweise.',qualificationHelp:'Beantworte alle fünf Fragen richtig. Bei einem Fehler musst du weiter ermitteln.',chooseOption:'Wählen…',checkEvidence:'HINWEISE PRÜFEN',more:'MEHR HINWEISE NÖTIG',incorrect:'Nicht alle Antworten waren richtig.',returnHelp:'Kehre ins Dorf zurück und ermittle weiter.',return:'ZURÜCK INS DORF',checkClues:'HINWEISE PRÜFEN',finalQualification:'LETZTE PRÜFUNG',last:'Eine letzte Antwort vor dem Kampf.',qualified:'FÜR DEN KAMPF QUALIFIZIERT!',qualifiedHelp:'Alle Antworten richtig! Betritt die Arena!',enterBattle:'ZUM KAMPF →',notYet:'NOCH NICHT BEREIT',investigate:'Löse das Rätsel',investigateHelp:'Kehre ins Dorf zurück und sammle weitere Hinweise.',profile:'DAS VOLLSTÄNDIGE RÄTSEL',hearEvidence:'🔊 HINWEISE NOCH EINMAL ANHÖREN',notQuite:'NICHT GANZ',solved:'RÄTSEL GELÖST!',solvedHelp:'Du hast das Rätsel gelöst! Verteidige nun dein Wissen.',move:'BEWEGEN',fire:'SCHIESSEN',round:'RUNDE',correct:'RICHTIG!',complete:'🏆 ABENTEUER ABGESCHLOSSEN!',completeHelp:'Du hast die Hinweise gefunden und dein Wissen bewiesen.',celebrate:'Rätsel gelöst! Sehr gut gemacht!',start:'ABENTEUER STARTEN →'}
+};
+function tr(k){return (UI[$('languageSelect').value.slice(0,2)]||UI.en)[k]||UI.en[k]||k;}
+function updateGameLanguage(){document.documentElement.lang=$('languageSelect').value.slice(0,2);$('menuBtn').textContent=tr('menu');$('skipBattleBtn').textContent=tr('skip');$('startGame').textContent=tr('start');}
+// Witness tag: witnesses flee when approached, but remain slower than the player.
+const WITNESS_FLEE_RADIUS=205, WITNESS_SPEED=117, WITNESS_CATCH_RADIUS=37;
+const WANDER_SPEED=77;
+function moveWitnesses(dt){
+ for(let i=0;i<villagers.length;i++){
+  if(completed.has(i))continue;
+  const v=villagers[i],dx=v.x-player.x,dy=v.y-player.y,dist=Math.hypot(dx,dy);
+  v.wanderTime=(v.wanderTime||0)-dt;
+  if(v.wanderTime<=0){v.wanderAngle=Math.random()*Math.PI*2;v.wanderTime=.35+Math.random()*.85;}
+  const fleeing=dist<WITNESS_FLEE_RADIUS&&dist>0.01;
+  const direction=fleeing?Math.atan2(dy,dx)+Math.sin(performance.now()/300+i)*.18:v.wanderAngle;
+  const speed=fleeing?WITNESS_SPEED:WANDER_SPEED;
+  const step=speed*dt,ux=Math.cos(direction),uy=Math.sin(direction);
+  const canStand=(x,y)=>x>=32&&x<=928&&y>=95&&y<=505&&!blocked(x,y);
+  const candidates=[[v.x+ux*step,v.y+uy*step],[v.x+ux*step,v.y],[v.x,v.y+uy*step]];
+  const next=candidates.find(([x,y])=>canStand(x,y));
+  if(next){v.x=next[0];v.y=next[1];}
+  else{v.wanderAngle+=Math.PI*(.55+Math.random()*.9);v.wanderTime=.3+Math.random()*.5;}
+ }
+}
+function drawExitPortal(){
+ const x=479,y=87,t=performance.now()/1000;
+ ctx.save();ctx.translate(x,y);
+ const pulse=.5+.5*Math.sin(t*4);
+ ctx.shadowColor='#6cecff';ctx.shadowBlur=15+12*pulse;
+ ctx.fillStyle='#174d78';ctx.beginPath();ctx.ellipse(0,0,35,45,0,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#8df5ff';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,35,45,0,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle='#b4faff';for(let i=0;i<8;i++){let a=t*1.4+i*Math.PI/4;ctx.fillRect(Math.cos(a)*25-2,Math.sin(a)*35-2,4,4);}
+ ctx.restore();
+ // A pulsing arrow below the portal, pointing north.
+ const ay=165+Math.sin(t*5)*7;
+ poly([[479,ay-24],[457,ay],[469,ay],[469,ay+21],[489,ay+21],[489,ay],[501,ay]],'#fff4a2');
+ ctx.fillStyle='#172f42';ctx.font='bold 15px monospace';ctx.textAlign='center';ctx.fillText(tr('enter'),479,225);ctx.textAlign='left';
+}
+function update(dt){if(invaderCooldown>0)invaderCooldown-=dt;
  if(state!=="world"&&state!=="boss")return;
  let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);
  let len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;player.moving=!!(dx||dy);
@@ -112,8 +555,11 @@ function update(dt){
  player.x=Math.max(18,Math.min(942,player.x));player.y=Math.max(35,Math.min(520,player.y));
  if(invuln>0)invuln-=dt;
  if(state==="world"){
-   for(let i=0;i<villagers.length;i++)if(!completed.has(i)&&Math.hypot(player.x-villagers[i].x,player.y-villagers[i].y)<34){beginTalk(i);break}
-   if(completed.size===villagers.length&&player.y<48&&player.x>405&&player.x<555)beginRecon();
+   // Check for a catch before fleeing, so contact always starts a conversation.
+   let caught=villagers.findIndex((v,i)=>!completed.has(i)&&Math.hypot(player.x-v.x,player.y-v.y)<WITNESS_CATCH_RADIUS);
+   if(caught>=0)beginTalk(caught);
+   else moveWitnesses(dt);
+   if(completed.size===villagers.length&&Math.hypot(player.x-479,player.y-87)<42)beginRecon();
  } else updateBoss(dt);
 }
 function blocked(x,y){for(const b of buildings)if(x>b.x-10&&x<b.x+b.w+10&&y>b.y-5&&y<b.y+b.h+8)return true;return false}
@@ -123,84 +569,304 @@ function validateNPCPositions(){
    if(blocked(v.x,v.y)){v.x=safe[i][0];v.y=safe[i][1]}
  });
 }
-function render(){if(state==="boss")drawBoss();else drawWorld();hud()}
+function render(){$("skipBattleBtn").classList.toggle("hidden",state!=="world");if(state==="boss")drawBoss();else drawWorld();hud()}
 function frame(t){let dt=Math.min(.035,(t-last)/1000);last=t;update(dt);render();requestAnimationFrame(frame)}
-function hud(){$("health").textContent="❤️".repeat(Math.max(0,lives));$("status").textContent=`🔎 ${completed.size}/${villagers.length}   🔫 ${ammo}`;$("objective").textContent=state==="boss"?"DERROTA A MARIO":completed.size<villagers.length?"OBJETIVO: INTERROGA A TODOS LOS HABITANTES":"OBJETIVO: VE AL CASTILLO"}
-function beginTalk(i){Object.keys(keys).forEach(k=>keys[k]=false);if(state!=="world")return;state="talk";player.moving=false;current=i;phase="question";showConjugation()}
+function hud(){$("objective").style.maxWidth="360px";$("objective").style.fontSize="12px";$("health").textContent="❤️".repeat(Math.max(0,lives));$("status").textContent=`🔎 ${completed.size}/${villagers.length}   ⭐ ${ammo}`;$("objective").textContent=state==="boss"?tr('invaders'):completed.size<villagers.length?tr('goal'):tr('portal')}
+function beginTalk(i){if(state!=="world")return;state="talk";player.moving=false;current=i;showQuestion()}
 function placeBubble(){
- const v=villagers[current], shell=$("shell").getBoundingClientRect(), sx=shell.width/960, sy=shell.height/540, bw=shell.width<=760?shell.width-24:Math.min(470,shell.width*.48);
- let left=v.x*sx-bw/2, top=v.y*sy-190;left=Math.max(12,Math.min(shell.width-bw-12,left));top=Math.max(65,Math.min(shell.height-205,top));
- if(shell.width<=760){left=12;top=65}
- bubble.style.width=bw+"px";bubble.style.left=left+"px";bubble.style.top=top+"px";bubble.style.setProperty("--tail",Math.max(22,Math.min(bw-55,v.x*sx-left-18))+"px")
+  // Dialogue stays in the lower UI band so the player and NPC remain visible.
+  bubble.style.left="5%"; bubble.style.right="5%"; bubble.style.bottom="18px";
+  bubble.style.top="auto"; bubble.style.width="auto";
 }
-function showConjugation(){
+// Five hidden question cards per witness. Each question leads to the witness's factual testimony.
+const VIKING_QUESTIONS=[
+ ["When did this ruler live?","Which century was this king's reign?","How long ago did this king rule Denmark?","Was this ruler from the early or late Viking Age?","What time in Danish history should I investigate?"],
+ ["What did the king build at Jelling?","Where can I find a monument connected to him?","Which runestone tells us about this ruler?","What evidence did he leave in stone?","What is special about the Jelling monument?"],
+ ["Who was this king's father?","What do we know about his royal family?","Which earlier king was his parent?","Can you tell me about his father?","Who ruled in his family before him?"],
+ ["What did this king say about religion?","Which religious change happened in his reign?","What does the Jelling stone say about faith?","What was his role in Denmark's conversion?","Which religion is linked to this king?"],
+ ["What fortresses are connected to this ruler?","What kind of strongholds were built in his age?","Which military constructions might identify him?","What is unusual about Viking ring fortresses?","Which defences are associated with his reign?"]
+];
+let dialogueToken=0, askedQuestions=new Set(),challengeMode=false;
+function showQuestion(){
  const v=villagers[current];placeBubble();bubble.classList.remove("hidden");speaker.textContent=v.name;
- const sentence=phase==="question"?v.q:v.a;
- content.innerHTML=`<div class="line">${sentence}</div><div class="inf">[${v.inf}]</div><input id="answer" autocomplete="off" spellcheck="false"><span class="accents" id="acc"></span><div class="actions"><button id="send">Enviar</button><span class="feedback" id="feedback"></span></div>`;
- const inp=$("answer"),acc=$("acc");["á","é","í","ó","ú","ñ"].forEach(ch=>{let b=document.createElement("button");b.className="accent";b.textContent=ch;b.onclick=()=>{inp.value+=ch;inp.focus()};acc.appendChild(b)});
- $("send").onclick=submitConj;inp.onkeydown=e=>{if(e.key==="Enter")submitConj()};inp.focus()
+ const numbers=[1,2,3,4,5].map(n=>{
+  const used=askedQuestions.has(n-1);
+  return `<button type="button" class="numberChoice${used?' used':''}" data-number="${n}" ${used?'disabled aria-disabled="true" title="Already asked"':''}>${n}</button>`;
+ }).join("");
+ content.innerHTML=`<div class="line">${tr('choose')}</div><div class="numberGrid">${numbers}</div>`;
+ content.querySelectorAll('.numberChoice:not(:disabled)').forEach(b=>b.onclick=()=>askNumberedQuestion(Number(b.dataset.number)-1));
 }
-function submitConj(){
- const v=villagers[current],inp=$("answer");if(inp.value.trim().toLocaleLowerCase("es")===v.form){
-  tone(760,.08);let full=(phase==="question"?v.q:v.a).replace("____",v.form);speak(full);
-  content.innerHTML=`<div class="line"><b>${full}</b></div><div class="actions"><span class="reward">✓ CORRECTO</span></div>`;
-  if(phase==="question"){phase="answer";setTimeout(showConjugation,900)}else setTimeout(showCheck,900)
- }else{damage(false);$("feedback").innerHTML='<span class="nope">NOPE</span>';inp.select()}
+function askNumberedQuestion(choice){
+ if(state!=="talk"||current<0)return;
+ if(!Number.isInteger(choice)||choice<0||choice>=5||askedQuestions.has(choice))return;
+ askedQuestions.add(choice);
+ const token=++dialogueToken,v=villagers[current],q=(selectedAdventure.id==="harald"?VIKING_QUESTIONS[current][choice]:v.q);
+ speaker.textContent=tr('ask');
+ content.innerHTML=`<div class="line">${q}</div><div class="inf">${tr('question')} ${choice+1} / 5</div><button id="nextReply">${tr('hear')}</button>`;
+ speak(q);
+ $("nextReply").onclick=()=>showWitnessAnswer(token);
+}
+function showWitnessAnswer(token){
+ if(state!=="talk"||token!==dialogueToken||current<0)return;
+ const v=villagers[current];speaker.textContent=v.name;
+ content.innerHTML=`<div class="line">${v.a}</div><div class="actions"><button id="understood">${tr('check')}</button><button id="repeat">${tr('repeat')}</button></div>`;
+ speak(v.a);$("understood").onclick=showCheck;$("repeat").onclick=()=>speak(v.a);
+}
+function shuffledChoices(v){
+ const items=v.opts.map((text,i)=>({text,correct:i===v.correct}));
+ for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
+ return items;
 }
 function showCheck(){
- const v=villagers[current];placeBubble();speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.check}</div>`+v.opts.map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("");
- content.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answerCheck(+b.dataset.i))
+ speechSynthesis.cancel();const v=villagers[current],choices=shuffledChoices(v);placeBubble();speaker.textContent=v.name;
+ content.innerHTML=`<div class="line">${v.check}</div>`+choices.map((o,i)=>`<button class="choice" data-i="${i}">${o.text}</button>`).join("");
+ content.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answerCheck(choices[+b.dataset.i].correct))
 }
-function answerCheck(i){
- const v=villagers[current];if(i!==v.correct){damage(false);flash("NOPE");return}
- tone(880,.1);speak(v.opts[i]);completed.add(current);clues.push({label:v.label,text:v.clue});ammo++;
- speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.clue}</div><div class="reward">🔫 +1 BALA</div><div class="inf">Pista añadida al cuaderno.</div><button id="continue">Continuar</button>`;$("continue").onclick=endTalk
+function answerCheck(isCorrect){
+ const v=villagers[current];if(!isCorrect){damage(false);flash(tr('nope'));return}
+ tone(880,.1);speak(v.clue);completed.add(current);clues.push({label:v.label,text:v.clue});ammo++;
+ speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.clue}</div><div class="reward">★ ${tr('clue')} ${completed.size}/5 ${tr('found')}</div><button id="continue">${tr('continue')}</button>`;
+ $("continue").onclick=endTalk
 }
-function endTalk(){bubble.classList.add("hidden");state="world";let v=villagers[current];let ang=Math.atan2(player.y-v.y,player.x-v.x);player.x=v.x+Math.cos(ang)*42;player.y=v.y+Math.sin(ang)*42;current=-1}
-function damage(bossHit=true){lives--;tone(125,.16);if(lives<=0){state="dead";setTimeout(()=>location.reload(),500)}else if(bossHit)invuln=1}
+function endTalk(){dialogueToken++;speechSynthesis.cancel();bubble.classList.add("hidden");state="world";let v=villagers[current];let ang=Math.atan2(player.y-v.y,player.x-v.x);player.x=v.x+Math.cos(ang)*42;player.y=v.y+Math.sin(ang)*42;current=-1}
+function damage(bossHit=true){lives--;tone(125,.16);if(lives<=0){state="dead";flash(tr('gameover'));setTimeout(goMainMenu,900)}else if(bossHit)invuln=1}
 function flash(msg){let t=$("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),600)}
 function beginRecon(){
- if(state!=="world")return;state="recon";let box=$("recon");box.classList.remove("hidden");
- window.recon=[
-  ["DÓNDE","¿Dónde trabajará Mario mañana?",["En el castillo","En su casa","En el mercado"],0],
-  ["CON QUIÉN","¿Con quién hablará Mario esta noche?",["Con el rey","Con el guardia","Con la cocinera"],1],
-  ["QUÉ","¿Qué llevará Mario al castillo?",["Una botella","Una espada","Una corona"],0],
-  ["CUÁNDO","¿Cuándo entrará Mario al castillo?",["Mañana por la noche","Esta mañana","La próxima semana"],0],
-  ["CÓMO","¿Cómo matará Mario al rey?",["Con fuego","Con veneno","Con una espada"],1]
- ];window.ri=0;showRecon()
+ if(state!=="world")return;challengeMode=false;state="recon";$("recon").classList.remove("hidden");showReconFill()
 }
-function showRecon(){
- let q=recon[ri],box=$("recon");box.innerHTML=`<div class="progress">RECONSTRUYE EL PLAN · ${ri+1}/${recon.length} · ${q[0]}</div><h2>${q[1]}</h2>`+q[2].map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("");
- box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>pickRecon(+b.dataset.i))
+function beginBattleChallenge(){
+ if(state!=="world")return;
+ challengeMode=true;state="recon";player.moving=false;
+ $("recon").classList.remove("hidden");showReconFill();
 }
-function pickRecon(i){let q=recon[ri];if(i!==q[3]){damage(false);flash("NOPE");return}tone(820,.08);ri++;if(ri<recon.length)showRecon();else{$("recon").innerHTML=`<div class="progress">PLAN DESCUBIERTO</div><h2>Mario intentará matar al rey.</h2><p>Trabajará en el castillo, hablará con el guardia, llevará una botella, entrará mañana por la noche y usará veneno.</p><p class="reward">Munición disponible: 🔫 ${ammo}</p><button id="fight">ENTRAR AL CASTILLO</button>`;$("fight").onclick=startBoss}}
-let boss={x:480,y:105,hp:5,t:0,dir:1,shots:[]},playerShots=[];
-function startBoss(){$("recon").classList.add("hidden");state="boss";player.x=480;player.y=455;boss={x:480,y:105,hp:5,t:0,dir:1,shots:[]};playerShots=[];$("bossPrompt").classList.remove("hidden");$("bossPrompt").innerHTML=`Muévete y apunta. <span class="kbd">ESPACIO</span> dispara. Cada impacto consume 1 bala.`}
+function showReconFill(){
+ const box=$("recon"),r=selectedAdventure.reconstruction;
+ box.innerHTML=`<div class="progress">${challengeMode?tr('qualification'):tr('evidence')}</div><h2>${challengeMode?tr('prove'):tr('discovered')}</h2><p>${challengeMode?tr('qualificationHelp'):tr('evidenceHelp')}</p>`+
+ r.map((x,i)=>`<div class="reconLine">${i+1}. ${x[0]}<select class="reconInput" data-i="${i}"><option value="">${tr('chooseOption')}</option>${x[1].map((o,j)=>`<option value="${j}">${o}</option>`).join("")}</select></div>`).join("")+
+ `<button id="checkRecon">${tr('checkEvidence')}</button>`;
+ $("checkRecon").onclick=checkRecon;
+}
+function checkRecon(){
+ let ok=true;document.querySelectorAll(".reconInput").forEach(inp=>{let i=+inp.dataset.i,yes=Number(inp.value)===selectedAdventure.reconstruction[i][2]&&inp.value!=="";inp.classList.toggle("ok",yes);if(!yes)ok=false});
+ if(!ok){
+   if(challengeMode){
+     state="challengeFailed";$("recon").innerHTML=`<div class="progress">${tr('more')}</div><h2>${tr('incorrect')}</h2><p>${tr('returnHelp')}</p><button id="returnVillage">${tr('return')}</button>`;
+     $("returnVillage").onclick=returnFromChallenge;
+   }else{damage(false);flash(tr('checkClues'))}
+   return;
+ }
+ tone(820,.1);
+ if(challengeMode){showBattleQualificationFinal()}
+ else{showFinalInference();speakSequence([selectedAdventure.fullStory,selectedAdventure.finalQuestion])}
+}
+function returnFromChallenge(){
+ challengeMode=false;state="world";$("recon").classList.add("hidden");
+}
+function showBattleQualificationFinal(){
+ const box=$("recon"),opts=shuffledChoices({opts:selectedAdventure.finalOptions,correct:selectedAdventure.finalCorrect});
+ box.innerHTML=`<div class="progress">${tr('finalQualification')}</div><h2>${selectedAdventure.finalQuestion}</h2><p>${tr('last')}</p><div class="finalOptions">`+
+ opts.map((o,i)=>`<button class="choice" data-i="${i}">${o.text}</button>`).join("")+`</div>`;
+ box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
+  if(opts[+b.dataset.i].correct){
+   tone(900,.12);box.innerHTML=`<div class="progress">${tr('qualified')}</div><h2>${selectedAdventure.finalOptions[selectedAdventure.finalCorrect]}</h2><p>${tr('qualifiedHelp')}</p><button id="fight">${tr('enterBattle')}</button>`;
+   $("fight").onclick=startBoss;
+  }else{
+   state="challengeFailed";box.innerHTML=`<div class="progress">${tr('notYet')}</div><h2>${tr('investigate')}</h2><p>${tr('investigateHelp')}</p><button id="returnVillage">${tr('return')}</button>`;
+   $("returnVillage").onclick=returnFromChallenge;
+  }
+ });
+}
+function showFinalInference(){
+ const box=$("recon"),opts=shuffledChoices({opts:selectedAdventure.finalOptions,correct:selectedAdventure.finalCorrect});
+ box.innerHTML=`<div class="progress">${tr('profile')}</div><p>${selectedAdventure.fullStory}</p><h2>${selectedAdventure.finalQuestion}</h2><div class="finalOptions">`+
+ opts.map((o,i)=>`<button class="choice" data-i="${i}">${o.text}</button>`).join("")+`</div><button id="hearStory">${tr('hearEvidence')}</button>`;
+ box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>pickFinal(opts[+b.dataset.i].correct));
+ $("hearStory").onclick=()=>speakSequence([selectedAdventure.fullStory,selectedAdventure.finalQuestion]);
+}
+function pickFinal(correct){
+ if(!correct){damage(false);flash(tr('notQuite'));return}
+ tone(900,.12);$("recon").innerHTML=`<div class="progress">${tr('solved')}</div><h2>${selectedAdventure.finalOptions[selectedAdventure.finalCorrect]}</h2><p>${tr('solvedHelp')}</p><button id="fight">${tr('enterBattle')}</button>`;$("fight").onclick=startBoss
+}
+let invaderRound=0,invaderTargets=[],playerShots=[],enemyShots=[],enemyFireTimer=1.1,invaderCooldown=0,roundTransition=false;
+function makeInvaderRound(){
+ if(state!=="boss")return;
+ const q=selectedAdventure.finale[invaderRound],choices=shuffledChoices(q);
+ const xs=[250,480,710];invaderTargets=choices.map((c,i)=>({...c,x:xs[i],y:165,dir:i%2?1:-1,alive:true}));
+ $("bossPrompt").innerHTML=`<b>${q.question}</b><br><span class="small">← → MOVE · SPACE FIRE · ROUND ${invaderRound+1}/5</span>`;
+ roundTransition=false;enemyShots=[];enemyFireTimer=.75+Math.random()*.6;
+}
+function startBoss(){
+ $("recon").classList.add("hidden");state="boss";player.x=480;player.y=455;playerShots=[];enemyShots=[];enemyFireTimer=1;invaderRound=0;invaderCooldown=0;heroStyle=selectedHero;roundTransition=false;
+ $("bossPrompt").classList.remove("hidden");makeInvaderRound()
+}
 function updateBoss(dt){
- boss.t+=dt;boss.x+=boss.dir*85*dt;if(boss.x<130||boss.x>830)boss.dir*=-1;
- if(boss.t>1.25){boss.t=0;let a=Math.atan2(player.y-boss.y,player.x-boss.x);boss.shots.push({x:boss.x,y:boss.y+18,vx:Math.cos(a)*155,vy:Math.sin(a)*155})}
- boss.shots.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt});boss.shots=boss.shots.filter(s=>s.x>-20&&s.x<980&&s.y>-20&&s.y<560);
- playerShots.forEach(s=>{s.y-=320*dt});playerShots=playerShots.filter(s=>{if(s.y<=-20&&!s.dead)ammo++;return s.y>-20&&!s.dead});
- for(const s of boss.shots)if(invuln<=0&&Math.hypot(s.x-player.x,s.y-player.y)<16){s.x=-100;damage(true)}
- for(const s of playerShots)if(!s.dead&&Math.hypot(s.x-boss.x,s.y-boss.y)<34){s.dead=true;boss.hp--;tone(300,.08);flash("¡IMPACTO!");if(boss.hp<=0)win()}
+ let dx=(keys["ArrowRight"]||keys["d"]?1:0)-(keys["ArrowLeft"]||keys["a"]?1:0);
+ player.x=Math.max(70,Math.min(890,player.x+dx*260*dt));
+ if(roundTransition)return;
+ enemyFireTimer-=dt;
+ if(enemyFireTimer<=0){const shooters=invaderTargets.filter(t=>t.alive);if(shooters.length){const t=shooters[Math.floor(Math.random()*shooters.length)];enemyShots.push({x:t.x,y:t.y+48,vy:155+invaderRound*15});tone(170,.035);}enemyFireTimer=.7+Math.random()*.75;}
+ enemyShots.forEach(sh=>{sh.y+=sh.vy*dt;if(invuln<=0&&Math.abs(sh.x-player.x)<17&&Math.abs(sh.y-(player.y-5))<23){sh.dead=true;damage(true);flash(tr('nope'));}});enemyShots=enemyShots.filter(sh=>!sh.dead&&sh.y<535);
+ invaderTargets.forEach(t=>{if(!t.alive)return;t.x+=t.dir*42*dt;if(t.x<160||t.x>800)t.dir*=-1});
+ playerShots.forEach(sh=>sh.y-=390*dt);
+ for(const sh of playerShots){
+  if(sh.dead)continue;
+  for(const t of invaderTargets){
+   if(t.alive&&Math.abs(sh.x-t.x)<82&&Math.abs(sh.y-t.y)<38){
+    sh.dead=true;roundTransition=true;playerShots=[];
+    if(t.correct){tone(880,.09);flash(tr('correct'));invaderRound++;
+      if(invaderRound>=5){setTimeout(()=>{if(state==="boss")win()},450)}
+      else setTimeout(makeInvaderRound,450);
+    }else{damage(false);flash(tr('nope'));if(state==="boss")setTimeout(makeInvaderRound,550)}
+    break;
+   }
+  }
+  if(roundTransition)break;
+ }
+ playerShots=playerShots.filter(sh=>!sh.dead&&sh.y>-20);
 }
-function shoot(){if(state!=="boss"||ammo<=0)return;ammo--;playerShots.push({x:player.x,y:player.y-18,dead:false});tone(520,.045)}
+function shoot(){
+ if(state!=="boss"||invaderCooldown>0)return;
+ playerShots.push({x:player.x,y:player.y-24,dead:false});tone(520,.045);invaderCooldown=.18
+}
 function drawBoss(){
- rect(0,0,960,540,"#2c273c");for(let i=0;i<12;i++)rect(i*80,0,3,540,"#332e45");rect(80,55,800,420,"#4b4056");rect(100,75,760,380,"#332d3f");
- ctx.fillStyle="#7d6b87";for(let y=90;y<450;y+=38)for(let xx=110+(y%76?20:0);xx<850;xx+=70)ctx.fillRect(xx,y,58,4);
- drawPerson(boss.x,boss.y,3,false,0,false);ctx.fillStyle="#e64f5f";ctx.fillRect(boss.x-42,boss.y-50,84,8);ctx.fillStyle="#78c765";ctx.fillRect(boss.x-42,boss.y-50,84*(boss.hp/5),8);
+ rect(0,0,960,540,"#182d36");rect(55,52,850,420,"#30434a");
+ for(let i=0;i<22;i++)rect(70+i*39,410,22,5,"#57705e");
+ ctx.fillStyle="#f2cf86";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText(tr('invaders'),480,92);
+ invaderTargets.forEach(t=>{if(!t.alive)return;drawPerson(t.x,t.y-35,4+Math.floor(t.x/100)%5,false,0,false);
+   rect(t.x-89,t.y+10,178,42,"#3c2927");rect(t.x-84,t.y+14,168,33,"#edcf95");
+   ctx.fillStyle="#29231d";ctx.font="bold 12px monospace";ctx.fillText(t.text,t.x,t.y+36);
+ });
  drawPerson(player.x,player.y,heroStyle,true,player.step,false);
- ctx.fillStyle="#ffd85a";playerShots.forEach(s=>ctx.fillRect(s.x-2,s.y-7,4,12));ctx.fillStyle="#f06a6a";boss.shots.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,6,0,7);ctx.fill()})
+ ctx.fillStyle="#f4d66d";playerShots.forEach(sh=>ctx.fillRect(sh.x-3,sh.y-9,6,16));
+ ctx.fillStyle="#ff786b";enemyShots.forEach(sh=>{ctx.fillRect(sh.x-4,sh.y-6,8,14);ctx.fillRect(sh.x-2,sh.y+8,4,5)});
+ ctx.textAlign="left";
 }
-function win(){state="win";$("bossPrompt").classList.add("hidden");let r=$("recon");r.classList.remove("hidden");r.innerHTML=`<div class="progress">🏆 MISIÓN COMPLETADA</div><h1>¡HAS SALVADO AL REY!</h1><p>Descubriste el complot y derrotaste a Mario.</p><button onclick="location.reload()">Jugar otra vez</button>`;speak("¡Has salvado al rey!")}
+function win(){state="win";$("bossPrompt").classList.add("hidden");let r=$("recon");r.classList.remove("hidden");r.innerHTML=`<div class="progress">${tr('complete')}</div><h1>${selectedAdventure.finalOptions[selectedAdventure.finalCorrect]}</h1><p>${tr('completeHelp')}</p><button onclick="goMainMenu()">${tr('menu')}</button>`;speak(tr('celebrate'))}
 function tone(f,d){try{audioCtx ||= new (AudioContext||webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;o.type="square";g.gain.setValueAtTime(.045,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch{}}
-function speak(text){try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text),vs=speechSynthesis.getVoices();u.voice=vs.find(v=>/^es(-|_)/i.test(v.lang))||null;u.lang="es-ES";u.rate=.9;speechSynthesis.speak(u)}catch{}}
-addEventListener("keydown",e=>{if(e.target.matches("input,textarea"))return;keys[e.key]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.code==="Space")shoot()});
+function speak(text){try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text),vs=speechSynthesis.getVoices();u.lang=$("languageSelect").value;u.voice=vs.find(v=>v.lang.toLowerCase()===u.lang.toLowerCase())||vs.find(v=>v.lang.toLowerCase().startsWith(u.lang.slice(0,2)))||null;u.rate=.9;speechSynthesis.speak(u)}catch{}} 
+function speakSequence(lines){
+ try{
+  speechSynthesis.cancel();let vs=speechSynthesis.getVoices(),voice=vs.find(v=>v.lang.toLowerCase()===$("languageSelect").value.toLowerCase())||vs.find(v=>v.lang.toLowerCase().startsWith($("languageSelect").value.slice(0,2)))||null,i=0;
+  const next=()=>{if(i>=lines.length)return;let u=new SpeechSynthesisUtterance(lines[i++]);u.voice=voice;u.lang=$("languageSelect").value;u.rate=.9;u.onend=next;speechSynthesis.speak(u)};next()
+ }catch{}
+}
+addEventListener("keydown",e=>{keys[e.key]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.code==="Space")shoot()});
 addEventListener("keyup",e=>keys[e.key]=false);
-document.querySelectorAll(".heroChoice").forEach((b,i)=>{let pc=b.querySelector("canvas"),pctx=pc.getContext("2d"),old=ctx; /* previews drawn manually */ pctx.fillStyle="#222";pctx.fillRect(20,48,5,18);pctx.fillRect(29,48,5,18);pctx.fillStyle=palette(i)[0];pctx.fillRect(15,27,24,23);pctx.fillStyle=palette(i)[1];pctx.fillRect(19,11,16,17);pctx.fillStyle=palette(i)[2];pctx.fillRect(17,7,20,8);b.onclick=()=>{heroStyle=i;$("start").classList.add("hidden");state="world";tone(600,.05)}})
-addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
-addEventListener("resize",()=>{if(state==="talk")placeBubble()});
-document.querySelectorAll("[data-key]").forEach(b=>{b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys[b.dataset.key]=true});["pointerup","pointercancel","lostpointercapture"].forEach(type=>b.addEventListener(type,()=>keys[b.dataset.key]=false))});
-$("fire").addEventListener("pointerdown",e=>{e.preventDefault();shoot()});
-validateNPCPositions();requestAnimationFrame(frame);
+let selectedHero=0;
+const CUSTOM_KEY="language_quests_custom_story_v2";
+const SAMPLE_ROWS=[
+"1\tWhen did this person live?\tThis person lived during the 10th century.\tWhich century?\t8th century\t10th century\t12th century\tB",
+"2\tWhere was this person connected to?\tThis person is remembered at Jelling in Denmark.\tWhich place?\tJelling\tLondon\tParis\tA",
+"3\tWhat was this person's role?\tThis person was a member of the Danish royal family.\tWhich group?\tMerchants\tFarmers\tRoyal family\tC",
+"4\tWhat monument remembers this person?\tA runestone at Jelling commemorates this person.\tWhich monument?\tRunestone\tPyramid\tAqueduct\tA",
+"5\tWhat was this person's name?\tThe name began with the letter T.\tWhich first letter?\tS\tT\tH\tB"
+].join("\n");
+function parseStoryRows(raw){
+ const lines=raw.trim().split(/\r?\n/).filter(x=>x.trim());
+ if(lines.length!==5)throw Error("Exactly 5 question rows are required (found "+lines.length+").");
+ return lines.map((line,i)=>{
+  const a=line.split("\t").map(x=>x.trim());
+  if(a.length!==8)throw Error("Row "+(i+1)+" needs 8 TAB-separated columns; found "+a.length+". Paste directly from a spreadsheet.");
+  if(a.some(x=>!x))throw Error("Row "+(i+1)+" contains an empty field.");
+  if(a[0]!==String(i+1))throw Error("Question numbers must be 1, 2, 3, 4, 5 in order.");
+  const correct="ABC".indexOf(a[7].toUpperCase());
+  if(correct<0)throw Error("Row "+(i+1)+" must end with A, B, or C.");
+  if(new Set(a.slice(4,7).map(x=>x.toLowerCase())).size!==3)throw Error("Row "+(i+1)+" must have three different answers.");
+  return {number:i+1,q:a[1],a:a[2],check:a[3],opts:a.slice(4,7),correct};
+ });
+}
+function buildCustomStory(){
+ const title=$("customTitle").value.trim(),premise=$("customIntro").value.trim(),identity=$("customIdentity").value.trim();
+ const wrong=$("customWrong").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ if(!title||!premise||!identity)throw Error("Title, introduction, and correct identity are required.");
+ if(wrong.length!==2||new Set([identity,...wrong].map(x=>x.toLowerCase())).size!==3)throw Error("Enter two distinct wrong identities, different from the correct one.");
+ const rows=parseStoryRows($("customRows").value);
+ const styles=[4,5,6,7,8],names=["The Skald","The Runecarver","The Storykeeper","The Merchant","The Builder"];
+ const facts=rows.map((r,i)=>({name:names[i],style:styles[i],label:"CLUE "+(i+1),q:r.q,a:r.a,check:r.check,opts:r.opts,correct:r.correct,clue:r.a}));
+ const reconstruction=rows.map(r=>[r.check.replace(/\?$/, "")+" — ____",r.opts,r.correct]);
+ return {id:"custom-story",group:"MY STORIES",title,premise,vocab:rows.map(r=>["Question "+r.number,r.q]),facts,reconstruction,fullStory:rows.map(r=>r.a).join(" "),finalQuestion:$("customFinalQuestion").value.trim()||"What is the mystery answer?",finalOptions:[wrong[0],identity,wrong[1]],finalCorrect:1,finale:rows.map(r=>({question:r.check,opts:r.opts,correct:r.correct}))};
+}
+function showEditorStatus(message,ok=false){$("editorStatus").textContent=message;$("editorStatus").style.color=ok?"#b7edaa":"#f5c19c"}
+function installCustomStory(story){const i=ADVENTURES.findIndex(a=>a.id==="custom-story");if(i>=0)ADVENTURES.splice(i,1);ADVENTURES.push(story);populateMenu();$("adventureSelect").value="custom-story";updatePreview()}
+function saveStory(){try{captureClue();const story=buildCustomStory();installCustomStory(story);try{localStorage.setItem(CUSTOM_KEY,JSON.stringify({title:$("customTitle").value,intro:$("customIntro").value,identity:$("customIdentity").value,wrong:$("customWrong").value,rows:$("customRows").value,finalQuestion:$("customFinalQuestion").value}))}catch{}showEditorStatus("✓ Story saved and selected! Choose a character and press START ADVENTURE.",true)}catch(e){showEditorStatus("✗ "+e.message)}}
+function restoreStory(){try{const v=JSON.parse(localStorage.getItem(CUSTOM_KEY)||"null");if(!v)return;$("customTitle").value=v.title;$("customIntro").value=v.intro;$("customIdentity").value=v.identity;$("customWrong").value=v.wrong;$("customRows").value=v.rows;$("customFinalQuestion").value=v.finalQuestion||"What is the mystery answer?";installCustomStory(buildCustomStory());loadClueRows($("customRows").value)}catch(e){showEditorStatus("Saved story could not be loaded: "+e.message)}}
+function populateMenu(){
+ const sel=$("adventureSelect");sel.innerHTML="";
+ let last="";
+ ADVENTURES.forEach(a=>{if(a.group!==last){let g=document.createElement("optgroup");g.label=a.group;sel.appendChild(g);last=a.group}let o=document.createElement("option");o.value=a.id;o.textContent=a.title;sel.lastElementChild.appendChild(o)});
+ sel.value=selectedAdventure.id;filterAdventuresByLanguage();
+}
+function updatePreview(){
+ const a=ADVENTURES.find(x=>x.id===$("adventureSelect").value)||ADVENTURES[0];
+ $("vocabPreview").value=a.vocab.map(v=>v[0]+" — "+v[1]).join("\n");
+ $("adventureBlurb").textContent=a.group+" · "+(a.blurb||a.premise||"");
+ loadStoryIntoEditor(a);
+}
+let editorDirty=false, editorLoading=false;
+function loadStoryIntoEditor(a){
+ if(!a)return;
+ editorLoading=true;
+ $("customTitle").value=a.title||"";
+ $("customFinalQuestion").value=a.finalQuestion||"What is the mystery answer?";
+ $("customIdentity").value=a.finalOptions?.[a.finalCorrect]||"";
+ $("customIntro").value=a.premise||"";
+ $("customWrong").value=(a.finalOptions||[]).filter((_,i)=>i!==a.finalCorrect).slice(0,2).join("\n");
+ for(let i=0;i<5;i++){
+  const f=a.facts?.[i]||{};
+  clueData[i]={q:f.q||"",a:f.a||"",check:f.check||"",opts:[...(f.opts||["","",""])],correct:"ABC"[f.correct??0]};
+ }
+ activeClue=0;showClue();syncClueRows();editorDirty=false;editorLoading=false;
+ showEditorStatus("Adventure loaded. You can edit every field before playing.",true);
+}
+function confirmReplace(){return !editorDirty||confirm("Replace your unsaved story edits with the selected adventure?")}
+function launchEditedStory(){
+ updateGameLanguage();
+ captureClue();
+ const story=buildCustomStory();
+ story.id="active-editor-story";story.language=$("languageSelect").value;
+ const base=ADVENTURES.find(a=>a.id===$("adventureSelect").value);
+ if(base){story.group=base.group;story.vocab=base.vocab;story.facts.forEach((f,i)=>{f.name=base.facts?.[i]?.name||f.name;f.style=base.facts?.[i]?.style??f.style;f.label=base.facts?.[i]?.label||f.label});}
+ selectedAdventure=story;
+ resetRun();villagers=story.facts.map((f,i)=>({x:POS[i][0],y:POS[i][1],...f}));
+ heroStyle=selectedHero;validateNPCPositions();$("start").classList.add("hidden");$("menuBtn").classList.remove("hidden");$("skipBattleBtn").classList.remove("hidden");showPremise();
+}
+function resetRun(){
+ dialogueToken++;askedQuestions=new Set();speechSynthesis.cancel();Object.keys(keys).forEach(k=>keys[k]=false);lives=5;ammo=0;clues=[];completed=new Set();current=-1;phase="";invuln=0;player.x=470;player.y=290;player.moving=false;playerShots=[];enemyShots=[];invaderTargets=[];invaderRound=0;invaderCooldown=0;roundTransition=false;
+ challengeMode=false;bubble.classList.add("hidden");$("recon").classList.add("hidden");$("bossPrompt").classList.add("hidden");$("toast").classList.add("hidden");$("premise").classList.add("hidden");
+}
+function goMainMenu(){$("premise").classList.add("hidden");
+ resetRun();state="menu";$("menuBtn").classList.add("hidden");$("skipBattleBtn").classList.add("hidden");$("start").classList.remove("hidden");updatePreview();
+}
+function drawHeroPreview(c,i){
+ const old=ctx;ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.imageSmoothingEnabled=false;
+ ctx.save();ctx.translate(26,46);ctx.scale(1.08,1.08);drawPerson(0,0,i,false,0,false);ctx.restore();ctx=old;
+}
+document.querySelectorAll(".heroChoice").forEach((b,i)=>{drawHeroPreview(b.querySelector("canvas"),i);b.onclick=()=>{selectedHero=i;document.querySelectorAll(".heroChoice").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")}});
+function showPremise(){state="premise";$("premiseTitle").textContent=selectedAdventure.title;$("premiseText").textContent=selectedAdventure.premise;$("premise").classList.remove("hidden")}
+$("closePremise").onclick=()=>{$("premise").classList.add("hidden");state="world";tone(600,.05)};
+let lastAdventureId="harald";
+$("adventureSelect").addEventListener("change",()=>{if(!confirmReplace()){$("adventureSelect").value=lastAdventureId;return}lastAdventureId=$("adventureSelect").value;updatePreview()});
+$("languageSelect").addEventListener("change",()=>{if(!confirmReplace())return;filterAdventuresByLanguage();lastAdventureId=$("adventureSelect").value;updateGameLanguage()});
+const clueData=Array.from({length:5},()=>({q:"",a:"",check:"",opts:["","",""],correct:"A"}));
+let activeClue=0;
+function captureClue(){if(!editorLoading)editorDirty=true;const c=clueData[activeClue];c.q=$("clueQuestion").value;c.a=$("clueAnswer").value;c.check=$("clueCheck").value;c.opts=[$("clueA").value,$("clueB").value,$("clueC").value];c.correct=$("clueCorrect").value;syncClueRows();renderClueTabs()}
+function syncClueRows(){$("customRows").value=clueData.map((c,i)=>[i+1,c.q,c.a,c.check,...c.opts,c.correct].join("\t")).join("\n")}
+function renderClueTabs(){$("clueTabs").innerHTML=clueData.map((c,i)=>`<button type="button" class="clueTab ${i===activeClue?'active':''} ${c.q&&c.a&&c.check&&c.opts.every(Boolean)?'complete':''}" data-i="${i}">${i+1}</button>`).join("");$("clueCounter").textContent=`Clue ${activeClue+1} / 5`;document.querySelectorAll('.clueTab').forEach(b=>b.onclick=()=>{captureClue();activeClue=Number(b.dataset.i);showClue()})}
+function showClue(){const c=clueData[activeClue];$("clueQuestion").value=c.q;$("clueAnswer").value=c.a;$("clueCheck").value=c.check;["clueA","clueB","clueC"].forEach((id,i)=>$(id).value=c.opts[i]);$("clueCorrect").value=c.correct;renderClueTabs()}
+function loadClueRows(raw){const lines=raw.trim().split(/\r?\n/);if(lines.length!==5)return;lines.forEach((line,i)=>{const v=line.split('\t');if(v.length===8)clueData[i]={q:v[1],a:v[2],check:v[3],opts:v.slice(4,7),correct:v[7]}});showClue()}
+["clueQuestion","clueAnswer","clueCheck","clueA","clueB","clueC","clueCorrect"].forEach(id=>$(id).addEventListener('input',captureClue));
+showClue();
+["customTitle","customFinalQuestion","customIdentity","customIntro","customWrong"].forEach(id=>$(id).addEventListener("input",()=>{if(!editorLoading)editorDirty=true}));
+$("clueQuestion").addEventListener("paste",e=>{const t=e.clipboardData?.getData("text");if(t?.startsWith("TITLE\t")){e.preventDefault();try{importStoryScript(t)}catch(err){showEditorStatus(err.message)}}});
+$("loadExample").onclick=()=>{$("customTitle").value="The Jelling Mystery";$("customIntro").value="Explore a Viking settlement and discover who is remembered at Jelling.";$("customIdentity").value="Thyra";$("customWrong").value="Harald Bluetooth\nCnut the Great";$("customRows").value=SAMPLE_ROWS;$("customFinalQuestion").value="Who is remembered at Jelling?";loadClueRows(SAMPLE_ROWS);showEditorStatus("Example loaded. Edit the five clues, then SAVE & SELECT.",true)};
+$("customRows").addEventListener("paste",e=>{const txt=e.clipboardData&&e.clipboardData.getData("text");if(txt&&txt.startsWith("TITLE\t")){e.preventDefault();try{importStoryScript(txt)}catch(err){showEditorStatus("✗ "+err.message)}}});
+$("validateStory").onclick=()=>{try{buildCustomStory();showEditorStatus("✓ Valid story: 5 questions, 3 options each, all correct answers defined.",true)}catch(e){showEditorStatus("✗ "+e.message)}};
+$("saveStory").onclick=saveStory;
+$("exportStory").onclick=()=>{try{buildCustomStory();const script=["TITLE\t"+$("customTitle").value,"INTRO\t"+$("customIntro").value,"IDENTITY\t"+$("customIdentity").value,"WRONG1\t"+$("customWrong").value.split(/\r?\n/)[0],"WRONG2\t"+$("customWrong").value.split(/\r?\n/)[1],"QUESTIONS",$("customRows").value,"FINALQUESTION\t"+$("customFinalQuestion").value].join("\n");navigator.clipboard.writeText(script).then(()=>showEditorStatus("✓ Script copied to clipboard.",true)).catch(()=>showEditorStatus("Copy not available here. Select the fields and copy manually."))}catch(e){showEditorStatus("✗ "+e.message)}};
+function importStoryScript(raw){const lines=raw.replace(/\r/g,"").split("\n");const keys=["TITLE","INTRO","IDENTITY","WRONG1","WRONG2"];if(lines.length<11||lines[5]!=="QUESTIONS")throw Error("Invalid script header. Expected TITLE, INTRO, IDENTITY, WRONG1, WRONG2, QUESTIONS.");const vals=keys.map((k,i)=>{const a=lines[i].split("\t");if(a[0]!==k)throw Error("Expected "+k+" on line "+(i+1));return a.slice(1).join("\t")});$("customTitle").value=vals[0];$("customIntro").value=vals[1];$("customIdentity").value=vals[2];$("customWrong").value=vals[3]+"\n"+vals[4];const qlines=lines.slice(6);const fq=qlines.findIndex(x=>x.startsWith("FINALQUESTION\t"));if(fq>=0){$("customFinalQuestion").value=qlines[fq].slice(14);qlines.splice(fq,1)}$("customRows").value=qlines.join("\n").trim();loadClueRows($("customRows").value);saveStory()}
+
+$("startGame").onclick=()=>{try{launchEditedStory()}catch(e){showEditorStatus("✗ "+e.message)}};
+$("menuBtn").onclick=goMainMenu;
+$("skipBattleBtn").onclick=beginBattleChallenge;
+updateGameLanguage();buildTerrain();loadAdventure("harald");populateMenu();restoreStory();validateNPCPositions();requestAnimationFrame(frame);
 </script></body></html>
