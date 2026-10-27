@@ -352,7 +352,7 @@ window.addEventListener('keydown',e=>{if(E('game').hidden||['INPUT','SELECT','TE
  const items=[['👾 Sentence Invaders','sentences-invaders'],['🟡 Sentence Eater','sentence-eater'],['📦 Sentence Warehouse','sentence-warehouse'],['🐈 Sentence Cat (Test)','sentence-cat-test']];
  const heading=document.createElement('h3');heading.textContent='CHOOSE ANOTHER SENTENCE GAME';
  const links=document.createElement('div');links.className='crossLinks';
- items.forEach(([label,route])=>{const a=document.createElement('a');a.textContent=label;a.href='https://boringteacher.com/'+route+'/?autoplay=1#set='+encodeURIComponent(id);links.append(a)});
+ items.forEach(([label,route])=>{const a=document.createElement('a');a.textContent=label;a.href='https://boringteacher.com/previews/sentence-games-v1/'+({'sentences-invaders':'invaders','sentence-eater':'eater','sentence-warehouse':'warehouse','sentence-cat-test':'cat'}[route])+'/?autoplay=1#set='+encodeURIComponent(id);links.append(a)});
  host.append(heading,links);
  const menu=document.getElementById('menu');
  const show=()=>{host.style.display=menu?.classList.contains('student-mode')?'block':'none'};
