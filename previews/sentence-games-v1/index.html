@@ -35,7 +35,31 @@ $('check').onclick=()=>{const p=render();$('status').textContent=p.errors.length
 $('clear').onclick=()=>{if(!confirmReplace())return;$('editor').value='';$('topic').value='';dirty=false;render()};
 $('swap').onclick=()=>{const lines=$('editor').value.split(/\r?\n/);$('editor').value=lines.map(l=>{const sep=l.includes('\t')?'\t':l.includes(' | ')?' | ':l.includes(' - ')?' - ':l.includes(' — ')?' — ':null;if(!sep)return l;const p=l.split(sep);return p.length===2?p.reverse().join('\t'):l}).join('\n');dirty=true;render();$('status').textContent='Columns reversed. LANGUAGE DIRECTION NOT CHANGED — review before sharing.'};
 $('save').onclick=()=>{try{localStorage.setItem('bt-sentence-integration-preview-v1',JSON.stringify({title:$('title').value,language:$('language').value,editor:$('editor').value}));$('status').textContent='Draft saved in this browser (not My Library).'}catch(e){$('status').textContent='Local save failed: '+e.message}};
-$('voice').onclick=()=>{const p=parse().pairs;if(!('speechSynthesis'in window)){$('status').textContent='Speech synthesis unavailable';return}const u=new SpeechSynthesisUtterance(p[0]?.[1]||'Hola');u.lang=$('language').value;speechSynthesis.cancel();speechSynthesis.speak(u);$('status').textContent='Voice test requested. Installed voices vary by device.'};
+let voiceTestToken=0;
+$('voice').onclick=()=>{
+  const token=++voiceTestToken, status=$('status');
+  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+    status.textContent='VOICE TEST: speech synthesis is not supported by this browser.';return;
+  }
+  const lang=$('language').value, text=parse().pairs[0]?.[1]||({'es-ES':'Hola','de-DE':'Hallo','da-DK':'Hej','fr-FR':'Bonjour','it-IT':'Ciao'})[lang]||'Hola';
+  const synth=window.speechSynthesis;
+  const voices=synth.getVoices();
+  const voice=voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||voices.find(v=>v.lang.toLowerCase().split('-')[0]===lang.slice(0,2).toLowerCase());
+  let started=false,finished=false;
+  const detail='Language '+lang+' · '+(voice?'voice '+voice.name:'no matching voice reported')+' · '+voices.length+' voices listed.';
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;u.rate=.9;u.volume=1;if(voice)u.voice=voice;
+  u.onstart=()=>{if(token!==voiceTestToken)return;started=true;status.textContent='VOICE TEST: playback started. '+detail};
+  u.onend=()=>{if(token!==voiceTestToken)return;finished=true;status.textContent='VOICE TEST: playback completed. '+detail};
+  u.onerror=e=>{if(token!==voiceTestToken)return;finished=true;status.textContent='VOICE TEST ERROR: '+(e.error||'unknown')+'. '+detail};
+  try{
+    synth.cancel();
+    synth.speak(u);
+    if(synth.paused)synth.resume();
+    status.textContent='VOICE TEST: requested. '+detail;
+    setTimeout(()=>{if(token===voiceTestToken&&!started&&!finished)status.textContent='VOICE TEST: no playback event after 4 seconds. '+detail+' Browser state: pending='+synth.pending+', speaking='+synth.speaking+', paused='+synth.paused+'.';},4000);
+  }catch(e){status.textContent='VOICE TEST EXCEPTION: '+e.message+'. '+detail}
+};
 async function request(path,options={}){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const res=await fetch(API+path,{...options,signal:controller.signal});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||'HTTP '+res.status);return data}finally{clearTimeout(timer)}}
 $('share').onclick=async()=>{if(loading)return;const {pairs,errors}=render();if(errors.length||pairs.length<2||pairs.length>100){$('status').textContent='Sharing requires 2–100 valid pairs and zero invalid lines.';return}loading=true;$('share').disabled=true;$('shareResult').textContent='Saving to staging API…';try{const body={title:$('title').value.trim()||'Untitled sentence set',language:$('language').value,pairs:pairs.map(([en,target])=>[target,en])};const data=await request('/sentence-sets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!ID.test(data.id||''))throw Error('Invalid set ID returned');const url=location.origin+location.pathname+'#set='+encodeURIComponent(data.id);$('shareResult').replaceChildren();const a=document.createElement('a');a.className='link';a.href=url;a.textContent=url;const btn=document.createElement('button');btn.className='secondary full';btn.textContent='COPY STUDENT LINK';btn.onclick=async()=>{try{await navigator.clipboard.writeText(url);btn.textContent='✓ COPIED!'}catch{btn.textContent='COPY FAILED — SELECT LINK ABOVE'}};$('shareResult').append('Staging student link created: ',a,btn);$('status').textContent='Saved '+pairs.length+' sentences to the staging service.'}catch(e){$('shareResult').textContent='Could not create link: '+(e.name==='AbortError'?'Request timed out':e.message)}finally{loading=false;$('share').disabled=false}};
 async function student(){const id=new URLSearchParams(location.hash.slice(1)).get('set');if(!id)return;$('teacher').classList.add('hide');$('student').classList.remove('hide');window.btStudentReady=false;setStudentButtons(false);$('retryStudent').classList.add('hide');$('studentStatus').textContent='Loading shared sentences…';if(!ID.test(id)){$('studentStatus').textContent='Invalid shared set ID. Ask your teacher for a new link.';return}try{const data=await request('/sentence-sets/'+encodeURIComponent(id)),set=data.set;if(!set||!LANGS.includes(set.language)||!Array.isArray(set.pairs)||set.pairs.length<2||set.pairs.length>100||!set.pairs.every(p=>Array.isArray(p)&&p.length===2&&p.every(x=>typeof x==='string'&&x.trim()&&x.length<=1000)))throw Error('Invalid shared set');$('studentTitle').textContent=set.title||'Shared sentence set';$('studentInfo').textContent=set.pairs.length+' sentences · English → '+set.language;window.btStudentReady=true;setStudentButtons(true);$('studentStatus').textContent='✓ Set loaded successfully. All four game previews are ready to test.'}catch(e){window.btStudentReady=false;setStudentButtons(false);$('studentStatus').textContent='Unable to load shared set: '+(e.name==='AbortError'?'Request timed out':e.message);$('retryStudent').classList.remove('hide')}}
