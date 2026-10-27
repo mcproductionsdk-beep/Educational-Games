@@ -18,7 +18,7 @@ button{font:700 14px "Courier New",monospace;cursor:pointer;border:3px solid var
 @media(max-width:650px){.columns,.actions{grid-template-columns:1fr}.gamegrid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:10px}.panel{padding:11px}textarea{height:200px}}
 .student-preview-hero{background:#fff8db;border:3px solid var(--navy);text-align:center;padding:12px;margin-bottom:17px}.student-preview-hero h2{color:#166947;margin:0 0 5px}.student-preview-hero p{margin:0}.student-preview-games{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.student-preview-games .game{min-height:96px;box-shadow:2px 2px var(--dark)}.student-preview-games .game span{font-size:29px}.student-preview-games .game small{font-size:11px;overflow-wrap:anywhere}.dialog:has(.student-preview-games){width:min(780px,100%)}@media(max-width:650px){.student-preview-games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
-<body><div class="wrap"><header><h1>BORING TEACHER</h1><div class="sub">UNIVERSAL GAME LAUNCHER · V1.9 · SNAKE + RACER INTEGRATION</div></header>
+<body><div class="wrap"><header><h1>BORING TEACHER</h1><div class="sub">UNIVERSAL GAME LAUNCHER · V2.0 · STUDENT SHARING</div></header>
 <main><h2>WORD GAMES</h2><div class="columns">
 <section class="panel"><h3>GAME SETTINGS</h3><label for="prompt">PROMPT LANGUAGE</label><select id="prompt"><option value="en-US">English</option><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
 <label for="target">TARGET LANGUAGE</label><select id="target"><option value="es-ES">Spanish</option><option value="en-US">English</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
@@ -31,11 +31,11 @@ button{font:700 14px "Courier New",monospace;cursor:pointer;border:3px solid var
 <div class="row"><button id="review" type="button">CHECK IMPORT</button><button id="clear" type="button">CLEAR</button></div>
 <div class="status" id="parseStatus" role="status"></div>
 </section></div>
-<div class="actions"><div class="actionbox"><button id="share" type="button">🔗 STUDENT LINK</button><div class="note">Preview a student launcher. Public link creation requires the Cloudflare sharing API.</div></div><div class="actionbox"><button id="save" type="button">📁 SAVE TO FOLDER</button><div class="note">Save locally on this device for prototype testing. Cloud sync requires login.</div></div></div>
+<div class="actions"><div class="actionbox"><button id="share" type="button">🔗 STUDENT LINK</button><div class="note">Create one real student link to a student-only launcher with the selected vocabulary.</div></div><div class="actionbox"><button id="save" type="button">📁 SAVE TO FOLDER</button><div class="note">Save locally on this device for prototype testing. Cloud sync requires login.</div></div></div>
 <h3 class="games-title">CHOOSE YOUR GAME</h3><div class="gamegrid" id="games"></div>
 <div class="status" id="mainStatus" role="status"></div>
 <div class="preview" id="preview"><strong>VOCABULARY PREVIEW</strong><p class="small">Press ▶ beside a word to hear it in its selected language. Voice availability depends on your browser and device.</p><p class="small" id="summary"></p><div id="previewRows"></div></div>
-</main><footer>PROTOTYPE ONLY · LIVE WEBSITE AND GAMES UNCHANGED</footer></div>
+</main><footer>DEVELOPMENT DASHBOARD · STUDENT SHARING ENABLED</footer></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h3 id="modalTitle"></h3><div id="modalBody"></div><button type="button" id="closeModal">CLOSE</button></div></div>
 <script>
 "use strict";
@@ -119,12 +119,44 @@ body.append(btn("SAVE LOCALLY",()=>{if(!name.value.trim()||!folder.value.trim())
 const existing=JSON.parse(localStorage.getItem("bt-word-sets-v1")||"[]");body.append(el("p",`${existing.length} locally saved set(s).`));
 existing.slice(-8).reverse().forEach(s=>body.append(btn("LOAD · "+s.folder+" / "+s.title,()=>{$("prompt").value=s.promptLanguage;$("target").value=s.targetLanguage;$("category").value="custom";selectedTitle=s.title;isCustom=true;$("editor").dataset.edited="true";$("editor").value=s.pairs.map(([p,t])=>p+"\t"+t).join("\n");parse();$("modal").classList.remove("open")})));
 })};
-$("share").onclick=()=>{const set=currentSet();if(!set)return;showModal("STUDENT LINK · PREVIEW",body=>{
- const hero=el("div");hero.className="student-preview-hero";hero.append(el("h2",set.title),el("p",`${set.promptLanguage} → ${set.targetLanguage} · ${set.pairs.length} words`));body.append(hero);
- body.append(el("h3","CHOOSE A GAME"));const grid=el("div");grid.className="gamegrid student-preview-games";
- GAMES.forEach(([emoji,name])=>{const card=el("div");card.className="game";card.append(el("span",emoji),el("small",name.toUpperCase()));grid.append(card)});body.append(grid);
- const note=el("p","Preview only · Real shareable links and direct game launches will be enabled after Cloudflare integration.");note.className="small";body.append(note);
-});};
+const API="https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev";
+async function requestSharedSet(path,options={}){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+ try{const response=await fetch(API+path,{...options,signal:controller.signal});if(!response.ok)throw Error("Sharing service HTTP "+response.status);return await response.json();}
+ finally{clearTimeout(timer);}
+}
+function validSharePayload(data){const s=data?.set??data;if(!s||typeof s.title!=="string"||!Array.isArray(s.pairs)||s.pairs.length<5||s.pairs.some(p=>!Array.isArray(p)||p.length!==2||p.some(w=>typeof w!=="string"||!w.trim()))||!["en-US","es-ES","de-DE","da-DK","fr-FR","it-IT"].includes(s.language)||!["en-US","es-ES","de-DE","da-DK","fr-FR","it-IT"].includes(s.promptLanguage)||s.language===s.promptLanguage)throw Error("Shared vocabulary is invalid or incomplete");return s;}
+function studentGameGrid(body,id){const grid=el("div");grid.className="gamegrid student-preview-games";GAMES.forEach(([emoji,name,path])=>{const card=btn("",()=>{const url=new URL("https://boringteacher.com"+path);url.hash="set="+encodeURIComponent(id);if(path==="/word-snake/"||path==="/word-racer/")url.searchParams.set("autoplay","1");window.location.assign(url.toString());});card.className="game";card.append(el("span",emoji),el("small",name.toUpperCase()));grid.append(card);});body.append(grid);}
+$("share").onclick=async()=>{const set=currentSet();if(!set)return;if(set.pairs.length<5){$("mainStatus").textContent="Sharing requires at least five vocabulary pairs.";$("mainStatus").className="status bad";return;}
+ const button=$("share");button.disabled=true;button.textContent="SAVING SHARED SET…";
+ try{
+  const data=await requestSharedSet("/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:set.title,language:set.targetLanguage,promptLanguage:set.promptLanguage,pairs:set.pairs})});
+  const id=data?.id??data?.setId??data?.set?.id;if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Sharing service did not return a valid ID");
+  const url=new URL(location.href);url.search="";url.hash="set="+encodeURIComponent(id);
+  showModal("STUDENT LINK · READY",body=>{
+   body.append(el("p","Share this link with students. It opens a student-only launcher using this saved vocabulary set."));
+   const link=el("a",url.toString());link.href=url.toString();link.target="_blank";link.rel="noopener";link.style.overflowWrap="anywhere";body.append(link);
+   body.append(btn("COPY STUDENT LINK",async()=>{try{await navigator.clipboard.writeText(url.toString());$("mainStatus").textContent="Student link copied.";}catch{$("mainStatus").textContent="Clipboard unavailable. Select the link above to copy.";}}));
+   body.append(el("h3","STUDENT GAME CHOICES"));studentGameGrid(body,id);
+   body.append(el("p","Word Snake and Word Racer launch automatically. Other games currently open their existing student game-selection screen."));
+  });
+ }catch(e){$("mainStatus").textContent="Student sharing failed: "+(e.name==="AbortError"?"request timed out":e.message);$("mainStatus").className="status bad";}
+ finally{button.disabled=false;button.textContent="🔗 STUDENT LINK";}
+};
+async function initStudentLauncher(){
+ const hash=location.hash;if(!hash.startsWith("#set="))return;
+ const id=decodeURIComponent(hash.slice(5));
+ document.body.classList.add("student-mode");
+ const main=document.querySelector("main");main.replaceChildren();
+ const shell=el("section");shell.className="student-preview-hero";shell.append(el("h2","STUDENT WORD GAMES"));
+ const status=el("p","Loading shared vocabulary…");shell.append(status);main.append(shell);
+ if(!id||id.length>512){status.textContent="Invalid student link.";return;}
+ try{const data=await requestSharedSet("/sets/"+encodeURIComponent(id));const s=validSharePayload(data);
+  shell.querySelector("h2").textContent=s.title;status.textContent=s.promptLanguage+" → "+s.language+" · "+s.pairs.length+" vocabulary pairs";
+  main.append(el("h3","CHOOSE A GAME"));studentGameGrid(main,id);
+  main.append(el("p","Choose a game above to practice this vocabulary. Your teacher's settings are not available in student mode."));
+ }catch(e){status.textContent="Unable to load shared vocabulary: "+(e.name==="AbortError"?"request timed out":e.message);main.append(el("p","Please ask your teacher for a new link or try again later."));}
+}
 async function launchIntegratedGame(button,gamePath,gameName){
  const set=currentSet();if(!set)return;
  if(set.pairs.length<5){$("mainStatus").textContent="This game requires at least 5 valid vocabulary pairs.";$("mainStatus").className="status bad";return;}
@@ -143,8 +175,8 @@ async function launchIntegratedGame(button,gamePath,gameName){
  }catch(e){$("mainStatus").textContent="Could not start "+gameName+": "+(e.name==="AbortError"?"request timed out":e.message)+". No game was opened.";$("mainStatus").className="status bad";button.disabled=false;}
 }
 GAMES.forEach(([emoji,name,url])=>{const b=btn("",()=>{if(url==="/word-snake/"||url==="/word-racer/"){void launchIntegratedGame(b,url,name);return;}const set=currentSet();if(!set)return;showModal("GAME INTEGRATION PENDING",body=>{body.append(el("p",`${name} is already hosted at ${url}. This prototype does not yet pass the selected vocabulary to that game.`));body.append(el("p","Launching the old URL now would open its existing menu and ignore this set. No gameplay code has been modified."));body.append(btn("OPEN EXISTING GAME",()=>window.open("https://boringteacher.com"+url,"_blank","noopener")));});});b.className="game";b.append(el("span",emoji),el("small",name.toUpperCase()));$("games").append(b)});
-window.addEventListener("pageshow",()=>{for(const tile of $("games").querySelectorAll("button"))tile.disabled=false;$("mainStatus").textContent="";$("mainStatus").className="status";});
+window.addEventListener("pageshow",()=>{if(location.hash.startsWith("#set="))return;for(const tile of $("games").querySelectorAll("button"))tile.disabled=false;$("mainStatus").textContent="";$("mainStatus").className="status";});
 $("closeModal").onclick=()=>$("modal").classList.remove("open");$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 loadCategory();
-void fetchLibrary();
+if(location.hash.startsWith("#set=")){void initStudentLauncher();}else{void fetchLibrary();}
 </script></body></html>
