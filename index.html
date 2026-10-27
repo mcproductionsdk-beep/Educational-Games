@@ -1,116 +1,244 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Educational Games Arcade</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Boring Teacher · Educational Games</title>
 <style>
-:root{--sky:#63b7df;--navy:#102744;--cream:#fff3c4;--yellow:#f6d94b;--green:#79d85b;--pink:#ef6c88;--cyan:#5cc5d8;--white:#fffdf1}
-*{box-sizing:border-box}html{background:var(--sky)}body{margin:0;color:var(--navy);font-family:"Courier New",monospace;background:linear-gradient(#63b7df 0 78%,#4b9b62 78% 100%);min-height:100vh;image-rendering:pixelated}
-.shell{width:min(1180px,calc(100% - 20px));margin:10px auto 24px}
-header{background:var(--navy);color:#fff;border:5px solid var(--navy);box-shadow:0 0 0 4px var(--yellow);padding:14px 18px;text-align:center}
-h1{margin:0;font-size:clamp(25px,4vw,42px);letter-spacing:4px;text-shadow:4px 4px #000}.blink{color:var(--yellow);font-size:12px;font-weight:900;margin-top:6px;letter-spacing:2px;animation:blink 1.2s steps(1) infinite}@keyframes blink{50%{opacity:.35}}
-.section{margin-top:18px}.section-title{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#fff;text-shadow:3px 3px var(--navy);font-size:20px;letter-spacing:2px}.section-title:after{content:"";height:4px;background:var(--navy);flex:1;box-shadow:0 3px var(--yellow)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.card{position:relative;background:var(--cream);border:4px solid var(--navy);box-shadow:4px 4px 0 rgba(16,39,68,.8);text-decoration:none;color:var(--navy);min-height:178px;padding:12px;display:flex;flex-direction:column;transition:transform .08s}
-.card:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(16,39,68,.8);background:#fff8d9}.card:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--navy)}
-.icon{width:54px;height:54px;background:var(--cyan);border:3px solid var(--navy);display:grid;place-items:center;font-size:30px;box-shadow:inset -4px -4px #2e7c9a;margin-bottom:9px}.card:nth-child(4n+2) .icon{background:var(--yellow);box-shadow:inset -4px -4px #c19b25}.card:nth-child(4n+3) .icon{background:var(--green);box-shadow:inset -4px -4px #419438}.card:nth-child(4n+4) .icon{background:var(--pink);box-shadow:inset -4px -4px #b52f49}
-h3{margin:0 0 5px;font-size:16px;text-transform:uppercase}.desc{font-size:11px;font-weight:bold;line-height:1.3;color:#294361;flex:1}.play{align-self:flex-start;margin-top:10px;background:var(--green);border:3px solid var(--navy);padding:5px 9px;font-weight:900;font-size:11px;box-shadow:inset -2px -2px #419438}.card:hover .play{background:var(--yellow);box-shadow:inset -2px -2px #c19b25}
-.note{margin-top:18px;background:#d8eef0;border:4px solid var(--navy);padding:10px 13px;font-size:11px;font-weight:bold;line-height:1.45;box-shadow:4px 4px var(--navy)}footer{text-align:center;color:#fff;text-shadow:2px 2px var(--navy);font-size:10px;font-weight:bold;padding:18px 0}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{min-height:145px}.shell{width:min(100% - 12px,1180px)}header{padding:11px 8px}}
-
-/* Shared arcade geometry; retain distinct cream and navy visual identities. */
-.section:not(.sentence-section){background:var(--cream);border:3px solid var(--navy);border-radius:12px;padding:15px 17px 18px;box-shadow:4px 4px 0 #102744}
-.section:not(.sentence-section) .section-title{color:var(--navy);text-shadow:none}
-.section:not(.sentence-section) .section-title:after{background:#d3b753;box-shadow:none;height:2px}
-.section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.section .card{height:225px;min-height:225px;min-width:0;overflow:hidden}
-.section .icon{flex:none}
-.section .desc{flex:1;overflow:hidden}
-.section .play{margin-top:auto}
-@media(max-width:850px){.section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:480px){.section .grid{grid-template-columns:1fr}.section .card{height:auto;min-height:205px}}
-/* Sentence Games: the same restrained navy/cyan visual language as Sentence Invaders. */
-.sentence-section{background:#17243a;border:3px solid #3b5573;border-radius:12px;padding:15px 17px 18px;box-shadow:4px 4px 0 #102744}
-.sentence-section .section-title{color:#a5f3fc;text-shadow:none;letter-spacing:1px}
-.sentence-section .section-title:after{height:2px;background:#496482;box-shadow:none}
-.sentence-section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media(max-width:850px){.sentence-section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:480px){.sentence-section .grid{grid-template-columns:1fr}}
-.sentence-section .card{background:#20314b;border:2px solid #496482;border-radius:8px;box-shadow:none;color:#f5f7ff}
-.sentence-section .card:hover{background:#283d59;transform:translateY(-2px);box-shadow:0 5px 0 #102033}
-.sentence-section .icon,.sentence-section .card:nth-child(n) .icon{background:#0c1627;border:1px solid #55708e;border-radius:6px;box-shadow:none}
-.sentence-section h3{color:#a5f3fc}
-.sentence-section .desc{color:#b9d4e8;font-weight:normal;font-size:12px}
-.sentence-section .play{background:#167c77;border:1px solid #6ee7b7;border-radius:6px;color:white;box-shadow:none;padding:8px 13px}
-.sentence-section .card:hover .play{background:#1b9189;box-shadow:none}
-
-
-/* Spacious V2 arcade: consistent geometry, distinct game-world identities. */
-.shell{width:min(1440px,calc(100% - 28px))}
-.section .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.section .card{height:220px;min-height:220px;min-width:0}
-.section .icon{flex:none}
-.section .desc{flex:1}
-.section .play{margin-top:auto}
-.section:not(.sentence-section){padding:15px 17px 18px;border-radius:12px}
-.section:not(.sentence-section) .section-title{color:var(--navy);text-shadow:none}
-.section:not(.sentence-section) .section-title:after{height:2px;box-shadow:none}
-.section:not(.sentence-section):not(.conjugation-section):not(.adventure-section){background:#fff0ad;border:3px solid #d8b33e;box-shadow:4px 4px 0 #102744}
-.sentence-section .card{min-height:220px;height:220px}
-.conjugation-section{background:#21132c;border:3px solid #e34b80;box-shadow:4px 4px 0 #102744}
-.conjugation-section .section-title{color:#ff83ab!important}
-.conjugation-section .section-title:after{background:#e34b80!important}
-.conjugation-section .card{background:#2c1c40;color:#f7ecff;border:2px solid #d84b82;border-radius:8px;box-shadow:none}
-.conjugation-section .card:hover{background:#3c2451}
-.conjugation-section .icon{background:#17223e!important;border:2px solid #d84b82;box-shadow:none!important}
-.conjugation-section h3{color:#ff91b8}
-.conjugation-section .desc{color:#e2c8e9}
-.conjugation-section .play{background:#ce3270;border-color:#f58db1;color:#fff;box-shadow:none}
-.conjugation-section .card:hover .play{background:#e84b89;box-shadow:none}
-.adventure-section{background:#0d2b31;border:3px solid #3ed9a2;box-shadow:4px 4px 0 #102744}
-.adventure-section .section-title{color:#75f5be!important}
-.adventure-section .section-title:after{background:#3ed9a2!important}
-.adventure-section .card{background:#173f44;color:#e7fff4;border:2px solid #3ed9a2;border-radius:8px;box-shadow:none}
-.adventure-section .card:hover{background:#205257}
-.adventure-section .icon{background:#184f47!important;border:2px solid #70e9bd;box-shadow:none!important}
-.adventure-section h3{color:#8af5c7}
-.adventure-section .desc{color:#c4eee0}
-.adventure-section .play{background:#178a74;border-color:#7de6bd;color:#fff;box-shadow:none}
-.adventure-section .card:hover .play{background:#1cae91;box-shadow:none}
-@media(max-width:850px){.section .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:480px){.section .grid{grid-template-columns:1fr}.section .card,.sentence-section .card{height:auto;min-height:175px}.shell{width:calc(100% - 14px)}}
+:root{--navy:#19375d;--dark:#10243d;--panel:#243d60;--cream:#f4e8c1;--yellow:#ffdf80;--blue:#79bdf7;--green:#79d75d}*{box-sizing:border-box}
+body{margin:0;background:#78bce0;color:#122945;font:15px "Courier New",monospace}.wrap{max-width:1190px;margin:20px auto;padding:0 12px}
+header{background:var(--dark);color:var(--cream);border:5px solid #f9d45e;box-shadow:5px 5px #10243d;text-align:center;padding:16px}h1{font-size:clamp(23px,4vw,38px);letter-spacing:3px;margin:0}.sub{font-size:12px;color:var(--yellow);margin-top:7px}
+main{background:var(--cream);border:5px solid var(--navy);padding:18px;margin-top:20px;box-shadow:6px 6px #10243d}h2{text-align:center;font-size:27px;letter-spacing:3px;margin:2px 0 17px}
+.columns{display:grid;grid-template-columns:1fr 1.2fr;gap:13px}.panel{background:var(--panel);border:3px solid var(--blue);padding:15px;color:white;min-width:0}
+h3{color:var(--yellow);font-size:19px;margin:0 0 13px}label{display:block;font-weight:bold;font-size:12px;color:#c9ddf6;margin:13px 0 6px}
+input,select,textarea{width:100%;font:15px "Courier New",monospace;border:3px solid #10243d;background:#f5f7ff;color:#14263d;padding:10px;border-radius:0}
+textarea{height:230px;resize:vertical;line-height:1.5;white-space:pre-wrap}.note{font-size:12px;line-height:1.45;color:#c5d8ef}
+button{font:700 14px "Courier New",monospace;cursor:pointer;border:3px solid var(--dark);background:var(--yellow);padding:10px;color:var(--dark);box-shadow:3px 3px #0a1628}button:hover{filter:brightness(1.06)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f07c34;outline-offset:2px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:16px 0}.actionbox{background:var(--panel);padding:13px;display:grid;gap:9px}.actionbox button{width:100%}
+.gamegrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.game{min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--panel);color:white;border:3px solid var(--blue);box-shadow:4px 4px var(--dark);gap:8px;padding:8px;text-align:center}.game span{font-size:35px}.game small{font-size:13px;font-weight:bold}
+.game:disabled{opacity:.55;cursor:not-allowed}.games-title{color:#ba3559;text-align:center;font-size:21px;margin:20px 0 14px}.status{min-height:24px;font-size:13px;font-weight:bold}.ok{color:#165d39}.bad{color:#9a2c3c}
+.preview{background:#fff9df;border:3px solid var(--navy);padding:12px;margin:13px 0}.preview table{width:100%;border-collapse:collapse;table-layout:fixed}.preview td,.preview th{border-bottom:1px solid #d8cfae;padding:6px;text-align:left;overflow-wrap:anywhere}.word-cell{display:flex;align-items:center;gap:8px}.word-cell span{min-width:0}.preview .speak{box-shadow:none;padding:2px 4px;min-width:22px;min-height:24px;flex:0 0 auto;font-size:12px;border:1px solid transparent;background:transparent;color:#274765;border-radius:3px}.preview .speak:hover,.preview .speak:focus-visible{background:#e9dfb9;border-color:#7c91a6}.preview .speak:disabled{opacity:.45;cursor:not-allowed}.small{font-size:12px}
+.modal{position:fixed;inset:0;background:#061324cf;display:none;align-items:center;justify-content:center;padding:12px;z-index:10}.modal.open{display:flex}.dialog{background:var(--cream);border:5px solid var(--navy);padding:20px;width:min(550px,100%);max-height:90vh;overflow:auto}.dialog h3{color:var(--navy)}.dialog button{margin:7px 7px 0 0}.dialog p{line-height:1.5}.hidden{display:none}.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}footer{text-align:center;font-size:12px;margin:24px 0}
+@media(max-width:650px){.columns,.actions{grid-template-columns:1fr}.gamegrid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:10px}.panel{padding:11px}textarea{height:200px}}
+.student-preview-hero{background:#fff8db;border:3px solid var(--navy);text-align:center;padding:12px;margin-bottom:17px}.student-preview-hero h2{color:#166947;margin:0 0 5px}.student-preview-hero p{margin:0}.student-preview-games{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.student-preview-games .game{min-height:96px;box-shadow:2px 2px var(--dark)}.student-preview-games .game span{font-size:29px}.student-preview-games .game small{font-size:11px;overflow-wrap:anywhere}.dialog:has(.student-preview-games){width:min(780px,100%)}@media(max-width:650px){.student-preview-games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style><style>
+.bt-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:14px 0}
+.bt-tabs button{min-width:0;padding:12px 3px;font-size:clamp(10px,1.3vw,15px);background:#20314b;color:white;border:3px solid #6486a8}
+.bt-tabs button[aria-selected="true"]{background:#ffdf80;color:#10243d;border-color:#10243d}
+.bt-tabs button[data-family="sentence"][aria-selected="true"]{background:#167c77;color:white;border-color:#6ee7b7}
+.bt-family[hidden]{display:none!important}
+#bt-sentence{background:#101a2a;color:#eaf4ff;border:4px solid #486681;padding:17px;box-shadow:5px 5px #0a1628}
+#bt-sentence h2{text-align:center;color:#6ee7b7;margin:0 0 16px;font-size:25px}
+#bt-sentence .bt-columns{display:grid;grid-template-columns:1fr 1.2fr;gap:10px}
+#bt-sentence .bt-panel{background:#20314b;border:2px solid #496482;padding:13px;min-width:0}
+#bt-sentence h3{color:#6ee7b7;margin:0 0 10px;font-size:17px}
+#bt-sentence label{display:block;font-size:12px;color:#c4dced;margin:12px 0 5px}
+#bt-sentence select,#bt-sentence input,#bt-sentence textarea{background:#f5f8ff;color:#152840;border:3px solid #496482;width:100%;padding:9px;font:14px "Courier New",monospace}
+#bt-sentence textarea{height:225px;line-height:1.5;resize:vertical}
+#bt-sentence button{background:#167c77;color:white;border:2px solid #6ee7b7;padding:10px;font-size:12px;box-shadow:none}
+#bt-sentence button.bt-secondary{background:#243a55;border-color:#6486a8}
+#bt-sentence .bt-note{color:#c6d6e9;font-size:12px;line-height:1.5}
+#bt-sentence .bt-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+#bt-sentence .bt-actions>div{background:#20314b;border:2px solid #496482;padding:10px}
+#bt-sentence .bt-actions button{width:100%}
+#bt-sentence .bt-games{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#bt-sentence .bt-game{min-height:105px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#20314b!important;border:2px solid #6486a8!important}
+#bt-sentence .bt-game span{font-size:27px}
+#bt-sentence .bt-game small{font-size:11px}
+#bt-sentence .bt-preview{background:#15243a;border:2px solid #496482;margin-top:13px;padding:12px}
+#bt-sentence table{width:100%;border-collapse:collapse;font-size:12px}
+#bt-sentence td,#bt-sentence th{border-bottom:1px solid #435a74;text-align:left;padding:6px}
+#bt-sentence .bt-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}#bt-sentence .bt-edit-actions button,#bt-sentence .bt-swap-row button{width:100%}#bt-sentence .bt-swap-row{margin-top:9px}#bt-sentence .bt-status{font-size:12px;color:#ffdf80;white-space:pre-wrap;margin:8px 0;min-height:18px}
+#bt-placeholder{background:#f4e8c1;border:4px solid #19375d;padding:25px;min-height:250px}
+@media(max-width:680px){.bt-tabs{gap:3px}.bt-tabs button{font-size:10px;padding:10px 2px}#bt-sentence .bt-columns,#bt-sentence .bt-actions{grid-template-columns:1fr}#bt-sentence .bt-games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
-<body><div class="shell">
-<header><h1>EDUCATIONAL GAMES</h1><div class="blink">★ CHOOSE YOUR GAME ★</div></header>
-
-<section class="section"><h2 class="section-title">WORD GAMES</h2><div class="grid">
-<a class="card" href="/word-racer/" target="_blank" rel="noopener"><div class="icon">🏎️</div><h3>Word Racer</h3><div class="desc">Race through traffic and find the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/word-jumper/" target="_blank" rel="noopener"><div class="icon">🏃</div><h3>Word Jumper</h3><div class="desc">Jump, react and choose the right word as you run.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/frog-river/" target="_blank" rel="noopener"><div class="icon">🐸</div><h3>Word Frog</h3><div class="desc">Cross the river by landing on the correct answers.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/word-invaders/" target="_blank" rel="noopener"><div class="icon">👾</div><h3>Word Invaders</h3><div class="desc">Defend yourself by shooting the correct vocabulary.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/word-eater/" target="_blank" rel="noopener"><div class="icon">🟡</div><h3>Word Eater</h3><div class="desc">Navigate the maze, collect the correct words and dodge the ghosts.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/word-snake/" target="_blank" rel="noopener"><div class="icon">🐍</div><h3>Word Snake</h3><div class="desc">Guide the snake toward the correct word and build your score.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/word-warehouse/" target="_blank" rel="noopener"><div class="icon">📦</div><h3>Word Warehouse</h3><div class="desc">Carry vocabulary bricks to the matching translations with your Viking.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/matching-columns/" target="_blank" rel="noopener"><div class="icon">🔗</div><h3>Word Columns</h3><div class="desc">Match words and meanings as quickly as you can.</div><div class="play">▶ PLAY</div></a>
-</div></section>
-
-<section class="section sentence-section" id="sentence-games"><h2 class="section-title">SENTENCE GAMES</h2><div class="grid">
-<a class="card" href="/sentences-invaders/" target="_blank" rel="noopener"><div class="icon">👾</div><h3>Sentence Invaders</h3><div class="desc">Shoot the correct words in order to build sentences. Choose grammar topics or share your own.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/sentence-eater/" target="_blank" rel="noopener"><div class="icon">🟡</div><h3>Sentence Eater</h3><div class="desc">Collect the correct word ghosts in order. Choose grammar topics or share your own sentences.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/sentence-warehouse/" target="_blank" rel="noopener"><div class="icon">👷</div><h3>Sentence Warehouse</h3><div class="desc">Carry word boxes to the right slots to build complete sentences. Choose grammar topics or share your own.</div><div class="play">▶ PLAY</div></a>
-<a class="card" href="/sentence-cat-test/" target="_blank" rel="noopener"><div class="icon">🐈</div><h3>Sentence Cat</h3><div class="desc">Guide the cat through the word grid to build sentences. Choose grammar topics or share your own.</div><div class="play">▶ PLAY</div></a>
-</div></section>
-
-<section class="section conjugation-section"><h2 class="section-title">CONJUGATION GAMES</h2><div class="grid">
-<a class="card" href="/conjugation-shooter/" target="_blank" rel="noopener"><div class="icon">🎯</div><h3>Conjugation Shooter</h3><div class="desc">Find and shoot the correct verb conjugations.</div><div class="play">▶ PLAY</div></a>
-
-</div></section>
-
-<section class="section adventure-section"><h2 class="section-title">LANGUAGE ADVENTURES</h2><div class="grid">
-<a class="card" href="/conjugation-adventure/" target="_blank" rel="noopener"><div class="icon">🗺️</div><h3>Language Quest</h3><div class="desc">Explore an adventure world and master verb conjugations.</div><div class="play">▶ PLAY</div></a>
-</div></section>
-
-
-<div class="note">★ <b>MAKE IT YOURS:</b> Many language games let you paste your own vocabulary pairs and use them with different languages, units and classes.</div>
-<footer>EDUCATIONAL GAMES · LEARN BY PLAYING</footer>
-</div></body></html>
+<body><div class="wrap"><header><h1>BORING TEACHER</h1><div class="sub">UNIVERSAL GAME LAUNCHER · WORDS LIVE · SENTENCES PREVIEW</div></header><nav class="bt-tabs" aria-label="Game families"><button type="button" data-family="word" aria-selected="true">WORD GAMES</button><button type="button" data-family="sentence" aria-selected="false">SENTENCE GAMES</button><button type="button" data-family="conjugation" aria-selected="false">CONJUGATION</button><button type="button" data-family="communication" aria-selected="false">COMMUNICATION</button></nav>
+<div id="bt-word" class="bt-family"><main><h2>WORD GAMES</h2><div class="columns">
+<section class="panel"><h3>GAME SETTINGS</h3><label for="prompt">PROMPT LANGUAGE</label><select id="prompt"><option value="en-US">English</option><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
+<label for="target">TARGET LANGUAGE</label><select id="target"><option value="es-ES">Spanish</option><option value="en-US">English</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
+<label for="category">CATEGORY</label><select id="category"><option value="Animals">Animals</option><option value="Food &amp; Drink">Food &amp; Drink</option><option value="Body">Body</option><option value="School">School</option><option value="Home">Home</option><option value="Nature">Nature</option><option value="Colours">Colours</option><option value="Common Verbs">Common Verbs</option><option value="custom">Custom vocabulary</option></select>
+<p class="note">Selecting a built-in category loads editable word pairs. Choose Custom to paste your own.</p>
+</section>
+<section class="panel"><h3>CUSTOMIZE / EDIT</h3><label for="wordSetTitle">SET NAME</label><input id="wordSetTitle" type="text" maxlength="120" placeholder="Name this vocabulary set" value="Animals"><p class="note">Paste PROMPT first, then TARGET. Tabs, pipes, spaced dashes, semicolons and arrows are recognized.</p>
+<textarea id="editor" spellcheck="false" aria-label="Vocabulary pairs"></textarea>
+<div class="row"><button id="review" type="button">CHECK IMPORT</button><button id="clear" type="button">CLEAR</button></div><div class="row" style="margin-top:9px"><button id="swap" type="button">⇄ SWAP LANGUAGES + COLUMNS</button></div>
+<div class="status" id="parseStatus" role="status"></div>
+</section></div>
+<div class="actions"><div class="actionbox"><button id="share" type="button">🔗 STUDENT LINK</button><div class="note">Create one real student link to a student-only launcher with the selected vocabulary.</div></div><div class="actionbox"><button id="save" type="button">📁 SAVE TO FOLDER</button><div class="note">Save locally on this device for prototype testing. Cloud sync requires login.</div></div></div>
+<h3 class="games-title">CHOOSE YOUR GAME</h3><div class="gamegrid" id="games"></div>
+<div class="status" id="mainStatus" role="status"></div>
+<div class="preview" id="preview"><strong>VOCABULARY PREVIEW</strong><p class="small">Press ▶ beside a word to hear it in its selected language. Voice availability depends on your browser and device.</p><p class="small" id="summary"></p><div id="previewRows"></div></div>
+</main></div><section id="bt-sentence" class="bt-family" hidden><h2>SENTENCE GAMES · PREVIEW</h2><div id="bt-sentence-teacher"><div class="bt-columns"><div class="bt-panel"><h3>GAME SETTINGS</h3><label for="bt-s-target">TARGET LANGUAGE</label><select id="bt-s-target"><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select><label for="bt-s-grammar">GRAMMAR FOCUS</label><select id="bt-s-grammar"><option value="">Custom sentences</option><option value="present">Present tense — sample</option><option value="future">Future tense — sample</option><option value="questions">Questions — sample</option></select><p class="bt-note">English prompts → target-language sentences. Sample grammar content is illustrative, not the approved grammar library.</p><button type="button" id="bt-s-voice" class="bt-secondary">▶ TEST TARGET VOICE</button></div><div class="bt-panel"><h3>CUSTOMIZE / EDIT</h3><label for="bt-s-title">SET TITLE</label><input id="bt-s-title" value="My Spanish sentences"><label for="bt-s-editor">PROMPT [TAB] TARGET — one pair per line</label><textarea id="bt-s-editor" spellcheck="false">I eat apples.&#9;Como manzanas.&#10;She lives in Madrid.&#9;Ella vive en Madrid.&#10;We study every day.&#9;Estudiamos todos los días.&#10;They play football.&#9;Juegan al fútbol.</textarea><div class="bt-edit-actions"><button type="button" class="bt-secondary" id="bt-s-review">CHECK IMPORT</button><button type="button" class="bt-secondary" id="bt-s-clear">CLEAR</button></div><div class="bt-swap-row"><button type="button" class="bt-secondary" id="bt-s-swap">⇄ SWAP LANGUAGES + COLUMNS</button></div><div id="bt-s-validation" class="bt-status"></div></div></div><div class="bt-actions"><div><button type="button" id="bt-s-share">🔗 STUDENT LINK · PREVIEW</button><p class="bt-note">Local student launcher preview only. No public URL is created.</p></div><div><button type="button" class="bt-secondary" id="bt-s-save">▣ SAVE DRAFT LOCALLY</button><p class="bt-note">Browser-only storage. Not cloud My Library.</p></div></div><h3 style="text-align:center">CHOOSE YOUR GAME</h3><div id="bt-s-games" class="bt-games"></div><div class="bt-preview"><h3>SENTENCE PREVIEW</h3><div id="bt-s-preview"></div></div><div id="bt-s-status" class="bt-status" role="status"></div></div><div id="bt-s-student" hidden><h3>STUDENT LAUNCHER · PREVIEW</h3><p id="bt-s-studentinfo"></p><p class="bt-note">Game engines are not connected in this prototype. Student links are not generated.</p><div id="bt-s-studentgames" class="bt-games"></div><p><button type="button" id="bt-s-back">← BACK TO TEACHER</button></p><div id="bt-s-studentstatus" class="bt-status"></div></div></section><section id="bt-placeholder" class="bt-family" hidden><h2 id="bt-placeholder-title"></h2><p>Workspace placeholder. No backend or gameplay integration is claimed.</p></section><footer>DEVELOPMENT DASHBOARD · STUDENT SHARING ENABLED</footer></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h3 id="modalTitle"></h3><div id="modalBody"></div><button type="button" id="closeModal">CLOSE</button></div></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const CANONICAL_CATEGORIES=["Animals","Food & Drink","Body","School","Home","Nature","Colours","Common Verbs"];
+const LIBRARY_URL="https://boringteacher.com/libraries/vocabulary/v2.json";
+let library=null,libraryError="",isCustom=false,loading=false;
+const toLibraryLocale=locale=>locale==="en-US"?"en":locale;
+function libraryFor(category,prompt,target){
+ if(!library?.concepts)return null;
+ const p=toLibraryLocale(prompt),t=toLibraryLocale(target);
+ const matches=library.concepts.filter(c=>c.category===category&&typeof c.translations?.[p]==="string"&&typeof c.translations?.[t]==="string");
+ return matches.length===12?matches.map(c=>[c.translations[p],c.translations[t]]):null;
+}
+async function fetchLibrary(){
+ try{
+  const response=await fetch(LIBRARY_URL,{cache:"no-store"});
+  if(!response.ok)throw Error("HTTP "+response.status);
+  const data=await response.json();
+  if(data.schemaVersion!==2||!Array.isArray(data.concepts))throw Error("Unsupported vocabulary library");
+  const counts=Object.fromEntries(CANONICAL_CATEGORIES.map(c=>[c,0]));
+  for(const concept of data.concepts){if(Object.hasOwn(counts,concept.category))counts[concept.category]++;}
+  if(CANONICAL_CATEGORIES.some(c=>counts[c]!==12))throw Error("Incomplete V2 categories");
+  library=data;libraryError="";
+  if(!isCustom&&!$("editor").dataset.edited)loadCategory();
+ }catch(error){libraryError="Multilingual library could not load. Check internet access or open this prototype from a hosted page.";console.warn(libraryError,error);if(!isCustom)loadCategory();}
+}
+const GAMES=[["🐍","Word Snake","/word-snake/"],["🏎️","Word Racer","/word-racer/"],["🏃","Word Jumper","/word-jumper/"],["👾","Word Invaders","/word-invaders/"],["🐸","Word Frog","/frog-river/"],["🔗","Word Match","/matching-columns/"],["🟡","Word Eater","/word-eater/","/word-warehouse/"],["📦","Word Warehouse","/word-warehouse/"]];
+let parsed=[],errors=[],selectedTitle="Animals";
+function splitLine(line){
+ const delimiters=[/\t/,/\s+\|\s+/,/\s+[–—-]\s+/,/\s*;\s*/,/\s*→\s*/];
+ for(const d of delimiters){const parts=line.split(d);if(parts.length===2&&parts.every(x=>x.trim()))return parts.map(x=>x.trim());}
+ return null;
+}
+function parse(){parsed=[];errors=[];const lines=$("editor").value.split(/\r?\n/);lines.forEach((line,i)=>{if(!line.trim())return;const pair=splitLine(line);if(pair)parsed.push(pair);else errors.push(i+1)});renderPreview();}
+function speakWord(word,locale){
+ if(!("speechSynthesis" in window)){ $("mainStatus").textContent="Speech playback is not supported by this browser.";return; }
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(word);
+ utterance.lang=locale;utterance.rate=0.9;
+ const voices=window.speechSynthesis.getVoices();
+ const exact=voices.find(v=>v.lang.toLowerCase()===locale.toLowerCase());
+ const fallback=voices.find(v=>v.lang.toLowerCase().split("-")[0]===locale.toLowerCase().split("-")[0]);
+ if(exact||fallback)utterance.voice=exact||fallback;
+ utterance.onerror=()=>{$("mainStatus").textContent="Voice playback failed or no suitable voice is installed for "+locale;};
+ window.speechSynthesis.speak(utterance);
+}
+function renderPreview(){const status=$("parseStatus");status.textContent=`${parsed.length} valid pairs${errors.length?" · Review lines: "+errors.join(", "):""}`;status.className="status "+(errors.length?"bad":"ok");
+ $("summary").textContent=errors.length?"Fix invalid rows before sharing or launching.":`${parsed.length} pairs ready · ${$("prompt").value} → ${$("target").value}`;
+ const table=document.createElement("table");const head=document.createElement("tr");["PROMPT","TARGET"].forEach(t=>{const th=document.createElement("th");th.textContent=t;head.append(th)});table.append(head);
+ parsed.forEach(p=>{const tr=document.createElement("tr");p.forEach((v,i)=>{const td=document.createElement("td");const wrap=document.createElement("div");wrap.className="word-cell";const word=document.createElement("span");word.textContent=v;const speak=btn("▶",()=>speakWord(v,i===0?$("prompt").value:$("target").value));speak.className="speak";speak.title="Hear "+v;speak.setAttribute("aria-label","Pronounce "+v);speak.disabled=!("speechSynthesis" in window);wrap.append(speak,word);td.append(wrap);tr.append(td)});table.append(tr)});$("previewRows").replaceChildren(table);
+}
+function loadCategory(){
+ const category=$("category").value;
+ if(category==="custom"){
+  isCustom=true;selectedTitle="Custom vocabulary";$("wordSetTitle").value="";$("editor").value="";$("editor").dataset.edited="";parse();return;
+ }
+ isCustom=false;selectedTitle=category;$("wordSetTitle").value=category;$("editor").dataset.edited="";
+ const prompt=$("prompt").value,target=$("target").value;
+ if(prompt===target){$("editor").value="";parse();$("parseStatus").textContent="Choose two different languages.";$("parseStatus").className="status bad";return;}
+ const pairs=libraryFor(category,prompt,target);
+ if(!pairs){
+  $("editor").value="";parse();
+  $("parseStatus").textContent=libraryError||"Loading the 8-category multilingual vocabulary library…";
+  $("parseStatus").className="status bad";return;
+ }
+ $("editor").value=pairs.map(p=>p.join("\t")).join("\n");parse();
+}
+function currentSet(){parse();if($("prompt").value===$("target").value){$("mainStatus").textContent="Prompt and target languages must differ.";$("mainStatus").className="status bad";return null}if(errors.length||parsed.length<2){$("mainStatus").textContent="At least two valid pairs are required; correct all invalid lines.";$("mainStatus").className="status bad";return null}
+ return {schemaVersion:1,type:"words",title:$("wordSetTitle").value.trim()||selectedTitle,promptLanguage:$("prompt").value,targetLanguage:$("target").value,pairs:parsed.map(([prompt,target])=>[prompt,target])};}
+function showModal(title,build){$("modalTitle").textContent=title;$("modalBody").replaceChildren();build($("modalBody"));$("modal").classList.add("open")}
+function el(tag,text){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node}
+function btn(label,fn){const b=el("button",label);b.type="button";b.addEventListener("click",fn);return b}
+function saveLocal(set,folder){try{const existing=JSON.parse(localStorage.getItem("bt-word-sets-v1")||"[]");existing.push({...set,id:"local-"+Date.now(),folder,savedAt:new Date().toISOString()});localStorage.setItem("bt-word-sets-v1",JSON.stringify(existing));return true}catch(e){return false}}
+$("category").addEventListener("change",loadCategory);$("editor").addEventListener("input",()=>{$("editor").dataset.edited="true";isCustom=true;selectedTitle=$("category").value==="custom"?"Custom vocabulary":$("category").value+" (edited)";parse()});$("review").onclick=parse;
+$("clear").onclick=()=>{$("category").value="custom";loadCategory()};
+$("prompt").onchange=loadCategory;$("target").onchange=loadCategory;
+$("swap").onclick=()=>{const p=$("prompt").value;$("prompt").value=$("target").value;$("target").value=p;parse();$("editor").value=parsed.map(([a,b])=>b+"\t"+a).join("\n");isCustom=true;$("editor").dataset.edited="true";parse()};
+$("save").onclick=()=>{const set=currentSet();if(!set)return;showModal("SAVE TO FOLDER",body=>{body.append(el("p","Local prototype storage only. Saved sets stay in this browser, not in a teacher account."));const name=el("input");name.value=set.title;name.placeholder="Set name";name.setAttribute("aria-label","Set name");body.append(name);const folder=el("input");folder.value="My Word Sets";folder.placeholder="Folder name";folder.setAttribute("aria-label","Folder name");body.append(folder);
+body.append(btn("SAVE LOCALLY",()=>{if(!name.value.trim()||!folder.value.trim())return;const ok=saveLocal({...set,title:name.value.trim()},folder.value.trim());$("modalBody").append(el("p",ok?"Saved on this device.":"Storage unavailable. Check browser settings."));}));
+const existing=JSON.parse(localStorage.getItem("bt-word-sets-v1")||"[]");body.append(el("p",`${existing.length} locally saved set(s).`));
+existing.slice(-8).reverse().forEach(s=>body.append(btn("LOAD · "+s.folder+" / "+s.title,()=>{$("prompt").value=s.promptLanguage;$("target").value=s.targetLanguage;$("category").value="custom";selectedTitle=s.title;isCustom=true;$("editor").dataset.edited="true";$("editor").value=s.pairs.map(([p,t])=>p+"\t"+t).join("\n");parse();$("modal").classList.remove("open")})));
+})};
+const API="https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev";
+async function requestSharedSet(path,options={}){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+ try{const response=await fetch(API+path,{...options,signal:controller.signal});if(!response.ok)throw Error("Sharing service HTTP "+response.status);return await response.json();}
+ finally{clearTimeout(timer);}
+}
+function validSharePayload(data){const s=data?.set??data;if(!s||typeof s.title!=="string"||!Array.isArray(s.pairs)||s.pairs.length<5||s.pairs.some(p=>!Array.isArray(p)||p.length!==2||p.some(w=>typeof w!=="string"||!w.trim()))||!["en-US","es-ES","de-DE","da-DK","fr-FR","it-IT"].includes(s.language)||!["en-US","es-ES","de-DE","da-DK","fr-FR","it-IT"].includes(s.promptLanguage)||s.language===s.promptLanguage)throw Error("Shared vocabulary is invalid or incomplete");return s;}
+function studentGameGrid(body,id){const grid=el("div");grid.className="gamegrid student-preview-games";GAMES.forEach(([emoji,name,path])=>{const card=btn("",()=>{const url=new URL("https://boringteacher.com"+path);url.hash="set="+encodeURIComponent(id);if(["/word-snake/","/word-racer/","/word-jumper/","/word-invaders/","/frog-river/","/matching-columns/","/word-eater/","/word-warehouse/"].includes(path)){url.searchParams.set("autoplay","1");url.searchParams.set("returnTo","dashboard");}window.location.assign(url.toString());});card.className="game";card.append(el("span",emoji),el("small",name.toUpperCase()));grid.append(card);});body.append(grid);}
+$("share").onclick=async()=>{const set=currentSet();if(!set)return;if(set.pairs.length<5){$("mainStatus").textContent="Sharing requires at least five vocabulary pairs.";$("mainStatus").className="status bad";return;}
+ const button=$("share");button.disabled=true;button.textContent="SAVING SHARED SET…";
+ try{
+  const data=await requestSharedSet("/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:set.title,language:set.targetLanguage,promptLanguage:set.promptLanguage,pairs:set.pairs})});
+  const id=data?.id??data?.setId??data?.set?.id;if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Sharing service did not return a valid ID");
+  const url=new URL(location.href);url.search="";url.hash="set="+encodeURIComponent(id);
+  showModal("STUDENT LINK · READY",body=>{
+   body.append(el("p","Share this link with students. It opens a student-only launcher using this saved vocabulary set."));
+   const link=el("a",url.toString());link.href=url.toString();link.target="_blank";link.rel="noopener";link.style.overflowWrap="anywhere";body.append(link);
+   const copyButton=btn("COPY STUDENT LINK",async()=>{try{await navigator.clipboard.writeText(url.toString());copyButton.textContent="✓ COPIED!";copyButton.setAttribute("aria-label","Student link copied");$("mainStatus").textContent="Student link copied.";}catch{copyButton.textContent="COPY FAILED — SELECT LINK";$("mainStatus").textContent="Clipboard unavailable. Select the link above to copy.";}});body.append(copyButton);
+   const choicesHeading=el("h3","STUDENT GAME CHOICES");choicesHeading.style.marginTop="24px";choicesHeading.style.marginBottom="16px";body.append(choicesHeading);studentGameGrid(body,id);
+   body.append(el("p","All eight games now use the shared vocabulary and automatic launch."));
+  });
+ }catch(e){$("mainStatus").textContent="Student sharing failed: "+(e.name==="AbortError"?"request timed out":e.message);$("mainStatus").className="status bad";}
+ finally{button.disabled=false;button.textContent="🔗 STUDENT LINK";}
+};
+async function initStudentLauncher(){
+ const hash=location.hash;if(!hash.startsWith("#set="))return;
+ const id=decodeURIComponent(hash.slice(5));
+ document.body.classList.add("student-mode");
+ const main=document.querySelector("main");main.replaceChildren();
+ const shell=el("section");shell.className="student-preview-hero";shell.append(el("h2","STUDENT WORD GAMES"));
+ const status=el("p","Loading shared vocabulary…");shell.append(status);main.append(shell);
+ if(!id||id.length>512){status.textContent="Invalid student link.";return;}
+ try{const data=await requestSharedSet("/sets/"+encodeURIComponent(id));const s=validSharePayload(data);
+  shell.querySelector("h2").textContent=s.title;status.textContent=s.promptLanguage+" → "+s.language+" · "+s.pairs.length+" vocabulary pairs";
+  main.append(el("h3","CHOOSE A GAME"));studentGameGrid(main,id);
+  main.append(el("p","Choose a game above to practice this vocabulary. Your teacher's settings are not available in student mode."));
+ }catch(e){status.textContent="Unable to load shared vocabulary: "+(e.name==="AbortError"?"request timed out":e.message);main.append(el("p","Please ask your teacher for a new link or try again later."));}
+}
+async function launchIntegratedGame(button,gamePath,gameName){
+ const set=currentSet();if(!set)return;
+ if(set.pairs.length<5){$("mainStatus").textContent="This game requires at least 5 valid vocabulary pairs.";$("mainStatus").className="status bad";return;}
+ const payload={title:set.title,language:set.targetLanguage,promptLanguage:set.promptLanguage,pairs:set.pairs};
+ button.disabled=true;$("mainStatus").textContent="Saving vocabulary and preparing game…";$("mainStatus").className="status";
+ try{
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12000);
+  let response;
+  try{response=await fetch("https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal});}
+  finally{clearTimeout(timer);}
+  if(!response.ok)throw Error("Vocabulary service returned HTTP "+response.status);
+  const data=await response.json();const id=data?.id??data?.setId??data?.set?.id;
+  if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Vocabulary service returned no valid set ID");
+  const url=new URL("https://boringteacher.com"+gamePath);url.searchParams.set("autoplay","1");url.searchParams.set("returnTo","dashboard");url.hash="set="+encodeURIComponent(id);
+  $("mainStatus").textContent="Opening "+gameName+"…";window.location.assign(url.toString());
+ }catch(e){$("mainStatus").textContent="Could not start "+gameName+": "+(e.name==="AbortError"?"request timed out":e.message)+". No game was opened.";$("mainStatus").className="status bad";button.disabled=false;}
+}
+GAMES.forEach(([emoji,name,url])=>{const b=btn("",()=>{if(["/word-snake/","/word-racer/","/word-jumper/","/word-invaders/","/frog-river/","/matching-columns/","/word-eater/","/word-warehouse/"].includes(url)){void launchIntegratedGame(b,url,name);return;}const set=currentSet();if(!set)return;showModal("GAME INTEGRATION PENDING",body=>{body.append(el("p",`${name} is already hosted at ${url}. This prototype does not yet pass the selected vocabulary to that game.`));body.append(el("p","Launching the old URL now would open its existing menu and ignore this set. No gameplay code has been modified."));body.append(btn("OPEN EXISTING GAME",()=>window.open("https://boringteacher.com"+url,"_blank","noopener")));});});b.className="game";b.append(el("span",emoji),el("small",name.toUpperCase()));$("games").append(b)});
+window.addEventListener("pageshow",()=>{if(location.hash.startsWith("#set="))return;for(const tile of $("games").querySelectorAll("button"))tile.disabled=false;$("mainStatus").textContent="";$("mainStatus").className="status";});
+$("closeModal").onclick=()=>$("modal").classList.remove("open");$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
+loadCategory();
+if(location.hash.startsWith("#set=")){void initStudentLauncher();}else{void fetchLibrary();}
+</script><script>
+(function(){
+"use strict";
+const el=id=>document.getElementById(id);
+const tabs=[...document.querySelectorAll(".bt-tabs button")];
+tabs.forEach(t=>t.addEventListener("click",()=>{
+tabs.forEach(b=>b.setAttribute("aria-selected",String(b===t)));
+const family=t.dataset.family;
+el("bt-word").hidden=family!=="word";
+el("bt-sentence").hidden=family!=="sentence";
+el("bt-placeholder").hidden=family==="word"||family==="sentence";
+el("bt-placeholder-title").textContent=family.toUpperCase();
+}));
+const samples={
+present:[["I eat apples.","Como manzanas."],["She lives in Madrid.","Ella vive en Madrid."],["We study every day.","Estudiamos todos los días."]],
+future:[["Tomorrow I will study.","Mañana estudiaré."],["We will travel next year.","Viajaremos el próximo año."],["She will work here.","Ella trabajará aquí."]],
+questions:[["Where do you live?","¿Dónde vives?"],["What is your name?","¿Cómo te llamas?"],["Do you speak Spanish?","¿Hablas español?"]]
+};
+const entries=()=>el("bt-s-editor").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(line=>{const parts=line.split("\t");return parts.length===2&&parts.every(s=>s.trim())?parts.map(s=>s.trim()):null});
+const escape=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function render(){const all=entries(),good=all.filter(Boolean);el("bt-s-validation").textContent=good.length+" valid pairs"+(all.length-good.length?" · "+(all.length-good.length)+" invalid lines":"");el("bt-s-preview").innerHTML=good.length?"<table><thead><tr><th>ENGLISH PROMPT</th><th>TARGET</th></tr></thead><tbody>"+good.map(p=>"<tr><td>"+escape(p[0])+"</td><td>"+escape(p[1])+"</td></tr>").join("")+"</tbody></table>":"<p class='bt-note'>No valid sentence pairs yet.</p>";return good}
+const games=[["👾","SENTENCE INVADERS"],["🟡","SENTENCE EATER"],["📦","SENTENCE WAREHOUSE"],["🐈","SENTENCE CAT · TEST"]];
+for(const [symbol,name] of games){for(const id of ["bt-s-games","bt-s-studentgames"]){const b=document.createElement("button");b.type="button";b.className="bt-game";b.innerHTML="<span>"+symbol+"</span><small>"+name+"</small>";b.addEventListener("click",()=>{const student=id==="bt-s-studentgames";el(student?"bt-s-studentstatus":"bt-s-status").textContent=render().length<2?"At least two valid pairs are required.":"PROTOTYPE ONLY: "+name+" selected. Direct game launch is not connected."});el(id).append(b)}}
+el("bt-s-editor").addEventListener("input",render);el("bt-s-review").addEventListener("click",()=>{const n=render().length;el("bt-s-status").textContent="Import checked: "+n+" valid sentence pairs.";});
+el("bt-s-grammar").addEventListener("change",e=>{if(!e.target.value)return;if(el("bt-s-target").value!=="es-ES"){el("bt-s-status").textContent="Grammar samples currently demonstrate Spanish only. Use custom sentences for other languages.";return}el("bt-s-editor").value=samples[e.target.value].map(p=>p.join("\t")).join("\n");render()});
+el("bt-s-clear").addEventListener("click",()=>{el("bt-s-editor").value="";el("bt-s-grammar").value="";render()});
+el("bt-s-swap").addEventListener("click",()=>{el("bt-s-editor").value=el("bt-s-editor").value.split(/\r?\n/).map(line=>{const p=line.split("\t");return p.length===2?p.reverse().join("\t"):line}).join("\n");render();el("bt-s-status").textContent="Columns swapped. The prompt/target language labels remain unchanged: review direction before using this set."});
+el("bt-s-share").addEventListener("click",()=>{const p=render();if(p.length<2){el("bt-s-status").textContent="Enter at least two valid pairs.";return}el("bt-s-studentinfo").textContent=(el("bt-s-title").value||"Untitled set")+" · "+p.length+" sentences · English → "+el("bt-s-target").selectedOptions[0].text;el("bt-sentence-teacher").hidden=true;el("bt-s-student").hidden=false});
+el("bt-s-back").addEventListener("click",()=>{el("bt-s-student").hidden=true;el("bt-sentence-teacher").hidden=false});
+el("bt-s-save").addEventListener("click",()=>{try{localStorage.setItem("bt-sentence-universal-preview",JSON.stringify({title:el("bt-s-title").value,target:el("bt-s-target").value,editor:el("bt-s-editor").value}));el("bt-s-status").textContent="Draft saved in this browser only."}catch{el("bt-s-status").textContent="Browser storage unavailable."}});
+el("bt-s-voice").addEventListener("click",()=>{if(!("speechSynthesis" in window)){el("bt-s-status").textContent="Speech synthesis unavailable.";return}const u=new SpeechSynthesisUtterance(render()[0]?.[1]||"Hola");u.lang=el("bt-s-target").value;speechSynthesis.cancel();speechSynthesis.speak(u);el("bt-s-status").textContent="Speech requested. Available voices depend on this device."});
+render();
+})();
+</script></body></html>
