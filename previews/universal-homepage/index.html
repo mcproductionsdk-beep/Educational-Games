@@ -166,8 +166,8 @@ $("share").onclick=async()=>{const set=currentSet();if(!set)return;if(set.pairs.
   showModal("STUDENT LINK · READY",body=>{
    body.append(el("p","Share this link with students. It opens a student-only launcher using this saved vocabulary set."));
    const link=el("a",url.toString());link.href=url.toString();link.target="_blank";link.rel="noopener";link.style.overflowWrap="anywhere";body.append(link);
-   body.append(btn("COPY STUDENT LINK",async()=>{try{await navigator.clipboard.writeText(url.toString());$("mainStatus").textContent="Student link copied.";}catch{$("mainStatus").textContent="Clipboard unavailable. Select the link above to copy.";}}));
-   body.append(el("h3","STUDENT GAME CHOICES"));studentGameGrid(body,id);
+   const copyButton=btn("COPY STUDENT LINK",async()=>{try{await navigator.clipboard.writeText(url.toString());copyButton.textContent="✓ COPIED!";copyButton.setAttribute("aria-label","Student link copied");$("mainStatus").textContent="Student link copied.";}catch{copyButton.textContent="COPY FAILED — SELECT LINK";$("mainStatus").textContent="Clipboard unavailable. Select the link above to copy.";}});body.append(copyButton);
+   const choicesHeading=el("h3","STUDENT GAME CHOICES");choicesHeading.style.marginTop="24px";choicesHeading.style.marginBottom="16px";body.append(choicesHeading);studentGameGrid(body,id);
    body.append(el("p","All eight games now use the shared vocabulary and automatic launch."));
   });
  }catch(e){$("mainStatus").textContent="Student sharing failed: "+(e.name==="AbortError"?"request timed out":e.message);$("mainStatus").className="status bad";}
