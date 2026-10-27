@@ -138,11 +138,12 @@ async function launchSnake(button){
   if(!response.ok)throw Error("Vocabulary service returned HTTP "+response.status);
   const data=await response.json();const id=data?.id??data?.setId??data?.set?.id;
   if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Vocabulary service returned no valid set ID");
-  const url=new URL("https://boringteacher.com/word-snake/");url.searchParams.set("autoplay","1");url.hash="set="+encodeURIComponent(id);
+  const url=new URL("https://boringteacher.com/word-snake/");url.searchParams.set("autoplay","1");url.searchParams.set("returnTo","dashboard");url.hash="set="+encodeURIComponent(id);
   $("mainStatus").textContent="Opening Word Snake…";window.location.assign(url.toString());
  }catch(e){$("mainStatus").textContent="Could not start Word Snake: "+(e.name==="AbortError"?"request timed out":e.message)+". No game was opened.";$("mainStatus").className="status bad";button.disabled=false;}
 }
 GAMES.forEach(([emoji,name,url])=>{const b=btn("",()=>{if(url==="/word-snake/"){void launchSnake(b);return;}const set=currentSet();if(!set)return;showModal("GAME INTEGRATION PENDING",body=>{body.append(el("p",`${name} is already hosted at ${url}. This prototype does not yet pass the selected vocabulary to that game.`));body.append(el("p","Launching the old URL now would open its existing menu and ignore this set. No gameplay code has been modified."));body.append(btn("OPEN EXISTING GAME",()=>window.open("https://boringteacher.com"+url,"_blank","noopener")));});});b.className="game";b.append(el("span",emoji),el("small",name.toUpperCase()));$("games").append(b)});
+window.addEventListener("pageshow",()=>{for(const tile of $("games").querySelectorAll("button"))tile.disabled=false;$("mainStatus").textContent="";$("mainStatus").className="status";});
 $("closeModal").onclick=()=>$("modal").classList.remove("open");$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 loadCategory();
 void fetchLibrary();
