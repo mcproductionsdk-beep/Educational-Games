@@ -18,7 +18,7 @@ button{font:700 14px "Courier New",monospace;cursor:pointer;border:3px solid var
 @media(max-width:650px){.columns,.actions{grid-template-columns:1fr}.gamegrid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:10px}.panel{padding:11px}textarea{height:200px}}
 .student-preview-hero{background:#fff8db;border:3px solid var(--navy);text-align:center;padding:12px;margin-bottom:17px}.student-preview-hero h2{color:#166947;margin:0 0 5px}.student-preview-hero p{margin:0}.student-preview-games{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.student-preview-games .game{min-height:96px;box-shadow:2px 2px var(--dark)}.student-preview-games .game span{font-size:29px}.student-preview-games .game small{font-size:11px;overflow-wrap:anywhere}.dialog:has(.student-preview-games){width:min(780px,100%)}@media(max-width:650px){.student-preview-games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
-<body><div class="wrap"><header><h1>BORING TEACHER</h1><div class="sub">UNIVERSAL GAME LAUNCHER · V1.8 · WORD SNAKE INTEGRATION</div></header>
+<body><div class="wrap"><header><h1>BORING TEACHER</h1><div class="sub">UNIVERSAL GAME LAUNCHER · V1.9 · SNAKE + RACER INTEGRATION</div></header>
 <main><h2>WORD GAMES</h2><div class="columns">
 <section class="panel"><h3>GAME SETTINGS</h3><label for="prompt">PROMPT LANGUAGE</label><select id="prompt"><option value="en-US">English</option><option value="es-ES">Spanish</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
 <label for="target">TARGET LANGUAGE</label><select id="target"><option value="es-ES">Spanish</option><option value="en-US">English</option><option value="de-DE">German</option><option value="da-DK">Danish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option></select>
@@ -125,11 +125,11 @@ $("share").onclick=()=>{const set=currentSet();if(!set)return;showModal("STUDENT
  GAMES.forEach(([emoji,name])=>{const card=el("div");card.className="game";card.append(el("span",emoji),el("small",name.toUpperCase()));grid.append(card)});body.append(grid);
  const note=el("p","Preview only · Real shareable links and direct game launches will be enabled after Cloudflare integration.");note.className="small";body.append(note);
 });};
-async function launchSnake(button){
+async function launchIntegratedGame(button,gamePath,gameName){
  const set=currentSet();if(!set)return;
- if(set.pairs.length<5){$("mainStatus").textContent="Word Snake requires at least 5 valid vocabulary pairs.";$("mainStatus").className="status bad";return;}
+ if(set.pairs.length<5){$("mainStatus").textContent="This game requires at least 5 valid vocabulary pairs.";$("mainStatus").className="status bad";return;}
  const payload={title:set.title,language:set.targetLanguage,promptLanguage:set.promptLanguage,pairs:set.pairs};
- button.disabled=true;$("mainStatus").textContent="Saving vocabulary and preparing Word Snake…";$("mainStatus").className="status";
+ button.disabled=true;$("mainStatus").textContent="Saving vocabulary and preparing game…";$("mainStatus").className="status";
  try{
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12000);
   let response;
@@ -138,11 +138,11 @@ async function launchSnake(button){
   if(!response.ok)throw Error("Vocabulary service returned HTTP "+response.status);
   const data=await response.json();const id=data?.id??data?.setId??data?.set?.id;
   if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Vocabulary service returned no valid set ID");
-  const url=new URL("https://boringteacher.com/word-snake/");url.searchParams.set("autoplay","1");url.searchParams.set("returnTo","dashboard");url.hash="set="+encodeURIComponent(id);
-  $("mainStatus").textContent="Opening Word Snake…";window.location.assign(url.toString());
- }catch(e){$("mainStatus").textContent="Could not start Word Snake: "+(e.name==="AbortError"?"request timed out":e.message)+". No game was opened.";$("mainStatus").className="status bad";button.disabled=false;}
+  const url=new URL("https://boringteacher.com"+gamePath);url.searchParams.set("autoplay","1");url.searchParams.set("returnTo","dashboard");url.hash="set="+encodeURIComponent(id);
+  $("mainStatus").textContent="Opening "+gameName+"…";window.location.assign(url.toString());
+ }catch(e){$("mainStatus").textContent="Could not start "+gameName+": "+(e.name==="AbortError"?"request timed out":e.message)+". No game was opened.";$("mainStatus").className="status bad";button.disabled=false;}
 }
-GAMES.forEach(([emoji,name,url])=>{const b=btn("",()=>{if(url==="/word-snake/"){void launchSnake(b);return;}const set=currentSet();if(!set)return;showModal("GAME INTEGRATION PENDING",body=>{body.append(el("p",`${name} is already hosted at ${url}. This prototype does not yet pass the selected vocabulary to that game.`));body.append(el("p","Launching the old URL now would open its existing menu and ignore this set. No gameplay code has been modified."));body.append(btn("OPEN EXISTING GAME",()=>window.open("https://boringteacher.com"+url,"_blank","noopener")));});});b.className="game";b.append(el("span",emoji),el("small",name.toUpperCase()));$("games").append(b)});
+GAMES.forEach(([emoji,name,url])=>{const b=btn("",()=>{if(url==="/word-snake/"||url==="/word-racer/"){void launchIntegratedGame(b,url,name);return;}const set=currentSet();if(!set)return;showModal("GAME INTEGRATION PENDING",body=>{body.append(el("p",`${name} is already hosted at ${url}. This prototype does not yet pass the selected vocabulary to that game.`));body.append(el("p","Launching the old URL now would open its existing menu and ignore this set. No gameplay code has been modified."));body.append(btn("OPEN EXISTING GAME",()=>window.open("https://boringteacher.com"+url,"_blank","noopener")));});});b.className="game";b.append(el("span",emoji),el("small",name.toUpperCase()));$("games").append(b)});
 window.addEventListener("pageshow",()=>{for(const tile of $("games").querySelectorAll("button"))tile.disabled=false;$("mainStatus").textContent="";$("mainStatus").className="status";});
 $("closeModal").onclick=()=>$("modal").classList.remove("open");$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 loadCategory();
