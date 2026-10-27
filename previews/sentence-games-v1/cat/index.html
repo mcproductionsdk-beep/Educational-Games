@@ -189,7 +189,7 @@ function togglePause(){
  else hideOverlay();
 }
 $('pause').addEventListener('click',togglePause);
-$('menu').addEventListener('click',()=>{showMenu()});
+$('menu').addEventListener('click',()=>{const id=new URLSearchParams(location.hash.slice(1)).get('set');if(id&&/^S[A-HJ-NP-Z2-9]{8}$/i.test(id)){if('speechSynthesis' in window)speechSynthesis.cancel();location.assign('https://boringteacher.com/previews/sentence-games-v1/#set='+encodeURIComponent(id));return}showMenu()});
 $('fullscreen').addEventListener('click',async()=>{
  try{
   if(document.fullscreenElement)await document.exitFullscreen();
@@ -272,7 +272,7 @@ $('shareSentences').addEventListener('click',async()=>{
 $('copyShare').addEventListener('click',async()=>{const link=$('shareLink').href;try{await navigator.clipboard.writeText(link);$('shareStatus').textContent='Student link copied.'}catch(e){$('shareStatus').textContent='Copy the displayed link manually.'}});
 function updateStudentGameLinks(id){
  document.querySelectorAll('[data-sentence-game]').forEach(link=>{
-  if(id){link.href='https://boringteacher.com/'+link.dataset.sentenceGame+'/?autoplay=1#set='+encodeURIComponent(id);link.removeAttribute('aria-disabled')}
+  if(id){link.href='https://boringteacher.com/previews/sentence-games-v1/'+({'sentences-invaders':'invaders','sentence-eater':'eater','sentence-warehouse':'warehouse','sentence-cat-test':'cat'}[link.dataset.sentenceGame]||'cat')+'/?autoplay=1#set='+encodeURIComponent(id);link.removeAttribute('aria-disabled')}
   else{link.removeAttribute('href');link.setAttribute('aria-disabled','true')}
  });
 }
