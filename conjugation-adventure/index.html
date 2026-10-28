@@ -116,7 +116,7 @@ const $=id=>document.getElementById(id), bubble=$("bubble"), content=$("content"
 let state="menu", heroStyle=0, lives=5, ammo=0, clues=[], completed=new Set(), current=-1, phase="", invuln=0, selectedAdventure=null, villagers=[];
 const player={x:470,y:290,r:11,dir:"down",moving:false,step:0,speed:150};
 const keys={}; let last=performance.now(), audioCtx=null;
-const ADVENTURES=[
+const ADVENTURES=[{"id":"hedeby-silver","group":"VIKING HISTORICAL MYSTERIES","language":"en-GB","title":"The Missing Silver of Hedeby","premise":"Hedeby, around 950 CE. A merchant's pouch of silver has vanished before an important trade. A dockworker is accused, but five witnesses remember different parts of the morning. Investigate their claims, inspect the evidence, and decide whether any theft occurred. The characters and incident are fictional; the trading settlement and silver-by-weight practices are historically grounded.","vocab":[["Hedeby","A Viking Age trading settlement"],["hacksilver","Cut silver fragments used in exchange"],["balance","A tool for weighing goods"],["corroboration","Independent evidence supporting an account"],["rivet","A metal fastener used in boatbuilding"]],"facts":[{"name":"Astrid","style":4,"label":"PERMISSION","q":"What makes you believe the silver was stolen?","a":"The pouch vanished from my table. I never saw anyone take it.","check":"What does Astrid actually know?","opts":["She witnessed Einar steal it.","The pouch disappeared, but she saw no theft.","The pouch held gold."],"correct":1,"clue":"The pouch vanished from my table. I never saw anyone take it.","branches":[{"q":"Did anyone have permission to move it?","a":"I asked Leif to have the silver checked before our trade. I had nearly forgotten.","flag":"astrid_authorized_leif"},{"q":"Then someone must have stolen it.","a":"That is what I feared, but I did not see a thief.","flag":"astrid_uncertain"},{"q":"What was inside the pouch?","a":"Coins and cut silver pieces. Their weight mattered for this exchange.","flag":"silver_by_weight"}]},{"name":"Leif","style":5,"label":"MOVEMENT","q":"Why did you carry Astrid's silver away?","a":"Astrid told me to have the pouch checked at Sigrid's weighing table.","check":"What independently supports Leif's permission?","opts":["His age.","His denial alone.","Astrid's own account."],"correct":2,"clue":"Astrid told me to have the pouch checked at Sigrid's weighing table.","branches":[{"q":"Where did you leave it?","a":"I placed it in Sigrid's wooden chest while she was busy.","flag":"leif_chest"},{"q":"Why didn't you return immediately?","a":"I went to fetch Astrid. By then she was already speaking of a thief.","flag":"leif_delay"},{"q":"Did you secretly take it?","a":"No. Astrid asked me to carry it. Sigrid can confirm where I went.","flag":"leif_denial"}]},{"name":"Einar","style":6,"label":"RIVETS","q":"Why did you carry a leather pouch past Astrid's stall?","a":"I was going to repair a boat. My pouch contained iron rivets, not silver.","check":"Why does Einar's pouch not prove theft?","opts":["A similar pouch can hold different objects.","Dockworkers never handle silver.","All pouches are identical."],"correct":0,"clue":"I was going to repair a boat. My pouch contained iron rivets, not silver.","branches":[{"q":"Can anyone confirm what it held?","a":"The boatwright gave me the rivets. You may inspect my pouch.","flag":"einar_rivets"},{"q":"Why were you walking so quickly?","a":"The boat was waiting for repairs. I was in a hurry.","flag":"einar_haste"},{"q":"Doesn't the pouch prove you stole it?","a":"It proves I carried a pouch, not that I carried Astrid's silver.","flag":"einar_identity_warning"}]},{"name":"Sigrid","style":7,"label":"CHEST","q":"Did anyone bring silver to your weighing table?","a":"Leif brought a pouch and placed it in my wooden chest. I closed the lid to keep it secure.","check":"How should the recovered silver be verified?","opts":["Count only whole coins.","Compare its contents and weight with Astrid's record.","Assume a tied pouch is complete."],"correct":1,"clue":"Leif brought a pouch and placed it in my wooden chest. I closed the lid to keep it secure.","branches":[{"q":"Can we open the chest together?","a":"Here it is, still tied shut. Ask Astrid to identify it and compare its contents with her record.","flag":"pouch_recovered"},{"q":"Why did you close it?","a":"I wanted to keep the pouch secure. I did not know Astrid was looking for it.","flag":"sigrid_protection"},{"q":"How can we verify the silver?","a":"Compare the contents with Astrid's record and weigh the silver. Appearance is not enough.","flag":"weight_verification"}]},{"name":"Faro","style":8,"label":"OBSERVATION","q":"What did you see near the stalls?","a":"Leif went toward Sigrid's stall. Later Einar walked toward the boats. I could not see inside either pouch.","check":"What can Faro's observation establish?","opts":["That Einar stole silver.","That both pouches held coins.","Where the two men walked, not what they carried."],"correct":2,"clue":"Leif went toward Sigrid's stall. Later Einar walked toward the boats. I could not see inside either pouch.","branches":[{"q":"Who entered Sigrid's stall?","a":"Leif entered while Sigrid was busy.","flag":"faro_leif_route"},{"q":"Did you see Einar steal anything?","a":"No. I saw Einar pass, but I saw no theft.","flag":"faro_no_theft_seen"},{"q":"Why should we trust your account?","a":"Do not trust me without checking. Ask Sigrid and inspect Einar's pouch.","flag":"faro_corrob"}]}],"reconstruction":[["Astrid gave Leif ____ to move the silver.",["permission","a punishment","a new pouch"],0],["Leif placed the pouch in Sigrid's ____.",["boat","wooden chest","oven"],1],["Einar's pouch contained ____.",["silver","beads","iron rivets"],2],["Faro observed the men's ____ rather than their pouch contents.",["movements","weights","agreements"],0],["The recovered silver must be checked against Astrid's ____.",["memory alone","record and weight","neighbour's pouch"],1]],"fullStory":"Astrid authorized Leif to take her silver for checking. He placed it in Sigrid's chest. Sigrid secured the pouch, while Einar carried unrelated iron rivets. The silver was not stolen: a forgotten instruction and mistaken assumptions caused the accusation.","finalQuestion":"What really happened to Astrid's silver?","finalOptions":["Einar stole the silver","The silver was safely stored","Leif secretly sold the silver"],"finalCorrect":1,"finale":[{"question":"Why was Hedeby important?","opts":["It connected trading routes","It was a modern capital","It had no harbour"],"correct":0},{"question":"How could silver fragments be measured?","opts":["By their colour","With a balance and weights","By counting ships"],"correct":1},{"question":"Which is an observation rather than an inference?","opts":["Einar must be guilty","All merchants are honest","Faro saw Einar walking toward the boats"],"correct":2},{"question":"Which accounts support Leif's explanation?","opts":["Astrid and Sigrid","Only Einar","No one"],"correct":0},{"question":"What best explains the missing pouch?","opts":["A raid on Hedeby","It was secured in Sigrid's chest","It was thrown into the harbour"],"correct":1}]},
  {
   "id": "harald",
   "group": "DANISH VIKING AGE",
@@ -587,8 +587,16 @@ const VIKING_QUESTIONS=[
  ["What fortresses are connected to this ruler?","What kind of strongholds were built in his age?","Which military constructions might identify him?","What is unusual about Viking ring fortresses?","Which defences are associated with his reign?"]
 ];
 let dialogueToken=0, askedQuestions=new Set(),challengeMode=false;
+let questFlags=new Set(),activeBranch=null;
+function isHedeby(){return selectedAdventure.id==='hedeby-silver'}
 function showQuestion(){
  const v=villagers[current];placeBubble();bubble.classList.remove("hidden");speaker.textContent=v.name;
+ if(isHedeby()){
+ const branches=v.branches||[];
+ content.innerHTML=`<div class="line">${v.q}</div><div class="inf">${v.a}</div>`+branches.map((b,i)=>`<button class="choice" data-branch="${i}">${b.q}</button>`).join("");
+ content.querySelectorAll("[data-branch]").forEach(b=>b.onclick=()=>showHedebyBranch(Number(b.dataset.branch)));
+ return;
+ }
  const numbers=[1,2,3,4,5].map(n=>{
   const used=askedQuestions.has(n-1);
   return `<button type="button" class="numberChoice${used?' used':''}" data-number="${n}" ${used?'disabled aria-disabled="true" title="Already asked"':''}>${n}</button>`;
@@ -612,6 +620,16 @@ function showWitnessAnswer(token){
  content.innerHTML=`<div class="line">${v.a}</div><div class="actions"><button id="understood">${tr('check')}</button><button id="repeat">${tr('repeat')}</button></div>`;
  speak(v.a);$("understood").onclick=showCheck;$("repeat").onclick=()=>speak(v.a);
 }
+function showHedebyBranch(i){
+ if(!isHedeby()||current<0||state!=="talk")return;
+ const v=villagers[current],branch=v.branches[i];if(!branch)return;
+ activeBranch=branch;questFlags.add(branch.flag);
+ speaker.textContent=v.name;
+ content.innerHTML='<div class="line">'+branch.a+'</div><div class="actions"><button id="understood">CHECK EVIDENCE</button><button id="anotherBranch">ASK ANOTHER QUESTION</button></div>';
+ speak(branch.a);
+ $("understood").onclick=showCheck;
+ $("anotherBranch").onclick=showQuestion;
+}
 function shuffledChoices(v){
  const items=v.opts.map((text,i)=>({text,correct:i===v.correct}));
  for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
@@ -623,8 +641,8 @@ function showCheck(){
  content.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answerCheck(choices[+b.dataset.i].correct))
 }
 function answerCheck(isCorrect){
- const v=villagers[current];if(!isCorrect){damage(false);flash(tr('nope'));return}
- tone(880,.1);speak(v.clue);completed.add(current);clues.push({label:v.label,text:v.clue});ammo++;
+ const v=villagers[current];if(!isCorrect){if(isHedeby()){speaker.textContent='INVESTIGATION';content.innerHTML='<div class="line">That conclusion is not supported by this witness. Compare what was seen with what was assumed.</div><button id="retryEvidence">TRY AGAIN</button>';$("retryEvidence").onclick=showCheck;return;}damage(false);flash(tr('nope'));return}
+ tone(880,.1);speak(v.clue);if(isHedeby()&&activeBranch)questFlags.add(activeBranch.flag);completed.add(current);clues.push({label:v.label,text:v.clue});ammo++;
  speaker.textContent=v.name;content.innerHTML=`<div class="line">${v.clue}</div><div class="reward">★ ${tr('clue')} ${completed.size}/5 ${tr('found')}</div><button id="continue">${tr('continue')}</button>`;
  $("continue").onclick=endTalk
 }
@@ -684,6 +702,8 @@ function showFinalInference(){
  $("hearStory").onclick=()=>speakSequence([selectedAdventure.fullStory,selectedAdventure.finalQuestion]);
 }
 function pickFinal(correct){
+ if(isHedeby()&&!correct){$("recon").innerHTML='<div class="progress">THE FALSE ACCUSATION</div><h2>Suspicion is not proof</h2><p>Einar carried a pouch, but that does not establish that he stole Astrid\'s silver. Re-examine the evidence before accusing anyone.</p><button id="retryFinal">RECONSIDER THE EVIDENCE</button>';$("retryFinal").onclick=showFinalInference;return;}
+ if(isHedeby()&&correct&&!questFlags.has('pouch_recovered')){$("recon").innerHTML='<div class="progress">INCOMPLETE EXPLANATION</div><h2>Where is the pouch?</h2><p>You have a plausible account, but have not inspected the chest with Sigrid. Return to the village and ask her to open it.</p><button id="backInvestigate">CONTINUE INVESTIGATION</button>';$("backInvestigate").onclick=()=>{state='world';$("recon").classList.add('hidden');};return;}
  if(!correct){damage(false);flash(tr('notQuite'));return}
  tone(900,.12);$("recon").innerHTML=`<div class="progress">${tr('solved')}</div><h2>${selectedAdventure.finalOptions[selectedAdventure.finalCorrect]}</h2><p>${tr('solvedHelp')}</p><button id="fight">${tr('enterBattle')}</button>`;$("fight").onclick=startBoss
 }
@@ -831,7 +851,7 @@ function launchEditedStory(){
  heroStyle=selectedHero;validateNPCPositions();$("start").classList.add("hidden");$("menuBtn").classList.remove("hidden");$("skipBattleBtn").classList.remove("hidden");showPremise();
 }
 function resetRun(){
- dialogueToken++;askedQuestions=new Set();speechSynthesis.cancel();Object.keys(keys).forEach(k=>keys[k]=false);lives=5;ammo=0;clues=[];completed=new Set();current=-1;phase="";invuln=0;player.x=470;player.y=290;player.moving=false;playerShots=[];enemyShots=[];invaderTargets=[];invaderRound=0;invaderCooldown=0;roundTransition=false;
+ dialogueToken++;askedQuestions=new Set();questFlags=new Set();activeBranch=null;speechSynthesis.cancel();Object.keys(keys).forEach(k=>keys[k]=false);lives=5;ammo=0;clues=[];completed=new Set();current=-1;phase="";invuln=0;player.x=470;player.y=290;player.moving=false;playerShots=[];enemyShots=[];invaderTargets=[];invaderRound=0;invaderCooldown=0;roundTransition=false;
  challengeMode=false;bubble.classList.add("hidden");$("recon").classList.add("hidden");$("bossPrompt").classList.add("hidden");$("toast").classList.add("hidden");$("premise").classList.add("hidden");
 }
 function goMainMenu(){$("premise").classList.add("hidden");
