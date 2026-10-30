@@ -1,3 +1,31 @@
+# BORING TEACHER — CURRENT ARCHITECTURE & DEVELOPMENT POLICY (2026-10-30)
+
+> **CURRENT AUTHORITY OVERLAY.** This block supersedes contradictory architecture/release claims in the historical source document preserved below. The complete Project document `BORING_TEACHER_SOURCE_OF_TRUTH_V21_WORD_SNAKE_AND_BRANCHING_2026-10-30.md` is the current Source of Truth after the user uploads and activates it in the ChatGPT Language Games Project. Its companions are Registry V1.6, Development Standards V4.4, and the new Game Adapter Migration & Branching Standard V1.0. **Do not treat documentation drafts as deployment approval.**
+
+## Released set-first model
+
+- `https://boringteacher.com/` is the universal **set-first workspace**, not merely a game-card arcade. Word Games and Sentence Games each use a family-specific editor and production shared-set service. Conjugation and Communication remain placeholder family tabs; do not infer shared-set release.
+- **One central content editor, many compatible direct-play games.** A migrated game does not duplicate the teacher category/language/paste/share editor or the student game-selection launcher. Preserve actual gameplay controls, HUD, assets, voice, scoring and mobile behavior.
+- Word Games use `https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev`, `#set=<ID>` and `pairs:[[prompt,target],...]`; Sentence Games have a **separate API, payload direction and `#sentence-set=<ID>`**.
+- **Word Snake is the first completed reference migration.** Canonical source `mcproductionsdk-beep/Word-Snake/main`, release PR #2 merged 2026-10-30 at SHA `176b348a165f056bfa5ae1a790b82e5a14259ba4`. The published streamlined version has user-confirmed gameplay. It deliberately has no duplicate vocabulary teacher menu, and `preview/index.html` was excluded from production. Opening `/word-snake/` **without a set ID** displays the safe return-to-home page. If this appears after launching via the homepage, investigate the actual URL and set handoff rather than assuming direct-open behavior.
+- **Word Warehouse is a source exception:** the published game lives in this repository under `word-warehouse/`, not in standalone `Word-Warehouse`. Frog River's actual dedicated repository is `Frog-River`. Reinspect public routes and dependencies before changing any other game.
+- `SAVE TO FOLDER` still has local-browser/prototype limitations. Do not call it an authenticated cloud My Library. Editorial Sentence Grammar V1.7 and certain French/Italian vocabulary translations remain candidates.
+
+## Required GitHub branch/release direction
+
+1. Verify each game's actual live repository/path/origin and baseline production commit.
+2. Keep production `main` protected with PR and **blocking** CI; maintain separate long-lived `develop`, isolated `feature/...` previews and clean `release/...` candidates. This is **target policy**, not yet enforced across all games.
+3. `develop` is **not a true backup**; pin a pre-release `recovery/...` branch or immutable tag and consider a separate repository mirror. Data/Workers/media require distinct backups.
+4. Prefer a release branch from current production `main` containing **only tested and explicitly approved commits**; do not merge unfinished `develop` work into production.
+5. Require actual browser gameplay, family API, correct language direction, teacher/student return paths, mobile, TTS and missing-set behavior tests. Remove preview-only assets/menus/mock data before release. Explicit user approval before production promotion; verify the public route afterward.
+6. **Status on 2026-10-30:** Word-Snake has `develop` and protected `main`. Six other dedicated Word Game repositories and this homepage repo have older dated development branches but no uniform `develop` observed. Do not claim new branches or protections have been installed unless checked.
+
+**Evidence rule:** a source commit, a passing CI check, a Cloudflare deployment, a working preview and a user-confirmed public playthrough are different evidence levels. Recording a policy or opening a documentation PR changes no game, routing, API or production branch.
+
+---
+
+# PRESERVED LEGACY SOURCE DOCUMENT (historical baseline; conflicting instructions superseded above)
+
 # BORING TEACHER — SOURCE OF TRUTH
 
 **Project:** Educational Games / Language Games  
