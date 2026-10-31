@@ -31,7 +31,7 @@ button{font:700 14px "Courier New",monospace;cursor:pointer;border:3px solid var
 <div class="row"><button id="review" type="button">CHECK IMPORT</button><button id="clear" type="button">CLEAR</button></div>
 <div class="status" id="parseStatus" role="status"></div>
 </section></div>
-<div class="actions"><div class="actionbox"><button id="share" type="button">🔗 STUDENT LINK</button><div class="note">Create one real student link to a student-only launcher with the selected vocabulary.</div></div><div class="actionbox"><button id="save" type="button">📁 SAVE TO FOLDER</button><div class="note">Save locally on this device for prototype testing. Cloud sync requires login.</div></div></div>
+<div class="actions"><div class="actionbox"><button id="share" type="button">🔗 STUDENT LINK</button><div class="note">Create one real student link to a student-only launcher with the selected vocabulary.</div><div class="note" id="wordShareLink" role="status" style="overflow-wrap:anywhere"></div></div><div class="actionbox"><button id="save" type="button">📁 SAVE TO FOLDER</button><div class="note">Save locally on this device for prototype testing. Cloud sync requires login.</div></div></div>
 <h3 class="games-title">CHOOSE YOUR GAME</h3><div class="gamegrid" id="games"></div>
 <div class="status" id="mainStatus" role="status"></div>
 <div class="preview" id="preview"><strong>VOCABULARY PREVIEW</strong><p class="small">Press ▶ beside a word to hear it in its selected language. Voice availability depends on your browser and device.</p><p class="small" id="summary"></p><div id="previewRows"></div></div>
@@ -133,13 +133,9 @@ $("share").onclick=async()=>{const set=currentSet();if(!set)return;if(set.pairs.
   const data=await requestSharedSet("/sets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:set.title,language:set.targetLanguage,promptLanguage:set.promptLanguage,pairs:set.pairs})});
   const id=data?.id??data?.setId??data?.set?.id;if(typeof id!=="string"||!id.trim()||id.length>512)throw Error("Sharing service did not return a valid ID");
   const url=new URL(location.href);url.search="";url.hash="set="+encodeURIComponent(id);
-  showModal("STUDENT LINK · READY",body=>{
-   body.append(el("p","Share this link with students. It opens a student-only launcher using this saved vocabulary set."));
-   const link=el("a",url.toString());link.href=url.toString();link.target="_blank";link.rel="noopener";link.style.overflowWrap="anywhere";body.append(link);
-   body.append(btn("COPY STUDENT LINK",async()=>{try{await navigator.clipboard.writeText(url.toString());$("mainStatus").textContent="Student link copied.";}catch{$("mainStatus").textContent="Clipboard unavailable. Select the link above to copy.";}}));
-   body.append(el("h3","STUDENT GAME CHOICES"));studentGameGrid(body,id);
-   body.append(el("p","All eight games now use the shared vocabulary and automatic launch."));
-  });
+   const area=$("wordShareLink");area.replaceChildren();
+   const link=el("a",url.toString());link.href=url.toString();link.target="_blank";link.rel="noopener noreferrer";link.style.color="#a7fff1";link.style.overflowWrap="anywhere";area.append(link);
+   try{await navigator.clipboard.writeText(url.toString());button.textContent="✓ LINK COPIED";$("mainStatus").textContent="Student link created and copied.";}catch{button.textContent="🔗 STUDENT LINK";$("mainStatus").textContent="Student link created. Automatic copy unavailable; select the link below the button.";}
  }catch(e){$("mainStatus").textContent="Student sharing failed: "+(e.name==="AbortError"?"request timed out":e.message);$("mainStatus").className="status bad";}
  finally{button.disabled=false;button.textContent="🔗 STUDENT LINK";}
 };
