@@ -1,6 +1,19 @@
 # Staging storage and deployment audit — 2026-11-04
 
-Status: STORAGE CONFIGURATION VERIFIED; DEPLOYMENT BLOCKED. No new live integrated preview is claimed.
+Status: STAGING DEPLOYED; LIVE AUTOMATED JOURNEY PASSED; PHYSICAL-DEVICE ACCEPTANCE PENDING.
+
+## Current verified result — 2026-11-04
+
+Tested central launcher: https://eb74f219.bt-vocabulary-platform-staging.pages.dev/ at bfd756c895f0053753546eb6682726a9a4af8a73.
+Pinned engine: https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game.html at af58cb3080a2e70737db59777e646cbef88d4eaa; artifact 5433403055ef05621455c7d608971078a36308fb.
+
+Live browser verification passed: real staging API publication, fresh guest links, Danish-to-Spanish direction, desktop 1280×900 and emulated phone 390×844 play/pause/restart/same-set return, and immutable original snapshot after republication. Browser requests were limited to the central staging origin, pinned engine origin and staging API. Actual shell and engine CSP headers were checked, as were 404 responses for excluded test/doc paths.
+
+Synthetic records V6PPXU and C4PBFW were found in staging by read-only SQL and absent from production using their exact IDs/titles. Both verification queries reported rows_written=0 and changed_db=false. Workflow: https://github.com/mcproductionsdk-beep/Educational-Games/actions/runs/41837030837 . Machine-readable evidence is platform/staging/ACCEPTANCE_2026-11-04.json.
+
+The dedicated central Pages project has only NODE_VERSION=22, no database/service bindings, no credentials and no custom domains. It deploys only the migration feature branch to a clean dist-staging output. Production main branches and public routing remain unchanged. Physical touch, audible pronunciation/effects and performance acceptance remain pending.
+
+The access failure below is historical; reauthentication later restored Pages write access. The earlier 14/462 row counts predate the two authorized synthetic staging publications.
 
 ## Verified account resources
 
@@ -40,13 +53,13 @@ Required engine Pages build settings:
 
 Local build succeeded with artifact ID 5433403055ef05621455c7d608971078a36308fb. This is an artifact ID, not a source commit or deployment proof.
 
-## Blocking evidence
+## Historical blocking evidence (resolved)
 
 Cloudflare rejected PATCH of the engine project's build settings after its reauthentication prompt: UNAUTHORIZED, missing permission/scope for the write action. No Pages configuration update succeeded. Direct HTTP checks of the staging Worker/Pages origin from this execution environment returned HTTP 403; this is not proof that the deployed public service itself fails for an ordinary browser.
 
 No synthetic public-API POST, new shared set, D1 insert, Worker update, new Pages project or final deployment was performed. Do not use an admin SQL insert to substitute for testing the real staging API journey.
 
-## Remaining concrete actions
+## Original action list (deployment and synthetic checks now completed; device acceptance remains)
 
 1. Restore Cloudflare Pages project-write access or explicitly approve a signed-in browser fallback for those dashboard operations.
 2. Apply clean output settings and verify the resulting engine deployment, commit, version metadata, response headers and output exclusions.
