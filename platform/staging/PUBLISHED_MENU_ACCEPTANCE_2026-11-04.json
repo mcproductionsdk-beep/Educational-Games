@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-04",
+  "source": "221c8a857d01b5a16e402691f8d2a7449c3b9e50",
+  "url": "https://37f05767.bt-vocabulary-platform-staging.pages.dev/",
+  "referenceSource": "481b84ab39f076f0b13192c8c9a26478e92ffb5c/index.html",
+  "engineUnchanged": {
+    "source": "431dd74e249711b72a8cdb1448f9483014bd774b",
+    "build": "c633cb915e402af01d9d36e4c3f280b58e8b4e0f"
+  },
+  "contracts": {
+    "result": "passed",
+    "count": 23
+  },
+  "live": {
+    "workflow": "https://github.com/mcproductionsdk-beep/Educational-Games/actions/runs/41887694331",
+    "attempt": 2,
+    "result": "passed",
+    "checks": [
+      "four family tabs and eight game cards",
+      "only Snake enabled",
+      "browser-local save",
+      "create and re-share immutable snapshots",
+      "student entry with catalog unavailable",
+      "play/pause/restart/same-set return at five viewports",
+      "custom editor available with catalog unavailable",
+      "no production requests"
+    ]
+  },
+  "pending": [
+    "physical device and audible acceptance",
+    "full universal-family migration",
+    "engine fallback and release packaging gates",
+    "explicit clipboard-denial UI regression",
+    "source bytes on public website unavailable to this executor (403)"
+  ],
+  "productionApproved": false
+}
