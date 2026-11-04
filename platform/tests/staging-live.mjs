@@ -4,7 +4,8 @@ import {readFile,writeFile} from 'node:fs/promises';
 const target=JSON.parse(await readFile('platform/staging/verification-target.json','utf8'));
 const base=new URL(target.url);assert.equal(base.protocol,'https:');assert.ok(base.hostname==='bt-vocabulary-platform-staging.pages.dev'||base.hostname.endsWith('.bt-vocabulary-platform-staging.pages.dev'));
 const API='https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev';
-const engine=new URL('https://7bd7d241.bt-vocabulary-snake-preview.pages.dev');
+const lock=JSON.parse(await readFile('platform/staging/engine-lock.json','utf8'));
+const engine=new URL(lock.url);
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
 const evidence={date:new Date().toISOString(),url:base.origin,records:[],requests:[],errors:[],viewports:[]};
 function observe(page){
@@ -16,7 +17,7 @@ try{
  const response=await page.goto(base.href);assert.equal(response.status(),200);const csp=response.headers()['content-security-policy'];assert.ok(csp?.includes('connect-src'));assert.ok(csp.includes(API));assert.equal(csp.includes('https://boringteacher.com'),false);
  evidence.headers={shellCsp:csp};
  const version=await(await context.request.get(base.origin+'/version.json')).json();assert.equal(version.environment,'staging');assert.equal(version.sourceCommit,target.sourceCommit);evidence.version=version;
- const engineResponse=await context.request.get(engine.origin+'/version.json');assert.equal(engineResponse.status(),200);evidence.engine=await engineResponse.json();assert.equal(evidence.engine.buildId,'5433403055ef05621455c7d608971078a36308fb');
+ const engineResponse=await context.request.get(engine.origin+'/version.json');assert.equal(engineResponse.status(),200);evidence.engine=await engineResponse.json();assert.equal(evidence.engine.buildId,lock.buildId);
  const engineHeaders=await context.request.get(engine.origin+'/snake-game.html');evidence.headers.engineCsp=engineHeaders.headers()['content-security-policy'];assert.ok(evidence.headers.engineCsp?.includes("connect-src 'none'"));
  for(const path of ['/platform/tests/runtime.test.mjs','/README.md','/.github/workflows/central-runtime-contracts.yml']){const r=await context.request.get(base.origin+path);assert.equal(r.status(),404,'Excluded artifact exposed: '+path);}
  await page.locator('#category').selectOption('Animals');await page.locator('#prompt-language').selectOption('da-DK');
@@ -40,7 +41,10 @@ try{
   await student.getByRole('button',{name:'PLAY VOCABULARY SNAKE',exact:true}).click();
   await student.waitForFunction(()=>document.querySelector('.bt-game-shell')?.dataset.state==='running');
   const frame=student.frames().find(f=>f.url().startsWith(engine.origin));assert.ok(frame);
-  assert.equal(await frame.locator('#game>.buttons').isVisible(),false);
+  assert.equal(await frame.locator('#game>.buttons,.logo,#mainMenu,#overMenu').count(),0);
+  const layout=await student.evaluate(()=>({height:document.documentElement.scrollHeight,width:document.documentElement.scrollWidth,titles:[...document.querySelectorAll('h1')].filter(n=>n.getClientRects().length).length}));
+  assert.ok(layout.height<=viewport.height&&layout.width<=viewport.width,JSON.stringify(layout));assert.equal(layout.titles,1);
+  const bounds=await frame.locator('#wrap').boundingBox();assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=viewport.width&&bounds.y+bounds.height<=viewport.height,JSON.stringify(bounds));
   await student.locator('[data-action="pause"]').click();await student.waitForFunction(()=>document.querySelector('[data-action="pause"]').textContent==='RESUME');
   await student.locator('[data-action="restart"]').click();await student.waitForFunction(()=>document.querySelector('.bt-game-shell').dataset.state==='running');
   if(viewport.width<=760){assert.equal(await frame.locator('#touchUp').isVisible(),true);}
