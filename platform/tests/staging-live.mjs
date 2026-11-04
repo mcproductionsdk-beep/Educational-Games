@@ -15,7 +15,7 @@ try{
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();observe(page);
  const response=await page.goto(base.href);assert.equal(response.status(),200);const csp=response.headers()['content-security-policy'];assert.ok(csp?.includes('connect-src'));assert.ok(csp.includes(API));assert.equal(csp.includes('https://boringteacher.com'),false);
  evidence.headers={shellCsp:csp};
- const version=await(await context.request.get(base.origin+'/version.json')).json();assert.equal(version.environment,'staging');evidence.version=version;
+ const version=await(await context.request.get(base.origin+'/version.json')).json();assert.equal(version.environment,'staging');assert.equal(version.sourceCommit,target.sourceCommit);evidence.version=version;
  const engineResponse=await context.request.get(engine.origin+'/version.json');assert.equal(engineResponse.status(),200);evidence.engine=await engineResponse.json();assert.equal(evidence.engine.buildId,'5433403055ef05621455c7d608971078a36308fb');
  const engineHeaders=await context.request.get(engine.origin+'/snake-game.html');evidence.headers.engineCsp=engineHeaders.headers()['content-security-policy'];assert.ok(evidence.headers.engineCsp?.includes("connect-src 'none'"));
  for(const path of ['/platform/tests/runtime.test.mjs','/README.md','/.github/workflows/central-runtime-contracts.yml']){const r=await context.request.get(base.origin+path);assert.equal(r.status(),404,'Excluded artifact exposed: '+path);}
