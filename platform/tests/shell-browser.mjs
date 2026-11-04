@@ -11,7 +11,7 @@ function serverFor(base,isEngine=false){return createServer(async(req,res)=>{
  try{
   let path=new URL(req.url,'http://test.invalid').pathname;
   if(!isEngine&&path==='/harness.html'){
-   res.setHeader('Content-Type','text/html');res.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/platform/shell.css"><main id="root"></main><button id="voice-test">TEST VOICE</button><script type="module">import {mountGameplayShell} from "/platform/shell.mjs";window.mountShell=options=>{window.shell=mountGameplayShell({root:document.getElementById("root"),...options,navigate:url=>window.returned=url});document.getElementById("voice-test").onclick=()=>shell.testVoice();return shell.ready;};</script>');return;
+   res.setHeader('Content-Type','text/html');res.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/platform/shell.css"><main id="root" style="height:calc(100dvh - 60px)"></main><button id="voice-test">TEST VOICE</button><script type="module">import {mountGameplayShell} from "/platform/shell.mjs";window.mountShell=options=>{window.shell=mountGameplayShell({root:document.getElementById("root"),...options,navigate:url=>window.returned=url});document.getElementById("voice-test").onclick=()=>shell.testVoice();return shell.ready;};</script>');return;
   }
   if(isEngine){if(!path.startsWith('/'+spec.commit+'/'))throw Error('Unpinned engine path');path=path.slice(spec.commit.length+1);}
   const target=resolve(base,'.'+path);if(!target.startsWith(base+sep))throw Error('Path escape');
