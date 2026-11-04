@@ -10,7 +10,7 @@ test('base language fallback and empty enumeration still request native speech',
  for(const voices of [[{lang:'da_NO'}],[]]){const f=fixture(voices),p=f.voice.speak('træ','da-DK'),u=f.calls.at(-1);assert.equal(u.lang,'da-DK');if(voices.length)assert.equal(u.voice.lang,'da_NO');else assert.equal(u.voice,undefined);u.onend();await p;}
 });
 test('mute/navigation cancellation settles previous request and ignores late callbacks',async()=>{
- const f=fixture(),p=f.voice.speak('Hund','de-DE'),u=f.calls.at(-1);f.voice.cancel();u.onend();assert.equal((await p).status,'cancelled');assert.equal(f.statuses.includes('ended'),false);
+ const f=fixture(),p=f.voice.speak('Hund','de-DE'),u=f.calls.at(-1);f.voice.cancel();u.onend();assert.equal((await p).status,'cancelled');assert.equal(f.statuses.includes('ended'),false);assert.equal(f.statuses.at(-1),'cancelled');
 });
 test('speech errors and unavailable browser remain honest',async()=>{
  const f=fixture(),p=f.voice.speak('gato','es-ES');f.calls.at(-1).onerror({error:'not-allowed'});assert.equal((await p).status,'error');
