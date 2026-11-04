@@ -11,6 +11,6 @@ test('central staging output excludes engine copies, tests and production endpoi
   if(path==='platform/config.mjs')continue; // This validator contains production denylist strings.
   const text=readFileSync(resolve(out,path),'utf8');assert.doesNotMatch(text,/https:\/\/boringteacher\.com|https:\/\/boringteacher-vocabulary-api\.mcproductionsdk/);
  }
- const headers=readFileSync(resolve(out,'_headers'),'utf8');assert.match(headers,/connect-src 'self' https:\/\/boringteacher-vocabulary-api-staging/);assert.match(headers,/frame-src https:\/\/0946e2c6/);
- const version=JSON.parse(readFileSync(resolve(out,'version.json'),'utf8'));assert.equal(version.environment,'staging');assert.equal(version.engine.buildId,'47ff0bd62d451b3d6583f7e2655d00a60489d64e');
+ const headers=readFileSync(resolve(out,'_headers'),'utf8');assert.match(headers,/connect-src 'self' https:\/\/boringteacher-vocabulary-api-staging/);assert.match(headers,/frame-src https:\/\/87e18652/);
+ const version=JSON.parse(readFileSync(resolve(out,'version.json'),'utf8'));assert.equal(version.environment,'staging');assert.equal(version.engine.buildId,'c633cb915e402af01d9d36e4c3f280b58e8b4e0f');
 });
