@@ -5,7 +5,7 @@ import { connectEngine } from './session-client.mjs';
 
 // The application supplies its already selected set or share ID; no second editor/catalog lives here.
 export function mountGameplayShell({root,config,registry,policy,set,shareId,context='student',
-  soundOn=true,fetchImpl,voice: suppliedVoice,navigate=url=>location.assign(url),onCreatorReturn}={}) {
+  soundOn=true,onSoundChange=()=>{},fetchImpl,voice: suppliedVoice,navigate=url=>location.assign(url),onCreatorReturn}={}) {
   if(!root)throw new Error('MISSING_SHELL_ROOT');
   const doc=root.ownerDocument,hostWindow=doc.defaultView,events=new AbortController();
   let runtime,snapshot,client,frame,closed=false,initialized=false,busy=false;
@@ -27,7 +27,7 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
       error:'Pronunciation unavailable on this device',unavailable:'Pronunciation unavailable on this device'})[value]??'';
   }});
   function update(next){
-    state=next;buttons.pause.textContent=state.status==='paused'?'RESUME':'PAUSE';
+    if(next.soundOn!==state.soundOn)onSoundChange(next.soundOn);state=next;buttons.pause.textContent=state.status==='paused'?'RESUME':'PAUSE';
     buttons.sound.textContent=state.soundOn?'SOUND ON':'SOUND OFF';
     for(const button of Object.values(buttons))button.disabled=!initialized||busy||closed;
     buttons.pause.disabled ||= state.status==='ended';
@@ -37,6 +37,7 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
   function showError(error){
     if(closed)return;initialized=false;recovery.hidden=false;container.dataset.state='error';status.textContent='Unable to start game. '+error.message;
     for(const button of Object.values(buttons))button.disabled=true;
+    buttons.menu.disabled=false;
     client?.destroy();frame?.remove();voice.cancel();
   }
   async function action(run){
@@ -57,7 +58,7 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
   buttons.pause.addEventListener('pointercancel',()=>{pauseIntent=null;},{signal:events.signal});
   buttons.restart.addEventListener('click',()=>void action(()=>client.restart()),{signal:events.signal});
   buttons.sound.addEventListener('click',()=>void action(()=>client.setSound(!state.soundOn)),{signal:events.signal});
-  buttons.menu.addEventListener('click',()=>void action(returnToMenu),{signal:events.signal});
+  buttons.menu.addEventListener('click',()=>{if(initialized)void action(returnToMenu);else{destroy();if(context==='creator')onCreatorReturn?.(snapshot);else if(runtime)navigate(runtime.settings.launcherUrl+'#set='+encodeURIComponent(shareId));}} ,{signal:events.signal});
   update(state);status.textContent='Loading game…';
   const ready=(async()=>{
     try{
