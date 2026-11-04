@@ -6,7 +6,7 @@ export function createPronunciationService({synth = globalThis.speechSynthesis,
   utteranceFactory = text => new globalThis.SpeechSynthesisUtterance(text), onStatus = () => {}} = {}) {
   let current = null;
   function cancel() {
-    if (current) {current.resolve({status:'cancelled'});current = null;}
+    if (current) {current.resolve({status:'cancelled'});current = null;onStatus('cancelled');}
     synth?.cancel?.();
   }
   function speak(text, locale) {
