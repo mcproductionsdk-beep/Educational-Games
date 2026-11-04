@@ -65,6 +65,9 @@ try{
   assert.equal(await frame.evaluate(()=>BTSnake.state().status),'paused');
   await page.locator('[data-action="restart"]').click();await page.waitForFunction(()=>document.querySelector('.bt-game-shell').dataset.state==='running');
   assert.equal(await frame.locator('#pauseOverlay').isVisible(),false);
+  assert.equal(await page.evaluate(()=>document.activeElement?.tagName),'IFRAME');
+  await page.keyboard.press('p');await page.waitForFunction(()=>document.querySelector('.bt-game-shell').dataset.state==='paused');
+  await page.keyboard.press('p');await page.waitForFunction(()=>document.querySelector('.bt-game-shell').dataset.state==='running');
   await page.locator('#voice-test').click();await page.waitForFunction(()=>speechCalls.length===1);
   await page.locator('[data-action="pause"]').click();
   await frame.evaluate(()=>__testCorrect());await page.waitForFunction(()=>speechCalls.length===2);
