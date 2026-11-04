@@ -6,6 +6,7 @@ const files=['platform/config.mjs','platform/content.mjs','platform/runtime.mjs'
 await rm(out,{recursive:true,force:true});
 for(const name of files){const target=new URL(name,out);await mkdir(new URL('./',target),{recursive:true});await writeFile(target,await readFile(new URL(name,root)));}
 await writeFile(new URL('index.html',out),await readFile(new URL('platform/staging/index.html',root)));
+await writeFile(new URL('404.html',out),'<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title><h1>Staging page not found</h1></html>');
 await writeFile(new URL('catalog.json',out),await readFile(new URL('libraries/vocabulary/v2.json',root)));
 await writeFile(new URL('version.json',out),JSON.stringify({environment:'staging',sourceCommit:process.env.CF_PAGES_COMMIT_SHA||process.env.GITHUB_SHA||'local-unreleased',engine,configuration:'staging-v1',registry:'snake-v1'},null,2)+'\n');
 await writeFile(new URL('_headers',out),`/*
