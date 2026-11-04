@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
+import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 const draft={title:'Test',promptLanguage:'da-DK',language:'es-ES',text:Array(5).fill('træ\tárbol').join('\n')};
 test('editor normalizes explicit publication whitespace without reversing columns',()=>{
  const set=parseVocabularyDraft({...draft,title:' Test ',text:Array(5).fill(' træ \t árbol ').join('\n')});assert.equal(set.title,'Test');assert.deepEqual(set.pairs[0],['træ','árbol']);assert.equal(set.promptLanguage,'da-DK');
@@ -12,4 +12,10 @@ test('new categories are derived centrally and English catalog key maps explicit
  const catalog={schemaVersion:2,concepts:[{category:'Animals',translations:{en:'cat','es-ES':'gato'}}]};assert.deepEqual(catalogCategories(catalog),['Animals']);assert.deepEqual(categoryPairs(catalog,'Animals','en-US','es-ES'),[['cat','gato']]);
  catalog.concepts.push({category:'New topic',translations:{en:'tree','es-ES':'árbol'}});assert.deepEqual(catalogCategories(catalog),['Animals','New topic']);
  assert.throws(()=>categoryPairs(catalog,'Animals','en-US','de-DE'));
+});
+
+test('published-menu paste formats preserve accented content and direction',()=>{
+ const text=['træ\tárbol','hund | perro','fugl — pájaro','fisk;pez','kat → gato'].join('\n');
+ const parsed=inspectVocabularyDraft(text);assert.deepEqual(parsed.errors,[]);assert.equal(parsed.pairs.length,5);assert.deepEqual(parsed.pairs[0],['træ','árbol']);assert.equal(parseVocabularyDraft({...draft,text}).pairs[4][1],'gato');
+ assert.deepEqual(inspectVocabularyDraft(text+'\nbroken row').errors,[6]);
 });
