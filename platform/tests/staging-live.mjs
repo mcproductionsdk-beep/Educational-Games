@@ -34,7 +34,7 @@ try{
  const second=await page.locator('#shared-link a').getAttribute('href'),secondId=new URL(second).hash.slice(5);assert.notEqual(secondId,id);
  const retained=await(await context.request.get(API+'/sets/'+id)).json();assert.equal(retained.set.title,title);assert.deepEqual(retained.set.pairs,saved.set.pairs);
  evidence.records.push({id:secondId,title:title+' edited'});
- for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
+ for(const viewport of [{width:1280,height:900},{width:1920,height:1080},{width:390,height:844},{width:360,height:640},{width:844,height:390}]){
   const studentContext=await browser.newContext({viewport}),student=await studentContext.newPage();observe(student);
   await student.goto(first);await student.getByRole('button',{name:'PLAY VOCABULARY SNAKE',exact:true}).waitFor();
   assert.equal(await student.locator('textarea').count(),0);assert.equal(await student.locator('#set-title').count(),0);
