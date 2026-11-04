@@ -1,0 +1,13 @@
+/* Shared shell only; engine artwork and directional controls remain isolated in the frame. */
+.bt-game-shell{box-sizing:border-box;max-width:1120px;margin:0 auto;padding:8px;color:#fff;background:#203a67;font-family:"Courier New",monospace}
+.bt-game-shell h1{text-align:center;margin:4px 0 8px;font-size:clamp(22px,4vw,36px);color:#78df62;text-shadow:3px 3px #0c1938}
+.bt-game-actions{display:grid;grid-template-columns:repeat(4,minmax(0,100px));justify-content:center;gap:5px}
+.bt-game-actions button{min-width:0;min-height:44px;padding:5px 2px;border:3px solid #101a43;background:#5cc7d8;color:#101a43;font:900 clamp(9px,2.2vw,13px) "Courier New",monospace;cursor:pointer}
+.bt-game-actions button[data-action="pause"]{background:#f2d64b}
+.bt-game-actions button[data-action="menu"]{background:#ef6689}
+.bt-game-actions button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.bt-game-actions button:active{transform:translateY(1px)}
+.bt-game-actions button:disabled{opacity:.65;cursor:default}
+.bt-game-status,.bt-speech-status{text-align:center;margin:4px 0;min-height:0;font-size:12px}
+.bt-game-status:empty,.bt-speech-status:empty{display:none}
+.bt-engine-frame{display:block;border:0;width:100%;height:calc(100dvh - 125px);min-height:520px;max-height:950px}
