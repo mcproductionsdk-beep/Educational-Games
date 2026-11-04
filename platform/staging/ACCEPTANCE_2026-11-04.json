@@ -1,0 +1,177 @@
+{
+  "date": "2026-11-04T13:19:36.714Z",
+  "url": "https://eb74f219.bt-vocabulary-platform-staging.pages.dev",
+  "records": [
+    {
+      "id": "V6PPXU",
+      "title": "STAGING Snake 1793798380657",
+      "promptLanguage": "da-DK",
+      "language": "es-ES",
+      "pairs": [
+        [
+          "kat",
+          "gato"
+        ],
+        [
+          "hund",
+          "perro"
+        ],
+        [
+          "fugl",
+          "pájaro"
+        ],
+        [
+          "fisk",
+          "pez"
+        ],
+        [
+          "hest",
+          "caballo"
+        ],
+        [
+          "ko",
+          "vaca"
+        ],
+        [
+          "gris",
+          "cerdo"
+        ],
+        [
+          "får",
+          "oveja"
+        ],
+        [
+          "mus",
+          "ratón"
+        ],
+        [
+          "kanin",
+          "conejo"
+        ],
+        [
+          "and",
+          "pato"
+        ],
+        [
+          "kylling",
+          "pollo"
+        ]
+      ]
+    },
+    {
+      "id": "C4PBFW",
+      "title": "STAGING Snake 1793798380657 edited"
+    }
+  ],
+  "requests": [
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/content.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/editor.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/runtime.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/voice.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/engine-lock.json",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/config.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/session-client.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/catalog.json",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/content.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/editor.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/runtime.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/voice.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/engine-lock.json",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/config.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/session-client.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/catalog.json",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets/V6PPXU",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game.html",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/snake.css",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/snake.js",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/staging-bootstrap.mjs",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/session.mjs",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/build.mjs",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets/V6PPXU",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.css",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/app.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/content.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/editor.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/runtime.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/shell.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/voice.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/staging/engine-lock.json",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/session-client.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/platform/config.mjs",
+    "https://eb74f219.bt-vocabulary-platform-staging.pages.dev/catalog.json",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets/V6PPXU",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game.html",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/snake.css",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/snake.js",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/staging-bootstrap.mjs",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/session.mjs",
+    "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/engine/build.mjs",
+    "https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev/sets/V6PPXU"
+  ],
+  "errors": [],
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 900,
+      "result": "fresh student link, play, pause, restart and same-set return passed"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "result": "fresh student link, play, pause, restart and same-set return passed"
+    }
+  ],
+  "headers": {
+    "shellCsp": "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev; frame-src https://7bd7d241.bt-vocabulary-snake-preview.pages.dev; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    "engineCsp": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors https://bt-vocabulary-platform-staging.pages.dev https://*.bt-vocabulary-platform-staging.pages.dev"
+  },
+  "version": {
+    "environment": "staging",
+    "sourceCommit": "bfd756c895f0053753546eb6682726a9a4af8a73",
+    "engine": {
+      "url": "https://7bd7d241.bt-vocabulary-snake-preview.pages.dev/snake-game.html",
+      "buildId": "5433403055ef05621455c7d608971078a36308fb",
+      "sourceCommit": "af58cb3080a2e70737db59777e646cbef88d4eaa",
+      "environment": "staging"
+    },
+    "configuration": "staging-v1",
+    "registry": "snake-v1"
+  },
+  "engine": {
+    "environment": "staging",
+    "buildId": "5433403055ef05621455c7d608971078a36308fb",
+    "sourceCommit": "af58cb3080a2e70737db59777e646cbef88d4eaa"
+  },
+  "workflow": "https://github.com/mcproductionsdk-beep/Educational-Games/actions/runs/41837030837",
+  "verificationCodeCommit": "be4d3d94e603a4867d7ffa3a587653b816548122",
+  "storage": {
+    "stagingDatabase": "419a5c80-c521-458f-af48-ff9aed3a8c05",
+    "productionDatabase": "2ff8a48c-e327-4d19-bf1d-ce184e931b09",
+    "syntheticRecordsPresentInStaging": true,
+    "syntheticRecordsAbsentFromProduction": true,
+    "verificationQueriesReadOnly": true
+  },
+  "limitations": [
+    "Viewport emulation is not physical-device acceptance.",
+    "Audible speech/effects and full device matrix are pending.",
+    "Client no-production-request evidence does not establish global production API authorization.",
+    "Catalog remains a development translation-review candidate.",
+    "No production merge, route, Worker or D1 schema/binding change."
+  ]
+}
