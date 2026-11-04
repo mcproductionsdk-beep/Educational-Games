@@ -1,0 +1,56 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright-core';
+import {readFile,writeFile} from 'node:fs/promises';
+const target=JSON.parse(await readFile('platform/staging/verification-target.json','utf8'));
+const base=new URL(target.url);assert.equal(base.protocol,'https:');assert.ok(base.hostname==='bt-vocabulary-platform-staging.pages.dev'||base.hostname.endsWith('.bt-vocabulary-platform-staging.pages.dev'));
+const API='https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev';
+const engine=new URL('https://7bd7d241.bt-vocabulary-snake-preview.pages.dev');
+const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
+const evidence={date:new Date().toISOString(),url:base.origin,records:[],requests:[],errors:[],viewports:[]};
+function observe(page){
+ page.on('request',r=>{const url=new URL(r.url());evidence.requests.push(url.href);assert.ok([base.origin,engine.origin,API].includes(url.origin),'Unexpected request: '+url.href);});
+ page.on('pageerror',error=>evidence.errors.push(error.message));
+}
+try{
+ const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();observe(page);
+ const response=await page.goto(base.href);assert.equal(response.status(),200);const csp=response.headers()['content-security-policy'];assert.ok(csp?.includes('connect-src'));assert.ok(csp.includes(API));assert.equal(csp.includes('https://boringteacher.com'),false);
+ evidence.headers={shellCsp:csp};
+ const version=await(await context.request.get(base.origin+'/version.json')).json();assert.equal(version.environment,'staging');evidence.version=version;
+ const engineResponse=await context.request.get(engine.origin+'/version.json');assert.equal(engineResponse.status(),200);evidence.engine=await engineResponse.json();assert.equal(evidence.engine.buildId,'5433403055ef05621455c7d608971078a36308fb');
+ const engineHeaders=await context.request.get(engine.origin+'/snake-game.html');evidence.headers.engineCsp=engineHeaders.headers()['content-security-policy'];assert.ok(evidence.headers.engineCsp?.includes("connect-src 'none'"));
+ for(const path of ['/platform/tests/runtime.test.mjs','/README.md','/.github/workflows/central-runtime-contracts.yml']){const r=await context.request.get(base.origin+path);assert.equal(r.status(),404,'Excluded artifact exposed: '+path);}
+ await page.locator('#category').selectOption('Animals');await page.locator('#prompt-language').selectOption('da-DK');
+ const title='STAGING Snake '+Date.now();await page.locator('#set-title').fill(title);
+ const before=await page.locator('#pairs').inputValue();assert.ok(before.includes('\t'));
+ await page.getByRole('button',{name:'CREATE STAGING STUDENT LINK',exact:true}).click();
+ await page.waitForFunction(()=>!!document.querySelector('#shared-link a'));
+ const first=await page.locator('#shared-link a').getAttribute('href');const id=new URL(first).hash.slice(5);assert.match(id,/^[A-Z0-9]{6}$/);
+ const saved=await(await context.request.get(API+'/sets/'+id)).json();assert.equal(saved.set.promptLanguage,'da-DK');assert.equal(saved.set.language,'es-ES');assert.equal(saved.set.title,title);
+ evidence.records.push({id,title,promptLanguage:saved.set.promptLanguage,language:saved.set.language,pairs:saved.set.pairs});
+ // A later publication creates a new snapshot without mutating the first one.
+ await page.locator('#set-title').fill(title+' edited');await page.locator('#shared-link').evaluate(el=>el.replaceChildren());
+ await page.getByRole('button',{name:'CREATE STAGING STUDENT LINK',exact:true}).click();await page.waitForFunction(()=>!!document.querySelector('#shared-link a'));
+ const second=await page.locator('#shared-link a').getAttribute('href'),secondId=new URL(second).hash.slice(5);assert.notEqual(secondId,id);
+ const retained=await(await context.request.get(API+'/sets/'+id)).json();assert.equal(retained.set.title,title);assert.deepEqual(retained.set.pairs,saved.set.pairs);
+ evidence.records.push({id:secondId,title:title+' edited'});
+ for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
+  const studentContext=await browser.newContext({viewport}),student=await studentContext.newPage();observe(student);
+  await student.goto(first);await student.getByRole('button',{name:'PLAY VOCABULARY SNAKE',exact:true}).waitFor();
+  assert.equal(await student.locator('textarea').count(),0);assert.equal(await student.locator('#set-title').count(),0);
+  await student.getByRole('button',{name:'PLAY VOCABULARY SNAKE',exact:true}).click();
+  await student.waitForFunction(()=>document.querySelector('.bt-game-shell')?.dataset.state==='running');
+  const frame=student.frames().find(f=>f.url().startsWith(engine.origin));assert.ok(frame);
+  assert.equal(await frame.locator('#game>.buttons').isVisible(),false);
+  await student.locator('[data-action="pause"]').click();await student.waitForFunction(()=>document.querySelector('[data-action="pause"]').textContent==='RESUME');
+  await student.locator('[data-action="restart"]').click();await student.waitForFunction(()=>document.querySelector('.bt-game-shell').dataset.state==='running');
+  if(viewport.width<=760){assert.equal(await frame.locator('#touchUp').isVisible(),true);}
+  await student.locator('[data-action="menu"]').click();await student.getByRole('button',{name:'PLAY VOCABULARY SNAKE',exact:true}).waitFor();
+  assert.equal(new URL(student.url()).hash,'#set='+id);assert.equal(student.frames().length,1);
+  evidence.viewports.push({...viewport,result:'fresh student link, play, pause, restart and same-set return passed'});
+  await studentContext.close();
+ }
+ assert.deepEqual(evidence.errors,[]);console.log('STAGING_EVIDENCE '+JSON.stringify(evidence));
+ await writeFile('/tmp/staging-evidence.json',JSON.stringify(evidence,null,2));
+ console.log('PASS real staging publication, frozen snapshots, fresh desktop/phone-sized guest journey; no production requests');
+ await context.close();
+}finally{await browser.close();}
