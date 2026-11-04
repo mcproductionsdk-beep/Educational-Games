@@ -33,7 +33,10 @@ export function createVocabularyRuntime({config, registry, policy, fetchImpl = g
       return validateVocabulary(result?.set ?? result, {legacy: true});
     },
     async publishSet(set) {
-      const payload = validateVocabulary(set);
+      const validated = validateVocabulary(set);
+      // The inspected public API trims fields; normalize explicitly before publication.
+      const payload = validateVocabulary({...validated,title:validated.title.trim(),
+        pairs:validated.pairs.map(pair=>pair.map(value=>value.trim()))});
       const base = sharingBase();
       // Existing API shape is preserved; the internal family/schema envelope stays local.
       const {title, promptLanguage, language, pairs} = payload;
