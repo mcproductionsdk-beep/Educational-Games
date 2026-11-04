@@ -15,3 +15,17 @@ Consumer supplies trusted policy separately from config; never build either from
 Content/string limits remain pending verified API limits. The prototype is not a production-ready general network sandbox or a private library. Existing production public endpoints may accept manual external requests; CORS and browser configuration do not establish backend authorization.
 
 Source base: Educational-Games 481b84ab39f076f0b13192c8c9a26478e92ffb5c. Detailed migration design lives in Vocabulary-Snake draft PR #1, docs/SNAKE_INTEGRATION_DESIGN_V0_1.md.
+
+## Central gameplay-shell increment
+
+shell.mjs mounts the shared four-action bar around the approved engine frame. It validates configuration and content before assigning the frame URL, uses correlated session commands, returns a guest to the same set ID, and requires a creator-return callback for an existing creator workspace. Failed initialization shows an error and Retry (reload); there is no fabricated vocabulary fallback.
+
+session-client.mjs validates the exact engine window/origin, protocol, build, session, acknowledgement and state. It times out and removes failed frames, ignores stale replies, cancels pronunciation on lifecycle changes, and distinguishes focusing the child frame from leaving the application. The trusted registry/build policy is still supplied by the deployment bootstrap, not URL data.
+
+voice.mjs is the single pronunciation implementation used by TEST VOICE and answer events. It normalizes voice locale separators/case, chooses exact then base-language voice, requests browser speech even with an empty voice list, and reports requested/started/ended/error without claiming audible output. Gameplay requests use the bound snapshot locale and must match an answer in that snapshot.
+
+The opt-in shell mode hides Snake's common title/actions while retaining its canvas, HUD, prompt and directional controls. Legacy baseline mode remains unchanged. The central application must load shell.css once; no common UI/CSS or speech implementation is copied into Snake.
+
+Browser test: prepare-engine.py downloads an immutable engine test dependency with SHA-256 checks. shell-browser.mjs serves it and the actual central shell on separate loopback origins, intercepts sharing responses, fixes rendering time for deterministic injected answer steps, and instruments browser speech. Test hooks are injected into served responses only. Tests are not performance measurements, physical-device evidence or real service/storage integration.
+
+The full teacher editor/student game picker/catalog refresh workflow and deployed sharing service remain outside this increment. Browser preferences, production release packaging/CSP and physical-device fullscreen/audio acceptance are still pending. Do not activate a public route from these tests.
