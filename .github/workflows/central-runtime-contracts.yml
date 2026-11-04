@@ -1,0 +1,17 @@
+name: Central runtime contracts
+on:
+  push:
+    branches: ['feature/central-runtime-config-20261104']
+  pull_request:
+    paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
+permissions:
+  contents: read
+jobs:
+  runtime-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test platform/tests/*.test.mjs
