@@ -42,7 +42,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>{
    // Fixed rendering clock makes the injected correct-answer steps deterministic.
-   window.requestAnimationFrame=()=>1;
+   if(window.parent!==window)window.requestAnimationFrame=()=>1;
    window.speechCalls=[];window.speechCancels=0;
    window.SpeechSynthesisUtterance=class{constructor(text){this.text=text}};
    Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'ES_es'}],cancel(){speechCancels++},speak(u){speechCalls.push({text:u.text,lang:u.lang,voice:u.voice?.lang});queueMicrotask(()=>{u.onstart?.();u.onend?.();});}}});
