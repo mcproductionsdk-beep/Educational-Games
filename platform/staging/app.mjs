@@ -21,13 +21,12 @@ function configuration(){
  const policy={environment:'staging',shellOrigin:location.origin,engineBuilds:{[engine.url]:engine.buildId},approved:{catalogUrls:[config.catalogUrl],launcherUrls:[config.launcherUrl],sharingBaseUrls:[API],engineUrls:[engine.url]}};
  return{config,registry,policy};
 }
-function showWorkspace(){game?.destroy();game=null;gameplay.replaceChildren();gameplay.hidden=true;workspace.hidden=false;voice.cancel();notice.textContent='';}
+function showWorkspace(){document.body.classList.remove('playing');game?.destroy();game=null;gameplay.replaceChildren();gameplay.hidden=true;workspace.hidden=false;voice.cancel();notice.textContent='';}
 function launch(set,id){
- showWorkspace();workspace.hidden=true;gameplay.hidden=false;
+ showWorkspace();document.body.classList.add('playing');window.scrollTo(0,0);workspace.hidden=true;gameplay.hidden=false;
  game=mountGameplayShell({root:gameplay,...configuration(),set,shareId:id,context:id?'student':'creator',voice,
   navigate:url=>{const next=new URL(url);if(next.origin!==location.origin)throw new Error('Invalid staging return.');if(location.hash===next.hash)void render();else location.assign(next.href);},
   onCreatorReturn:()=>{showWorkspace();void render();}});
- const tools=node('div');tools.className='actions';tools.append(button('TEST VOICE',()=>game?.testVoice()));gameplay.append(tools);
  void game.ready.then(result=>{if(!result.ok)notice.textContent='Unable to start the staging game: '+result.error;});
 }
 function selectField(parent,id,title,value){const l=node('label',title);l.htmlFor=id;const s=node('select');s.id=id;for(const locale of LOCALES){const o=node('option',label[locale]);o.value=locale;s.append(o);}s.value=value;parent.append(l,s);return s;}
