@@ -10,7 +10,7 @@ await writeFile(new URL('404.html',out),'<!doctype html><html lang="en"><meta ch
 await writeFile(new URL('catalog.json',out),await readFile(new URL('libraries/vocabulary/v2.json',root)));
 await writeFile(new URL('version.json',out),JSON.stringify({environment:'staging',sourceCommit:process.env.CF_PAGES_COMMIT_SHA||process.env.GITHUB_SHA||'local-unreleased',engine,configuration:'staging-v1',registry:'snake-v1'},null,2)+'\n');
 await writeFile(new URL('_headers',out),`/*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev; frame-src https://87e18652.bt-vocabulary-snake-preview.pages.dev https://76c57d70.bt-vocabulary-racer-preview.pages.dev; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev; frame-src https://87e18652.bt-vocabulary-snake-preview.pages.dev https://72dd2d78.bt-vocabulary-racer-preview.pages.dev; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Referrer-Policy: strict-origin
   X-Content-Type-Options: nosniff
   Cache-Control: no-store

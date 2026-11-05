@@ -18,10 +18,10 @@ async function loadCatalog(){if(catalog)return;const response=await fetch(runtim
 const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const button=(text,action)=>{const b=node('button',text);b.type='button';b.addEventListener('click',action);return b;};
 const voice=createPronunciationService({onStatus:state=>{notice.textContent=state==='error'||state==='unavailable'?'Pronunciation unavailable on this device.':state==='requested'?'Pronunciation requested.':state==='started'?'Speaking…':'';}});
-const racerOrigin='https://76c57d70.bt-vocabulary-racer-preview.pages.dev';
+const racerOrigin='https://72dd2d78.bt-vocabulary-racer-preview.pages.dev';
 function configuration(gameId='vocabulary-snake'){
  const variant=matchMedia('(pointer: coarse) and (max-width: 760px) and (orientation: portrait)').matches?'mobile':'desktop';
- const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant,buildId:'a48f7c5b79feaaf2094e1fc893012bf936e9a06f'}:engine;
+ const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant,buildId:'a4afaa1908445178c4b7559856161b8b05a14aa2'}:engine;
  if(!allowedHost||location.protocol!=='https:'||engine.environment!=='staging')throw new Error('Unapproved staging deployment.');
  const config={schemaVersion:1,environment:'staging',configRevision:'staging-v1',registryRevision:'snake-v1',shellOrigin:location.origin,catalogUrl:location.origin+'/catalog.json',launcherUrl:location.origin+'/',sharingBaseUrl:API,sharingTimeoutMs:12000};
  const registry={schemaVersion:1,revision:'snake-v1',engines:[{id:gameId,family:'vocabulary',protocol:'bt-vocabulary-engine/1',minPairs:5,url:selected.url,buildId:selected.buildId}]};
