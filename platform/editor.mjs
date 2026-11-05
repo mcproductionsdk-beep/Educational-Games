@@ -1,16 +1,36 @@
 import {validateVocabulary} from './content.mjs';
-// Delimiter precedence preserved from the published homepage.
+
+function splitVocabularyRow(raw){
+ const line=raw.includes('\t')?raw:raw.trim();
+ // An explicit tab boundary lets a teacher retain punctuation inside either phrase.
+ if(line.includes('\t')){
+  const columns=line.split('\t').map(value=>value.trim());
+  return columns.length===2&&columns.every(Boolean)?columns:null;
+ }
+ const separators=[];
+ // Match URL schemes and clock colons as content. Consume padding around punctuation
+ // so a spaced delimiter does not also count as a repeated-space delimiter.
+ for(const match of line.matchAll(/[a-z][a-z0-9+.-]*:\/\/[^ ]+|\b\d{1,2}:\d{2}(?::\d{2})?\b| *[;:→] *| +[|–—-] +| {2,}/gi)){
+  if(match[0].includes('://')||/^\d/.test(match[0]))continue;
+  separators.push(match);
+ }
+ if(separators.length!==1)return null;
+ const [separator]=separators;
+ const columns=[line.slice(0,separator.index).trim(),line.slice(separator.index+separator[0].length).trim()];
+ return columns.every(Boolean)?columns:null;
+}
+
 export function inspectVocabularyDraft(text){
  if(typeof text!=='string')throw new Error('Paste prompt and answer pairs.');
- const pairs=[],errors=[];
- for(const [index,line] of text.split(/\r?\n/).entries()){
-  if(!line.trim())continue;let pair;
-  for(const delimiter of [/\t/,/\s+\|\s+/,/\s+[–—-]\s+/,/\s*;\s*/,/\s*→\s*/]){
-   const parts=line.split(delimiter);if(parts.length===2&&parts.every(v=>v.trim())){pair=parts.map(v=>v.trim());break;}
-  }
-  if(pair)pairs.push(pair);else errors.push(index+1);
+ const rows=[],pairs=[],errors=[];
+ for(const [index,raw] of text.split(/\r?\n/).entries()){
+  if(!raw.trim())continue;
+  const pair=splitVocabularyRow(raw);
+  const number=index+1;
+  rows.push({number,raw,pair});
+  if(pair)pairs.push(pair);else errors.push(number);
  }
- return {pairs,errors};
+ return {rows,pairs,errors};
 }
 export function parseVocabularyDraft({title,promptLanguage,language,text}) {
  const {pairs,errors}=inspectVocabularyDraft(text);
