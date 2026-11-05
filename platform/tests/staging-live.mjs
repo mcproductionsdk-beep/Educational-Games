@@ -24,11 +24,31 @@ try{
  await page.getByRole('button',{name:'SAVE TO FOLDER',exact:true}).click();await page.getByRole('button',{name:'SAVE LOCALLY',exact:true}).click();assert.ok(await page.locator('dialog').textContent().then(t=>t.includes('Saved on this device.')));await page.getByRole('button',{name:'CLOSE',exact:true}).click();
  await page.locator('#category').selectOption('Animals');await page.locator('#prompt-language').selectOption('da-DK');
  const title='STAGING Snake '+Date.now();await page.locator('#set-title').fill(title);
- const before=await page.locator('#pairs').inputValue();assert.ok(before.includes('\t'));
+ const mixed=['ice cream  helado','red apple : manzana roja','ice-cream — helado artesanal','pear;pera','grapes | uvas'].join('\n');
+ const expected=[['ice cream','helado'],['red apple','manzana roja'],['ice-cream','helado artesanal'],['pear','pera'],['grapes','uvas']];
+ const editor=page.locator('#pairs');
+ const ambiguous=mixed+'\nfruit: pear;pera';
+ await editor.fill(ambiguous);
+ assert.equal(await page.getByText('Review this row: fruit: pear;pera',{exact:true}).count(),1);
+ await page.getByRole('button',{name:/SWAP LANGUAGES/}).click();
+ assert.equal(await editor.inputValue(),ambiguous);
+ await page.getByRole('button',{name:'STUDENT LINK',exact:true}).click();
+ assert.equal(await page.locator('#shared-link a').count(),0);
+ await page.locator('[data-game="vocabulary-snake"]').click();
+ assert.equal(await page.locator('iframe').count(),0);
+ await editor.fill(mixed);
+ const preview=()=>page.locator('.preview tr').evaluateAll(rows=>rows.slice(1).map(row=>Array.from(row.querySelectorAll('.word-cell span'),cell=>cell.textContent)));
+ assert.deepEqual(await preview(),expected);
+ await page.getByRole('button',{name:/SWAP LANGUAGES/}).click();
+ assert.equal(await page.locator('#prompt-language').inputValue(),'es-ES');
+ assert.equal(await page.locator('#target-language').inputValue(),'da-DK');
+ assert.deepEqual(await preview(),expected.map(([prompt,target])=>[target,prompt]));
+ await page.getByRole('button',{name:/SWAP LANGUAGES/}).click();
+ assert.deepEqual(await preview(),expected);
  await page.getByRole('button',{name:'STUDENT LINK',exact:true}).click();
  await page.waitForFunction(()=>!!document.querySelector('#shared-link a'));
  const first=await page.locator('#shared-link a').getAttribute('href');const id=new URL(first).hash.slice(5);assert.match(id,/^[A-Z0-9]{6}$/);
- const saved=await(await context.request.get(API+'/sets/'+id)).json();assert.equal(saved.set.promptLanguage,'da-DK');assert.equal(saved.set.language,'es-ES');assert.equal(saved.set.title,title);
+ const saved=await(await context.request.get(API+'/sets/'+id)).json();assert.equal(saved.set.promptLanguage,'da-DK');assert.equal(saved.set.language,'es-ES');assert.equal(saved.set.title,title);assert.deepEqual(saved.set.pairs,expected);
  evidence.records.push({id,title,promptLanguage:saved.set.promptLanguage,language:saved.set.language,pairs:saved.set.pairs});
  // A later publication creates a new snapshot without mutating the first one.
  await page.locator('#set-title').fill(title+' edited');await page.locator('#shared-link').evaluate(el=>el.replaceChildren());
@@ -40,11 +60,18 @@ try{
   const studentContext=await browser.newContext({viewport}),student=await studentContext.newPage();observe(student);
   // Student snapshots must not depend on the current category catalog.
   await student.route('**/catalog.json',route=>route.abort());
+  await student.addInitScript(shellOrigin=>{
+   addEventListener('message',event=>{
+    if(event.origin===shellOrigin&&event.source===parent&&event.data?.type==='INIT'){
+     window.receivedVocabulary=event.data.payload.vocabulary;
+    }
+   });
+  },base.origin);
   await student.goto(first);await student.locator('[data-game="vocabulary-snake"]').waitFor();
   assert.equal(await student.locator('textarea').count(),0);assert.equal(await student.locator('#set-title').count(),0);
   await student.locator('[data-game="vocabulary-snake"]').click();
   await student.waitForFunction(()=>document.querySelector('.bt-game-shell')?.dataset.state==='running');
-  const frame=student.frames().find(f=>f.url().startsWith(engine.origin));assert.ok(frame);
+  const frame=student.frames().find(f=>f.url().startsWith(engine.origin));assert.ok(frame);assert.deepEqual(await frame.evaluate(()=>window.receivedVocabulary?.pairs),expected);
   assert.equal(await frame.locator('#game>.buttons,.logo,#mainMenu,#overMenu').count(),0);
   const layout=await student.evaluate(()=>({height:document.documentElement.scrollHeight,width:document.documentElement.scrollWidth,titles:[...document.querySelectorAll('h1')].filter(n=>n.getClientRects().length).length}));
   assert.ok(layout.height<=viewport.height&&layout.width<=viewport.width,JSON.stringify(layout));assert.equal(layout.titles,1);
