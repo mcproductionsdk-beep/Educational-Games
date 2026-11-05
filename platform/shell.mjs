@@ -69,7 +69,7 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
       if(context==='creator'&&typeof onCreatorReturn!=='function')throw new Error('MISSING_CREATOR_RETURN');
       snapshot=set?validateVocabulary(set):await runtime.loadSet(shareId);
       if(closed)return{ok:false,error:'CANCELLED'};
-      frame=doc.createElement('iframe');frame.title='Vocabulary Snake playfield';frame.className='bt-engine-frame';
+      frame=doc.createElement('iframe');frame.title='Vocabulary game playfield';frame.className='bt-engine-frame';
       frame.setAttribute('allow','fullscreen');
       const entry=runtime.settings.engines[0];
       // Append a blank frame first so contentWindow exists before the message listener is installed.

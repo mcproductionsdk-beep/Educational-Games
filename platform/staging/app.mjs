@@ -12,23 +12,26 @@ const workspace=document.getElementById('workspace'),gameplay=document.getElemen
 const label={ 'en-US':'English','es-ES':'Spanish','de-DE':'German','da-DK':'Danish','fr-FR':'French','it-IT':'Italian' };
 let runtime,catalog,game,renderEpoch=0,draft=null,soundOn=true;
 const games=[['vocabulary-snake','🐍','Word Snake'],['vocabulary-racer','🏎️','Word Racer'],['vocabulary-jumper','🏃','Word Jumper'],['vocabulary-invaders','👾','Word Invaders'],['vocabulary-frog','🐸','Word Frog'],['vocabulary-match','🔗','Word Match'],['vocabulary-eater','🟡','Word Eater'],['vocabulary-warehouse','📦','Word Warehouse']];
-function gameGrid(parent,onPlay){const grid=node('div');grid.className='gamegrid';for(const [id,icon,name]of games){const b=button('',()=>onPlay(id));b.className='game';b.dataset.game=id;b.append(node('span',icon),node('small',name.toUpperCase()));if(id!=='vocabulary-snake'){b.disabled=true;b.title='Not yet migrated to isolated staging';}grid.append(b);}parent.append(grid);}
+function gameGrid(parent,onPlay){const grid=node('div');grid.className='gamegrid';for(const [id,icon,name]of games){const b=button('',()=>onPlay(id));b.className='game';b.dataset.game=id;b.append(node('span',icon),node('small',name.toUpperCase()));if(!['vocabulary-snake','vocabulary-racer'].includes(id)){b.disabled=true;b.title='Not yet migrated to isolated staging';}grid.append(b);}parent.append(grid);}
 async function loadCatalog(){if(catalog)return;const response=await fetch(runtime.settings.catalogUrl,{cache:'no-store',redirect:'error',credentials:'omit'});if(!response.ok)throw new Error('Vocabulary catalog unavailable.');const data=await response.json();catalogCategories(data);catalog=data;}
 
 const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const button=(text,action)=>{const b=node('button',text);b.type='button';b.addEventListener('click',action);return b;};
 const voice=createPronunciationService({onStatus:state=>{notice.textContent=state==='error'||state==='unavailable'?'Pronunciation unavailable on this device.':state==='requested'?'Pronunciation requested.':state==='started'?'Speaking…':'';}});
-function configuration(){
+const racerOrigin='https://2f15a06a.bt-vocabulary-racer-preview.pages.dev';
+function configuration(gameId='vocabulary-snake'){
+ const variant=matchMedia('(pointer: coarse) and (max-width: 760px) and (orientation: portrait)').matches?'mobile':'desktop';
+ const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant+'.html',buildId:'b2fd5379dc4e48a895d5f008662b1735aa09f8e1'}:engine;
  if(!allowedHost||location.protocol!=='https:'||engine.environment!=='staging')throw new Error('Unapproved staging deployment.');
  const config={schemaVersion:1,environment:'staging',configRevision:'staging-v1',registryRevision:'snake-v1',shellOrigin:location.origin,catalogUrl:location.origin+'/catalog.json',launcherUrl:location.origin+'/',sharingBaseUrl:API,sharingTimeoutMs:12000};
- const registry={schemaVersion:1,revision:'snake-v1',engines:[{id:'vocabulary-snake',family:'vocabulary',protocol:'bt-vocabulary-engine/1',minPairs:5,url:engine.url,buildId:engine.buildId}]};
- const policy={environment:'staging',shellOrigin:location.origin,engineBuilds:{[engine.url]:engine.buildId},approved:{catalogUrls:[config.catalogUrl],launcherUrls:[config.launcherUrl],sharingBaseUrls:[API],engineUrls:[engine.url]}};
+ const registry={schemaVersion:1,revision:'snake-v1',engines:[{id:gameId,family:'vocabulary',protocol:'bt-vocabulary-engine/1',minPairs:5,url:selected.url,buildId:selected.buildId}]};
+ const policy={environment:'staging',shellOrigin:location.origin,engineBuilds:{[selected.url]:selected.buildId},approved:{catalogUrls:[config.catalogUrl],launcherUrls:[config.launcherUrl],sharingBaseUrls:[API],engineUrls:[selected.url]}};
  return{config,registry,policy};
 }
 function showWorkspace(){document.body.classList.remove('playing');game?.destroy();game=null;gameplay.replaceChildren();gameplay.hidden=true;workspace.hidden=false;voice.cancel();notice.textContent='';}
-function launch(set,id){
+function launch(set,id,gameId){
  showWorkspace();document.body.classList.add('playing');window.scrollTo(0,0);workspace.hidden=true;gameplay.hidden=false;
- game=mountGameplayShell({root:gameplay,...configuration(),set,shareId:id,context:id?'student':'creator',voice,soundOn,onSoundChange:value=>{soundOn=value;},
+ game=mountGameplayShell({root:gameplay,...configuration(gameId),set,shareId:id,context:id?'student':'creator',voice,soundOn,onSoundChange:value=>{soundOn=value;},
   navigate:url=>{const next=new URL(url);if(next.origin!==location.origin)throw new Error('Invalid staging return.');if(location.hash===next.hash)void render();else location.assign(next.href);},
   onCreatorReturn:()=>{showWorkspace();void render();}});
  void game.ready.then(result=>{if(!result.ok)notice.textContent='Unable to start the staging game: '+result.error;});
@@ -42,7 +45,7 @@ async function render(){
   const id=hash.slice(5);notice.textContent='Loading shared vocabulary…';
   try{const set=await runtime.loadSet(id);if(epoch!==renderEpoch)return;notice.textContent='';
    const box=node('section');box.className='student-panel';box.append(node('h2',set.title),node('p',label[set.promptLanguage]+' → '+label[set.language]+' · '+set.pairs.length+' pairs'));
-   box.append(node('h3','CHOOSE YOUR GAME'));gameGrid(box,()=>launch(set,id));workspace.append(box);
+   box.append(node('h3','CHOOSE YOUR GAME'));gameGrid(box,gameId=>launch(set,id,gameId));workspace.append(box);
   }catch{if(epoch===renderEpoch)notice.textContent='Shared staging vocabulary could not be loaded. Check the link and try again.';}
   return;
  }
@@ -76,7 +79,7 @@ async function render(){
  saving.append(button('SAVE TO FOLDER',()=>{let set;try{set=current();}catch(e){notice.textContent=e.message;return;}dialog.replaceChildren(node('h3','SAVE TO FOLDER'),node('p','Local prototype only: this browser and staging site. No account or cloud sync.'));
  const folderLabel=node('label','FOLDER NAME'),folder=node('input');folder.id='local-folder';folderLabel.htmlFor=folder.id;folder.value='My Word Sets';const result=node('p');let saved=[];try{saved=JSON.parse(localStorage.getItem('bt-staging-word-sets-v1')||'[]');if(!Array.isArray(saved))saved=[];}catch{result.textContent='Local storage could not be read.';}
  dialog.append(folderLabel,folder,button('SAVE LOCALLY',()=>{if(!folder.value.trim())return;try{saved.push({...set,folder:folder.value.trim()});localStorage.setItem('bt-staging-word-sets-v1',JSON.stringify(saved));result.textContent='Saved on this device.';}catch{result.textContent='Local storage unavailable.';}}),result);
- for(const item of saved.slice(-8).reverse())dialog.append(button('LOAD · '+item.folder+' / '+item.title,()=>{try{draft=parseVocabularyDraft({...item,text:item.pairs.map(p=>p.join('\t')).join('\n')});dialog.close();void render();}catch{result.textContent='This saved set is invalid.';}}));dialog.append(button('CLOSE',()=>dialog.close()));dialog.showModal();}));saving.append(node('p','Save locally on this device for prototype testing. Cloud sync is not available.'));actions.append(sharing,saving);workspace.append(actions,dialog,node('h3','CHOOSE YOUR GAME'));gameGrid(workspace,()=>{try{draft=current();launch(draft,null);}catch(e){notice.textContent=e.message;}});workspace.append(preview);
+ for(const item of saved.slice(-8).reverse())dialog.append(button('LOAD · '+item.folder+' / '+item.title,()=>{try{draft=parseVocabularyDraft({...item,text:item.pairs.map(p=>p.join('\t')).join('\n')});dialog.close();void render();}catch{result.textContent='This saved set is invalid.';}}));dialog.append(button('CLOSE',()=>dialog.close()));dialog.showModal();}));saving.append(node('p','Save locally on this device for prototype testing. Cloud sync is not available.'));actions.append(sharing,saving);workspace.append(actions,dialog,node('h3','CHOOSE YOUR GAME'));gameGrid(workspace,gameId=>{try{draft=current();launch(draft,null,gameId);}catch(e){notice.textContent=e.message;}});workspace.append(preview);
  if(!draft&&category.value)chooseCategory();else updatePreview();
 }
 
