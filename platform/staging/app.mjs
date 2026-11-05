@@ -21,7 +21,7 @@ const voice=createPronunciationService({onStatus:state=>{notice.textContent=stat
 const racerOrigin='https://2f15a06a.bt-vocabulary-racer-preview.pages.dev';
 function configuration(gameId='vocabulary-snake'){
  const variant=matchMedia('(pointer: coarse) and (max-width: 760px) and (orientation: portrait)').matches?'mobile':'desktop';
- const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant+'.html',buildId:'b2fd5379dc4e48a895d5f008662b1735aa09f8e1'}:engine;
+ const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant,buildId:'b2fd5379dc4e48a895d5f008662b1735aa09f8e1'}:engine;
  if(!allowedHost||location.protocol!=='https:'||engine.environment!=='staging')throw new Error('Unapproved staging deployment.');
  const config={schemaVersion:1,environment:'staging',configRevision:'staging-v1',registryRevision:'snake-v1',shellOrigin:location.origin,catalogUrl:location.origin+'/catalog.json',launcherUrl:location.origin+'/',sharingBaseUrl:API,sharingTimeoutMs:12000};
  const registry={schemaVersion:1,revision:'snake-v1',engines:[{id:gameId,family:'vocabulary',protocol:'bt-vocabulary-engine/1',minPairs:5,url:selected.url,buildId:selected.buildId}]};
