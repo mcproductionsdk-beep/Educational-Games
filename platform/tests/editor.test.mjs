@@ -19,3 +19,12 @@ test('published-menu paste formats preserve accented content and direction',()=>
  const parsed=inspectVocabularyDraft(text);assert.deepEqual(parsed.errors,[]);assert.equal(parsed.pairs.length,5);assert.deepEqual(parsed.pairs[0],['træ','árbol']);assert.equal(parseVocabularyDraft({...draft,text}).pairs[4][1],'gato');
  assert.deepEqual(inspectVocabularyDraft(text+'\nbroken row').errors,[6]);
 });
+
+test('review preserves the raw line and never picks a competing boundary',()=>{
+ const text='ice cream  helado\n\nfruit: pear;pera\n10:30\nhttps://example.org:8080/a\nword:\nred apple :  manzana roja';
+ const result=inspectVocabularyDraft(text);
+ assert.deepEqual(result.errors,[3,4,5,6]);
+ assert.deepEqual(result.pairs,[['ice cream','helado'],['red apple','manzana roja']]);
+ assert.deepEqual(result.rows[1],{number:3,raw:'fruit: pear;pera',pair:null});
+ assert.deepEqual(inspectVocabularyDraft('fruit: pear\tfruta; pera').pairs,[['fruit: pear','fruta; pera']]);
+});
