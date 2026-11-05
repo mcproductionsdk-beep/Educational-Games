@@ -1170,6 +1170,66 @@
         "fr-FR": "parler",
         "it-IT": "parlare"
       }
+    },
+    {
+      "id": "instruments-piano",
+      "category": "Musical instruments",
+      "translations": {
+        "en": "piano",
+        "es-ES": "piano",
+        "de-DE": "Klavier",
+        "da-DK": "klaver",
+        "fr-FR": "piano",
+        "it-IT": "pianoforte"
+      }
+    },
+    {
+      "id": "instruments-guitar",
+      "category": "Musical instruments",
+      "translations": {
+        "en": "guitar",
+        "es-ES": "guitarra",
+        "de-DE": "Gitarre",
+        "da-DK": "guitar",
+        "fr-FR": "guitare",
+        "it-IT": "chitarra"
+      }
+    },
+    {
+      "id": "instruments-violin",
+      "category": "Musical instruments",
+      "translations": {
+        "en": "violin",
+        "es-ES": "violín",
+        "de-DE": "Geige",
+        "da-DK": "violin",
+        "fr-FR": "violon",
+        "it-IT": "violino"
+      }
+    },
+    {
+      "id": "instruments-trumpet",
+      "category": "Musical instruments",
+      "translations": {
+        "en": "trumpet",
+        "es-ES": "trompeta",
+        "de-DE": "Trompete",
+        "da-DK": "trompet",
+        "fr-FR": "trompette",
+        "it-IT": "tromba"
+      }
+    },
+    {
+      "id": "instruments-flute",
+      "category": "Musical instruments",
+      "translations": {
+        "en": "flute",
+        "es-ES": "flauta",
+        "de-DE": "Flöte",
+        "da-DK": "fløjte",
+        "fr-FR": "flûte",
+        "it-IT": "flauto"
+      }
     }
   ]
 }
