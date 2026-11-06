@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-04",
+  "url": "https://bcf916e7.bt-vocabulary-platform-staging.pages.dev/",
+  "shellSource": "3fec75eb5af7fc22d2ff15d1c8091e8142a99a2c",
+  "engineSource": "322724b54c70eb45e56136cd04ab33f25c319666",
+  "engineBuild": "2461bb11ad8f4d27bf833cbc6003230998f7e585",
+  "workflow": "https://github.com/mcproductionsdk-beep/Educational-Games/actions/runs/41848225143",
+  "result": "passed",
+  "viewports": [
+    [
+      1280,
+      900
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      360,
+      640
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "checks": [
+    "one visible title",
+    "no document scroll",
+    "board contained in viewport",
+    "no engine menu elements",
+    "play/pause/restart",
+    "fresh shared set and same-set return",
+    "no production network requests"
+  ],
+  "pending": [
+    "owner visual acceptance",
+    "physical touch and audible-device verification"
+  ],
+  "productionReleaseApproved": false
+}
