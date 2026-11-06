@@ -44,7 +44,7 @@ export function validateRuntimeConfiguration(config, registry, policy) {
   }
   const ids = new Set();
   const engines = registry.engines.map(entry => {
-    if (!record(entry) || !['vocabulary-snake', 'vocabulary-racer', 'vocabulary-jumper'].includes(entry.id) || ids.has(entry.id) ||
+    if (!record(entry) || !['vocabulary-snake', 'vocabulary-racer', 'vocabulary-jumper', 'vocabulary-invaders'].includes(entry.id) || ids.has(entry.id) ||
         entry.family !== 'vocabulary' || entry.protocol !== 'bt-vocabulary-engine/1' ||
         entry.minPairs !== 5 || !/^[a-f0-9]{40}$/.test(entry.buildId) ||
         policy.engineBuilds?.[entry.url] !== entry.buildId) fail();
