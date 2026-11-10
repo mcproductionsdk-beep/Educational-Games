@@ -3,6 +3,8 @@ import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPa
 import {createVocabularyRuntime} from '../runtime.mjs';
 import {mountGameplayShell} from '../shell.mjs';
 import {createPronunciationService} from '../voice.mjs';
+import {createSentenceWorkspace,mountSentenceCat} from './sentence.mjs';
+import catEngine from './cat-lock.json' with {type:'json'};
 import engine from './engine-lock.json' with {type:'json'};
 
 const BASE='bt-vocabulary-platform-staging.pages.dev';
@@ -37,9 +39,34 @@ function launch(set,id,gameId){
  void game.ready.then(result=>{if(!result.ok)notice.textContent='Unable to start the staging game: '+result.error;});
 }
 function selectField(parent,id,title,value){const l=node('label',title);l.htmlFor=id;const s=node('select');s.id=id;for(const locale of LOCALES){const o=node('option',label[locale]);o.value=locale;s.append(o);}s.value=value;parent.append(l,s);return s;}
+const wordTab=document.getElementById('word-tab'),sentenceTab=document.getElementById('sentence-tab');
+const familyTabs=document.getElementById('family-tabs');
+let family='word';
+const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,launch:set=>{
+ showWorkspace();
+ document.body.classList.add('playing');
+ window.scrollTo(0,0);
+ workspace.hidden=true;
+ gameplay.hidden=false;
+ game=mountSentenceCat({root:gameplay,engine:catEngine,set,soundOn,voice,
+  onSound:value=>{soundOn=value;},onMenu:()=>void render(),
+  onError:message=>{void render().then(()=>{notice.textContent=message+' Return to the game card to retry.';});}});
+}});
+for(const [tab,value] of [[wordTab,'word'],[sentenceTab,'sentence']]){
+ tab.addEventListener('click',()=>{family=value;void render();});
+}
+
 async function render(){
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  const hash=location.hash;
+ const sentence=hash.startsWith('#sentence-set=')||(!hash&&family==='sentence');
+ familyTabs.hidden=hash.startsWith('#sentence-set=');
+ wordTab.setAttribute('aria-current',sentence?'false':'page');
+ sentenceTab.setAttribute('aria-current',sentence?'page':'false');
+ if(sentence){
+  await sentenceWorkspace.render(workspace,hash,()=>epoch===renderEpoch);
+  return;
+ }
  if(hash){
   if(!/^#set=[A-Z0-9]{6}$/.test(hash)){notice.textContent='Invalid staging link. Open the staging homepage to create a test set.';return;}
   const id=hash.slice(5);notice.textContent='Loading shared vocabulary…';
