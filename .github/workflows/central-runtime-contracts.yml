@@ -1,0 +1,28 @@
+name: Central runtime contracts
+on:
+  push:
+    branches: ['feature/central-runtime-config-20261104']
+  pull_request:
+    paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
+permissions:
+  contents: read
+jobs:
+  runtime-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test platform/tests/*.test.mjs
+      - run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Prepare pinned engine test dependency
+        run: python3 platform/tests/prepare-engine.py
+      - name: Test central shell with actual engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || true)"
+          test -n "$CHROME_BIN"
+          node platform/tests/shell-browser.mjs

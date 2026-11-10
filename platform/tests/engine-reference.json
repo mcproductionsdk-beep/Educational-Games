@@ -1,0 +1,10 @@
+{
+  "repository": "mcproductionsdk-beep/Vocabulary-Snake",
+  "commit": "431dd74e249711b72a8cdb1448f9483014bd774b",
+  "files": {
+    "snake-game.html": "4734c757b3d4ba8eb1ace5f5ee1456b6cbf2a7b2439b5775a5fba08e1f5fccd8",
+    "engine/snake.js": "7977ddb6fbb56a18aa7ab2b5e6623c6bc109ea0985dea289c3bdf8d833741b8d",
+    "engine/snake.css": "9ee5e5c4409d83fda9e229ee779028708c10e5db0af0f5814caf7e1a065eabb4",
+    "engine/session.mjs": "057d6123118329ea5ea72dec55d3159d58871d46a6af22e26a6dc63de8c97698"
+  }
+}
