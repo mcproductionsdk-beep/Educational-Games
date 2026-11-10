@@ -9,14 +9,17 @@ const languages = {
 const words = text => text.match(/[\p{L}\p{N}]+(?:[’'\-][\p{L}\p{N}]+)*/gu) ?? [];
 
 export function inspectSentences(text) {
-  const pairs = [], errors = [];
+  const pairs = [], errors = [], rows = [];
   text.split(/\r?\n/).forEach((row, index) => {
     if (!row.trim()) return;
     const pair = row.split(row.includes('\t') ? '\t' : '|').map(value => value.trim());
-    if (pair.length !== 2 || pair.some(value => !value || value.length > 1000) || !words(pair[1]).length) errors.push(index + 1);
-    else pairs.push(pair);
+    const valid = pair.length === 2 && pair.every(value => value && value.length <= 1000) && words(pair[1]).length > 0;
+    const number = index + 1;
+    rows.push({ number, raw: row, pair: valid ? pair : null });
+    if (valid) pairs.push(pair);
+    else errors.push(number);
   });
-  return { pairs, errors };
+  return { pairs, errors, rows };
 }
 
 export function validateSentenceSet(set) {
@@ -113,7 +116,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   return { destroy };
 }
 
-export function createSentenceWorkspace({ node, button, voice, notice, launch }) {
+export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch }) {
   let draft = { title: '', language: 'es-ES', text: '', topic: '' };
   let catalog;
   const textFor = pairs => pairs.map(pair => pair.join('\t')).join('\n');
@@ -169,24 +172,20 @@ export function createSentenceWorkspace({ node, button, voice, notice, launch })
     const text = field(editor, 'textarea', 'sentence-pairs', 'ENGLISH FIRST · TARGET SECOND');
     text.value = draft.text;
     text.spellcheck = false;
-    const review = node('p'), preview = node('section'), rows = node('div');
+    const review = node('p'), preview = node('section'), summary = node('p'), previewRows = node('div');
     preview.className = 'preview';
-    preview.append(node('strong', 'SENTENCE PREVIEW'), rows);
+    summary.className = 'small';
+    preview.append(node('strong', 'SENTENCE PREVIEW'),
+      node('p', 'Press ▶ beside a sentence to hear it in its selected language.'), summary, previewRows);
     editor.append(node('p', 'Use a tab or pipe between the English sentence and its translation.'), review);
     const shareArea = node('div');
     shareArea.id = 'shared-link';
     shareArea.setAttribute('role', 'status');
     function refresh() {
-      const { pairs, errors } = inspectSentences(text.value);
+      const { pairs, errors, rows } = inspectSentences(text.value);
       review.textContent = pairs.length + ' valid pairs' + (errors.length ? ' · Review lines ' + errors.join(', ') : '');
-      rows.replaceChildren(...pairs.map(([en, target]) => {
-        const line = node('p');
-        const speak = button('▶', () => void voice.speak(target, language.value));
-        speak.className = 'speak';
-        speak.setAttribute('aria-label', 'Pronounce ' + target);
-        line.append(speak, node('span', ' ' + en + ' → ' + target));
-        return line;
-      }));
+      summary.textContent = 'en-US → ' + language.value + ' · ' + pairs.length + ' pairs · at least 2 required to play/share';
+      renderPairPreview(previewRows, rows, ['en-US', language.value]);
       draft = { title: title.value, language: language.value, text: text.value, topic: topic.value };
       return { pairs, errors };
     }
