@@ -106,7 +106,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
     voice.cancel();
   }
   function onVisibility() { if (document.hidden) pauseBackground(); }
-  function onBlur() { if (document.hidden || !document.hasFocus()) pauseBackground(); }
+  function onBlur() { setTimeout(() => { if (document.hidden || !document.hasFocus()) pauseBackground(); }, 0); }
   const timer = setTimeout(() => { destroy(); onError(gameName+' could not start.'); }, 12000);
   function receive(event) {
     const data = event.data;
