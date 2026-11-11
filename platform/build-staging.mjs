@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process';
 import {readFile,writeFile,mkdir,rm} from 'node:fs/promises';
 const root=new URL('../',import.meta.url),out=new URL('../dist-staging/',import.meta.url);
 const engine=JSON.parse(await readFile(new URL('./staging/engine-lock.json',import.meta.url),'utf8'));
@@ -7,6 +8,7 @@ if(!/^https:\/\/[a-f0-9]+\.bt-sentence-eater-preview\.pages\.dev\/$/.test(eater.
 const cat=JSON.parse(await readFile(new URL('./staging/cat-lock.json',import.meta.url),'utf8'));
 if(!/^https:\/\/[a-f0-9]+\.bt-sentence-cat-preview\.pages\.dev\/$/.test(cat.url)||!/^[a-f0-9]{64}$/.test(cat.buildId))throw new Error('Invalid Sentence Cat engine lock.');
 const files=['platform/config.mjs','platform/content.mjs','platform/runtime.mjs','platform/editor.mjs','platform/voice.mjs','platform/session-client.mjs','platform/shell.mjs','platform/shell.css','platform/staging/app.mjs','platform/staging/app.css','platform/staging/engine-lock.json','platform/staging/cat-lock.json','platform/staging/eater-lock.json','platform/staging/sentence.mjs'];
+for(const name of files.filter(name=>name.endsWith('.mjs')))execFileSync(process.execPath,['--check',new URL(name,root).pathname]);
 await rm(out,{recursive:true,force:true});
 for(const name of files){const target=new URL(name,out);await mkdir(new URL('./',target),{recursive:true});await writeFile(target,await readFile(new URL(name,root)));}
 await writeFile(new URL('index.html',out),await readFile(new URL('platform/staging/index.html',root)));
