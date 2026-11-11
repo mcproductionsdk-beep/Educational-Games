@@ -7,7 +7,7 @@ const stage='https://bt-vocabulary-platform-staging.pages.dev',api='https://bori
 const id='SABCDEFGH';
 const headers=await readFile(new URL('_headers',root),'utf8'),csp=headers.match(/Content-Security-Policy: (.+)/)[1];
 const assets=new Map();
-for(const path of ['/','/engine/invaders.js','/engine/invaders.css','/engine/build-id.mjs','/version.json']){
+for(const path of ['/','/engine/lifecycle.js','/engine/invaders.js','/engine/invaders.css','/engine/build-id.mjs','/version.json']){
  const response=await fetch(new URL(path,lock.url));assert.equal(response.ok,true);
  assets.set(path,{body:await response.text(),contentType:response.headers.get('content-type'),headers:{'Content-Security-Policy':response.headers.get('content-security-policy')||''}});
 }

@@ -94,12 +94,19 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
     clearTimeout(timer);
     window.removeEventListener('message', receive);
     document.removeEventListener('visibilitychange', onVisibility);
+    window.removeEventListener('blur', onBlur);
     voice.cancel();
     frame.remove();
     loading.remove();
     root.removeAttribute('aria-busy');
   }
-  function onVisibility() { if (document.hidden) voice.cancel(); }
+  function pauseBackground() {
+    if (closed || !started) return;
+    send('PAUSE');
+    voice.cancel();
+  }
+  function onVisibility() { if (document.hidden) pauseBackground(); }
+  function onBlur() { if (document.hidden || !document.hasFocus()) pauseBackground(); }
   const timer = setTimeout(() => { destroy(); onError(gameName+' could not start.'); }, 12000);
   function receive(event) {
     const data = event.data;
@@ -118,6 +125,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
       frame.inert = false;
       frame.style.visibility = 'visible';
       frame.focus();
+      if (document.hidden) pauseBackground();
     } else if (started && data.type === 'MENU') {
       destroy();
       onMenu();
@@ -137,6 +145,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   }
   window.addEventListener('message', receive);
   document.addEventListener('visibilitychange', onVisibility);
+  window.addEventListener('blur', onBlur);
   frame.src = engineUrl.href;
   root.replaceChildren(loading, frame);
   return { destroy };

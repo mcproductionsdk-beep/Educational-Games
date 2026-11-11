@@ -1,0 +1,19 @@
+name: Sentence lifecycle integration
+on:
+  pull_request:
+    paths: ['platform/**', 'scripts/test-sentence-lifecycle-integration.mjs', '.github/workflows/sentence-lifecycle.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node platform/build-staging.mjs
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install chromium
+      - run: node scripts/test-sentence-lifecycle-integration.mjs
