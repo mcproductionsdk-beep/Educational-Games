@@ -3,6 +3,11 @@ import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPa
 import {createVocabularyRuntime} from '../runtime.mjs';
 import {mountGameplayShell} from '../shell.mjs';
 import {createPronunciationService} from '../voice.mjs';
+import {createSentenceWorkspace,mountSentenceCat} from './sentence.mjs';
+import catEngine from './cat-lock.json' with {type:'json'};
+import eaterEngine from './eater-lock.json' with {type:'json'};
+import warehouseEngine from './warehouse-lock.json' with {type:'json'};
+import invadersEngine from './invaders-lock.json' with {type:'json'};
 import engine from './engine-lock.json' with {type:'json'};
 
 const BASE='bt-vocabulary-platform-staging.pages.dev';
@@ -37,9 +42,59 @@ function launch(set,id,gameId){
  void game.ready.then(result=>{if(!result.ok)notice.textContent='Unable to start the staging game: '+result.error;});
 }
 function selectField(parent,id,title,value){const l=node('label',title);l.htmlFor=id;const s=node('select');s.id=id;for(const locale of LOCALES){const o=node('option',label[locale]);o.value=locale;s.append(o);}s.value=value;parent.append(l,s);return s;}
+function renderPairPreview(container,rows,locales){
+ const table=node('table'),head=node('tr');
+ for(const name of ['LINE','PROMPT','TARGET']){
+  const column=node('th',name);column.scope='col';head.append(column);
+ }
+ table.append(head);
+ for(const {number,raw,pair} of rows){
+  const row=node('tr');row.append(node('td',String(number)));
+  if(!pair){
+   const review=node('td','Review this row: '+raw);
+   review.colSpan=2;review.style.whiteSpace='pre-wrap';row.append(review);
+  }else{
+   pair.forEach((value,index)=>{
+    const cell=node('td'),wrap=node('div');
+    wrap.className='word-cell';
+    const speak=button('▶',()=>void voice.speak(value,locales[index]));
+    speak.className='speak';speak.setAttribute('aria-label','Pronounce '+value);
+    wrap.append(speak,node('span',value));cell.append(wrap);row.append(cell);
+   });
+  }
+  table.append(row);
+ }
+ container.replaceChildren(table);
+}
+
+const wordTab=document.getElementById('word-tab'),sentenceTab=document.getElementById('sentence-tab');
+const familyTabs=document.getElementById('family-tabs');
+let family='word';
+const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,launch:(set,gameId='cat')=>{
+ showWorkspace();
+ document.body.classList.add('playing');
+ window.scrollTo(0,0);
+ workspace.hidden=true;
+ gameplay.hidden=false;
+ game=mountSentenceCat({root:gameplay,engine:gameId==='cat'?catEngine:gameId==='eater'?eaterEngine:gameId==='warehouse'?warehouseEngine:invadersEngine,gameId,set,soundOn,voice,
+  onSound:value=>{soundOn=value;},onMenu:()=>void render(),
+  onError:message=>{void render().then(()=>{notice.textContent=message+' Return to the game card to retry.';});}});
+}});
+for(const [tab,value] of [[wordTab,'word'],[sentenceTab,'sentence']]){
+ tab.addEventListener('click',()=>{family=value;void render();});
+}
+
 async function render(){
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  const hash=location.hash;
+ const sentence=hash.startsWith('#sentence-set=')||(!hash&&family==='sentence');
+ familyTabs.hidden=hash.startsWith('#sentence-set=');
+ wordTab.setAttribute('aria-current',sentence?'false':'page');
+ sentenceTab.setAttribute('aria-current',sentence?'page':'false');
+ if(sentence){
+  await sentenceWorkspace.render(workspace,hash,()=>epoch===renderEpoch);
+  return;
+ }
  if(hash){
   if(!/^#set=[A-Z0-9]{6}$/.test(hash)){notice.textContent='Invalid staging link. Open the staging homepage to create a test set.';return;}
   const id=hash.slice(5);notice.textContent='Loading shared vocabulary…';
@@ -65,7 +120,7 @@ async function render(){
  const parseStatus=node('div');parseStatus.className='status';parseStatus.setAttribute('role','status');
  const preview=node('section');preview.className='preview';preview.append(node('strong','WORD PREVIEW'),node('p','Press ▶ beside a word to hear it in its selected language. Voice availability depends on your browser and device.'));
  const previewSummary=node('p'),previewRows=node('div');previewSummary.className='small';preview.append(previewSummary,previewRows);
- function updatePreview(){const parsed=inspectVocabularyDraft(words.value);parseStatus.textContent=parsed.pairs.length+' valid pairs'+(parsed.errors.length?' · Review lines: '+parsed.errors.join(', '):'');parseStatus.className='status '+(parsed.errors.length?'bad':'ok');previewSummary.textContent=prompt.value+' → '+target.value+' · '+parsed.pairs.length+' pairs · at least 5 required to play/share';const table=node('table'),head=node('tr');for(const name of ['LINE','PROMPT','TARGET']){const th=node('th',name);th.scope='col';head.append(th);}table.append(head);for(const {number,raw,pair} of parsed.rows){const row=node('tr');row.append(node('td',String(number)));if(!pair){const review=node('td','Review this row: '+raw);review.colSpan=2;review.style.whiteSpace='pre-wrap';row.append(review);table.append(row);continue;}pair.forEach((value,index)=>{const cell=node('td'),wrap=node('div');wrap.className='word-cell';const speak=button('▶',()=>void voice.speak(value,index===0?prompt.value:target.value));speak.className='speak';speak.setAttribute('aria-label','Pronounce '+value);wrap.append(speak,node('span',value));cell.append(wrap);row.append(cell);});table.append(row);}previewRows.replaceChildren(table);}
+ function updatePreview(){const parsed=inspectVocabularyDraft(words.value);parseStatus.textContent=parsed.pairs.length+' valid pairs'+(parsed.errors.length?' · Review lines: '+parsed.errors.join(', '):'');parseStatus.className='status '+(parsed.errors.length?'bad':'ok');previewSummary.textContent=prompt.value+' → '+target.value+' · '+parsed.pairs.length+' pairs · at least 5 required to play/share';renderPairPreview(previewRows,parsed.rows,[prompt.value,target.value]);}
  function chooseCategory(){if(!category.value){title.value='';words.value='';updatePreview();return;}try{words.value=categoryPairs(catalog,category.value,prompt.value,target.value).map(p=>p.join('\t')).join('\n');title.value=category.value;notice.textContent='';}catch(e){notice.textContent=e.message;}updatePreview();}
  category.addEventListener('change',chooseCategory);for(const select of [prompt,target])select.addEventListener('change',()=>{if(category.value)chooseCategory();else updatePreview();});words.addEventListener('input',()=>{category.value='';updatePreview();});
  settings.append(button('TEST VOICE',()=>void voice.speak(inspectVocabularyDraft(words.value).pairs[0]?.[1]||({ 'en-US':'Hello','es-ES':'Hola','de-DE':'Hallo','da-DK':'Hej','fr-FR':'Bonjour','it-IT':'Ciao' }[target.value]),target.value)));
