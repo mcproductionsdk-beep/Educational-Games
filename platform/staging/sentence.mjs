@@ -1,3 +1,12 @@
+
+export function validateWarehouseSet(set){
+ const issues=set.pairs.flatMap((pair,i)=>{
+  const count=(pair[1].match(/[^\s]+/gu)||[]).map(w=>w.replace(/^[.,!?;:¡¿"“”()]+|[.,!?;:¡¿"“”()]+$/gu,'')).filter(Boolean).length;
+  return count<1||count>20?['Line '+(i+1)+': '+count+' words (Warehouse supports 1–20).']:[];
+ });
+ if(issues.length)throw Error(issues.join(' '));
+ return set;
+}
 const API = 'https://boringteacher-sentences-api-staging.mcproductionsdk.workers.dev';
 const idPattern = /^S[A-HJ-NP-Z2-9]{8}$/;
 const protocol = 'bt-sentence-cat/1';
@@ -53,14 +62,15 @@ export async function sentenceRequest(id, set) {
 }
 
 export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, onMenu, onError, gameId='cat' }) {
-  if(!['cat','eater'].includes(gameId))throw Error('Unsupported sentence game.');
+  if(!['cat','eater','warehouse'].includes(gameId))throw Error('Unsupported sentence game.');
   const protocol='bt-sentence-'+gameId+'/1';
-  const gameName=gameId==='cat'?'Sentence Cat':'Sentence Eater';
+  const gameName=gameId==='cat'?'Sentence Cat':gameId==='eater'?'Sentence Eater':'Sentence Warehouse';
+  if(gameId==='warehouse')validateWarehouseSet(set);
   const engineUrl = new URL(engine.url);
   if (engineUrl.protocol !== 'https:' ||
       !new RegExp('^[a-f0-9]+\\.bt-sentence-'+gameId+'-preview\\.pages\\.dev$').test(engineUrl.hostname) ||
       engineUrl.pathname !== '/' || engineUrl.search || engineUrl.hash ||
-      !/^[a-f0-9]{64}$/.test(engine.buildId)) throw Error('Invalid staging Cat engine lock.');
+      !/^[a-f0-9]{64}$/.test(engine.buildId)) throw Error('Invalid staging sentence engine lock.');
   const frame = document.createElement('iframe');
   frame.className = 'sentence-frame';
   frame.style.visibility = 'hidden';
@@ -73,7 +83,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   frame.title = gameName;
   frame.referrerPolicy = 'strict-origin';
   const sessionId = crypto.randomUUID();
-  const allowedSpeech = new Set(set.pairs.flatMap(([, text]) => [text, ...words(text)]));
+  const allowedSpeech = new Set(set.pairs.flatMap(([, text]) => [text, ...words(text), ...(gameId==='warehouse'?(text.match(/[^\s]+/gu)||[]).map(w=>w.replace(/^[.,!?;:¡¿"“”()]+|[.,!?;:¡¿"“”()]+$/gu,'')):[])]));
   let initialized = false, started = false, closed = false, speechId = 0;
   function send(type, data = {}) {
     frame.contentWindow.postMessage({ protocol, sessionId, type, ...data }, engineUrl.origin);
@@ -145,8 +155,8 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
   function gameButton(set) {
     const grid = node('div');
     grid.className = 'gamegrid';
-    for(const [id,label] of [['cat','🐈 SENTENCE CAT'],['eater','◉ SENTENCE EATER']]){
-      const card=button(label,()=>{try{launch(set(),id)}catch(error){notice.textContent=error.message}});
+    for(const [id,label] of [['cat','🐈 SENTENCE CAT'],['eater','◉ SENTENCE EATER'],['warehouse','📦 SENTENCE WAREHOUSE']]){
+      const card=button(label,()=>{try{const selected=set();if(id==='warehouse')validateWarehouseSet(selected);launch(selected,id)}catch(error){notice.textContent=error.message}});
       card.className='game';card.dataset.game='sentence-'+id;grid.append(card);
     }
     return grid;
