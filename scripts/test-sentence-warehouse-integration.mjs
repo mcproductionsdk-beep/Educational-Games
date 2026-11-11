@@ -15,13 +15,14 @@ for(const path of ['/','/engine/warehouse.js','/engine/warehouse.css','/engine/b
 assert.equal(JSON.parse(assets.get('/version.json').body).buildId,lock.buildId);
 for(const count of [1,20])assert.doesNotThrow(()=>validateWarehouseSet({pairs:[['Prompt',Array(count).fill('gato').join(' ')]]}));
 for(const count of [0,21])assert.throws(()=>validateWarehouseSet({pairs:[['Prompt',Array(count).fill('gato').join(' ')]]}),/Line 1/);
+const longPrompt='By the time the teacher arrived, the students had opened their books and started reading.';
 const locales={'es-ES':'Yo como pan.','de-DE':'Ich esse Brot.','da-DK':'Jeg spiser brød.','fr-FR':'Je mange du pain.','it-IT':'Io mangio pane.'};
 const browser=await chromium.launch();
 try{
 for(const [device,options] of [['desktop',{viewport:{width:1280,height:800}}],['portrait',devices['Pixel 7']],['landscape',{...devices['Pixel 7'],viewport:{width:844,height:390}}]]){
  for(const [language,target] of Object.entries(locales)){
   if(device!=='desktop'&&language!=='es-ES')continue;
-  const set={id,title:'Warehouse integration',language,pairs:[[target,'I eat bread.'],[target,'I eat bread again.']]};
+  const set={id,title:'Warehouse integration',language,pairs:[[target,longPrompt],[target,longPrompt+' Again.']]};
   const ctx=await browser.newContext(options),errors=[],denied=[];
   await ctx.addInitScript(()=>{window.spoken=[];window.cancelled=0;speechSynthesis.getVoices=()=>[];speechSynthesis.cancel=()=>window.cancelled++;speechSynthesis.speak=u=>{window.spoken.push([u.lang,u.text]);queueMicrotask(()=>{u.onstart?.();u.onend?.()})}});
   await ctx.route('**/*',async route=>{
@@ -45,6 +46,9 @@ for(const [device,options] of [['desktop',{viewport:{width:1280,height:800}}],['
   const frame=p.frames().find(f=>f.url().startsWith(lock.url));
   assert.deepEqual(await frame.evaluate(()=>state.pairs),set.pairs.map(p=>[...p].reverse()));
   assert.equal(await frame.locator('#menu').isVisible(),false);
+  assert.equal(await frame.locator('#prompt').textContent(),longPrompt);
+  assert.equal(await frame.locator('#completedWords').isVisible(),false);
+  assert.ok(await frame.locator('#prompt').evaluate(e=>e.scrollWidth<=e.clientWidth+1));
   assert.equal(await frame.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&document.documentElement.scrollWidth<=innerWidth),true);
   await f.getByRole('button',{name:'PAUSE',exact:true}).click();
   assert.equal(await frame.evaluate(()=>state.mode),'paused');
@@ -61,6 +65,7 @@ for(const [device,options] of [['desktop',{viewport:{width:1280,height:800}}],['
   await f.getByRole('button',{name:'RESTART',exact:true}).click();
   await p.waitForTimeout(500);
   assert.equal(await frame.evaluate(()=>state.idx),0);
+  assert.equal(await frame.locator('#prompt').textContent(),longPrompt);
   assert.equal(await frame.evaluate(()=>state.filled.some(Boolean)),false);
   await f.getByRole('button',{name:'SOUND ON',exact:true}).click();
   await f.getByRole('button',{name:'MAIN MENU',exact:true}).click();
