@@ -1,0 +1,23 @@
+name: Sentence Invaders shared integration
+on:
+  pull_request:
+    paths:
+      - 'platform/**'
+      - 'scripts/test-sentence-invaders-integration.mjs'
+      - '.github/workflows/sentence-invaders-integration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shared-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node platform/build-staging.mjs
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/test-sentence-invaders-integration.mjs
