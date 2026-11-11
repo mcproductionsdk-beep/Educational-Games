@@ -5,6 +5,7 @@ import {mountGameplayShell} from '../shell.mjs';
 import {createPronunciationService} from '../voice.mjs';
 import {createSentenceWorkspace,mountSentenceCat} from './sentence.mjs';
 import catEngine from './cat-lock.json' with {type:'json'};
+import eaterEngine from './eater-lock.json' with {type:'json'};
 import engine from './engine-lock.json' with {type:'json'};
 
 const BASE='bt-vocabulary-platform-staging.pages.dev';
@@ -67,13 +68,13 @@ function renderPairPreview(container,rows,locales){
 const wordTab=document.getElementById('word-tab'),sentenceTab=document.getElementById('sentence-tab');
 const familyTabs=document.getElementById('family-tabs');
 let family='word';
-const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,launch:set=>{
+const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,launch:(set,gameId='cat')=>{
  showWorkspace();
  document.body.classList.add('playing');
  window.scrollTo(0,0);
  workspace.hidden=true;
  gameplay.hidden=false;
- game=mountSentenceCat({root:gameplay,engine:catEngine,set,soundOn,voice,
+ game=mountSentenceCat({root:gameplay,engine:gameId==='cat'?catEngine:eaterEngine,gameId,set,soundOn,voice,
   onSound:value=>{soundOn=value;},onMenu:()=>void render(),
   onError:message=>{void render().then(()=>{notice.textContent=message+' Return to the game card to retry.';});}});
 }});
