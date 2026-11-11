@@ -62,9 +62,9 @@ export async function sentenceRequest(id, set) {
 }
 
 export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, onMenu, onError, gameId='cat' }) {
-  if(!['cat','eater','warehouse'].includes(gameId))throw Error('Unsupported sentence game.');
+  if(!['cat','eater','warehouse','invaders'].includes(gameId))throw Error('Unsupported sentence game.');
   const protocol='bt-sentence-'+gameId+'/1';
-  const gameName=gameId==='cat'?'Sentence Cat':gameId==='eater'?'Sentence Eater':'Sentence Warehouse';
+  const gameName=gameId==='cat'?'Sentence Cat':gameId==='eater'?'Sentence Eater':gameId==='warehouse'?'Sentence Warehouse':'Sentence Invaders';
   if(gameId==='warehouse')validateWarehouseSet(set);
   const engineUrl = new URL(engine.url);
   if (engineUrl.protocol !== 'https:' ||
@@ -83,7 +83,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   frame.title = gameName;
   frame.referrerPolicy = 'strict-origin';
   const sessionId = crypto.randomUUID();
-  const allowedSpeech = new Set(set.pairs.flatMap(([, text]) => [text, ...words(text), ...(gameId==='warehouse'?(text.match(/[^\s]+/gu)||[]).map(w=>w.replace(/^[.,!?;:¡¿"“”()]+|[.,!?;:¡¿"“”()]+$/gu,'')):[])]));
+  const allowedSpeech = new Set(set.pairs.flatMap(([, text]) => [text, ...words(text), ...(gameId==='invaders'?text.trim().replace(/[.!?。！？]+$/u,'').split(/\s+/).filter(Boolean).map(w=>w.replace(/[.!?。！？]+$/u,'')):[]), ...(gameId==='warehouse'?(text.match(/[^\s]+/gu)||[]).map(w=>w.replace(/^[.,!?;:¡¿"“”()]+|[.,!?;:¡¿"“”()]+$/gu,'')):[])]));
   let initialized = false, started = false, closed = false, speechId = 0;
   function send(type, data = {}) {
     frame.contentWindow.postMessage({ protocol, sessionId, type, ...data }, engineUrl.origin);
@@ -155,7 +155,7 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
   function gameButton(set) {
     const grid = node('div');
     grid.className = 'gamegrid';
-    for(const [id,label] of [['cat','🐈 SENTENCE CAT'],['eater','◉ SENTENCE EATER'],['warehouse','📦 SENTENCE WAREHOUSE']]){
+    for(const [id,label] of [['cat','🐈 SENTENCE CAT'],['eater','◉ SENTENCE EATER'],['warehouse','📦 SENTENCE WAREHOUSE'],['invaders','👾 SENTENCE INVADERS']]){
       const card=button(label,()=>{try{const selected=set();if(id==='warehouse')validateWarehouseSet(selected);launch(selected,id)}catch(error){notice.textContent=error.message}});
       card.className='game';card.dataset.game='sentence-'+id;grid.append(card);
     }
