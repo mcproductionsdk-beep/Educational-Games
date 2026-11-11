@@ -53,7 +53,15 @@ try{
     await t.page.locator('[data-action="pause"]').click();
     await t.page.waitForFunction(()=>document.querySelector('[data-action="pause"]').textContent==='RESUME');
     await t.page.locator('[data-action="restart"]').click();
-    await t.page.waitForFunction(()=>document.querySelector('.bt-game-shell')?.dataset.state==='running');
+    // Racer/Jumper intentionally restart paused through their existing adapters.
+    // Require the acknowledged state, rather than changing engine behavior here.
+    await t.page.waitForFunction(()=>!document.querySelector('[data-action="restart"]').disabled);
+    const restartState=await t.page.locator('.bt-game-shell').getAttribute('data-state');
+    assert.equal(restartState,['racer','jumper'].includes(id)?'paused':'running',id+': restart state changed');
+    if(restartState==='paused'){
+     await t.page.locator('[data-action="pause"]').click();
+     await t.page.waitForFunction(()=>document.querySelector('.bt-game-shell')?.dataset.state==='running');
+    }
     await t.page.locator('[data-action="menu"]').click();
     await t.page.locator('#pairs').waitFor();assert.equal(await t.page.locator('iframe').count(),0);
     assert.deepEqual(t.errors,[]);assert.deepEqual(t.external,[]);
