@@ -35,11 +35,14 @@ try{for(const game of ['cat','eater','warehouse','invaders']){
   await frame.evaluate(({session,protocol})=>window.dispatchEvent(new MessageEvent('message',{source:window.parent,origin:'https://invalid.example',data:{protocol,sessionId:session,type:'PAUSE'}})),{session,protocol});
   await page.evaluate(({protocol,lock})=>document.querySelector('iframe').contentWindow.postMessage({protocol,sessionId:'wrong-session',type:'PAUSE'},new URL(lock.url).origin),{protocol,lock});
   await page.waitForTimeout(80);assert.equal(await frame.locator('body').evaluate(e=>e.classList.contains('sentence-paused')),false,'untrusted pause ignored');
-  // Request permitted shared pronunciation, then hide the real browser tab.
+  // Request permitted shared pronunciation, then notify the parent of hidden state.
+  // The child stays visible: this specifically exercises the trusted PAUSE bridge.
   await page.evaluate(({session,protocol,lock})=>window.dispatchEvent(new MessageEvent('message',{source:document.querySelector('iframe').contentWindow,origin:new URL(lock.url).origin,data:{protocol,sessionId:session,type:'SPEAK',id:999,text:'Yo'}})),{session,protocol,lock});
   assert.equal(await page.evaluate(()=>speechCalls.length),1);const cancelled=await page.evaluate(()=>cancelCount);
-  const background=await ctx.newPage();await background.bringToFront();await frame.waitForFunction(()=>document.body.classList.contains('sentence-paused'));
-  assert.ok(await page.evaluate(()=>cancelCount)>cancelled);await page.bringToFront();await background.close();
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))});
+  await frame.waitForFunction(()=>document.body.classList.contains('sentence-paused'));
+  assert.ok(await page.evaluate(()=>cancelCount)>cancelled);
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('focus'))});
   assert.equal(await frame.locator('body').evaluate(e=>e.classList.contains('sentence-paused')),true);
   await frame.locator('#pause').click();assert.equal(await frame.locator('body').evaluate(e=>e.classList.contains('sentence-paused')),false);
   await frame.locator(game==='cat'?'#menu':game==='eater'?'#menuReturn':game==='warehouse'?'#back':'#backMenu').click();
