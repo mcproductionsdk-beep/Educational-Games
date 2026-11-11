@@ -1,0 +1,23 @@
+name: Word startup flash regression
+on:
+  pull_request:
+    paths:
+      - 'platform/**'
+      - 'scripts/test-word-startup-flash.mjs'
+      - '.github/workflows/word-startup-flash.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  delayed-startup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node platform/build-staging.mjs
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install chromium
+      - run: node scripts/test-word-startup-flash.mjs

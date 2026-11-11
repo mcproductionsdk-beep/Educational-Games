@@ -70,6 +70,9 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
       snapshot=set?validateVocabulary(set):await runtime.loadSet(shareId);
       if(closed)return{ok:false,error:'CANCELLED'};
       frame=doc.createElement('iframe');frame.title='Vocabulary game playfield';frame.className='bt-engine-frame';
+      // Keep legacy/test markup out of first paint and focus until the validated
+      // engine has acknowledged INIT and START. Visibility preserves its viewport.
+      frame.style.visibility='hidden';frame.inert=true;frame.setAttribute('aria-hidden','true');
       frame.setAttribute('allow','fullscreen');
       const entry=runtime.settings.engines[0];
       // Append a blank frame first so contentWindow exists before the message listener is installed.
@@ -79,7 +82,9 @@ export function mountGameplayShell({root,config,registry,policy,set,shareId,cont
       frame.src=entry.url;
       await client.ready;
       if(closed)return{ok:false,error:'CANCELLED'};
-      initialized=true;update(state);return{ok:true};
+      initialized=true;update(state);
+      frame.inert=false;frame.removeAttribute('aria-hidden');frame.style.visibility='visible';frame.focus();
+      return{ok:true};
     }catch(error){showError(error);return{ok:false,error:error.message};}
   })();
   return Object.freeze({ready,destroy,
