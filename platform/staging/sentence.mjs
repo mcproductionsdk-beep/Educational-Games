@@ -63,6 +63,13 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
       !/^[a-f0-9]{64}$/.test(engine.buildId)) throw Error('Invalid staging Cat engine lock.');
   const frame = document.createElement('iframe');
   frame.className = 'sentence-frame';
+  frame.style.visibility = 'hidden';
+  frame.inert = true;
+  const loading = document.createElement('p');
+  loading.className = 'sentence-loading';
+  loading.setAttribute('role', 'status');
+  loading.textContent = 'Loading ' + gameName + '…';
+  root.setAttribute('aria-busy', 'true');
   frame.title = gameName;
   frame.referrerPolicy = 'strict-origin';
   const sessionId = crypto.randomUUID();
@@ -79,6 +86,8 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
     document.removeEventListener('visibilitychange', onVisibility);
     voice.cancel();
     frame.remove();
+    loading.remove();
+    root.removeAttribute('aria-busy');
   }
   function onVisibility() { if (document.hidden) voice.cancel(); }
   const timer = setTimeout(() => { destroy(); onError(gameName+' could not start.'); }, 12000);
@@ -94,6 +103,10 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
     if (data.type === 'STARTED' && !started) {
       started = true;
       clearTimeout(timer);
+      loading.remove();
+      root.removeAttribute('aria-busy');
+      frame.inert = false;
+      frame.style.visibility = 'visible';
       frame.focus();
     } else if (started && data.type === 'MENU') {
       destroy();
@@ -115,7 +128,7 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   window.addEventListener('message', receive);
   document.addEventListener('visibilitychange', onVisibility);
   frame.src = engineUrl.href;
-  root.replaceChildren(frame);
+  root.replaceChildren(loading, frame);
   return { destroy };
 }
 
