@@ -7,6 +7,7 @@ import {createSentenceWorkspace,mountSentenceCat} from './sentence.mjs';
 import catEngine from './cat-lock.json' with {type:'json'};
 import eaterEngine from './eater-lock.json' with {type:'json'};
 import warehouseEngine from './warehouse-lock.json' with {type:'json'};
+import invadersEngine from './invaders-lock.json' with {type:'json'};
 import engine from './engine-lock.json' with {type:'json'};
 
 const BASE='bt-vocabulary-platform-staging.pages.dev';
@@ -75,7 +76,7 @@ const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,render
  window.scrollTo(0,0);
  workspace.hidden=true;
  gameplay.hidden=false;
- game=mountSentenceCat({root:gameplay,engine:gameId==='cat'?catEngine:gameId==='eater'?eaterEngine:warehouseEngine,gameId,set,soundOn,voice,
+ game=mountSentenceCat({root:gameplay,engine:gameId==='cat'?catEngine:gameId==='eater'?eaterEngine:gameId==='warehouse'?warehouseEngine:invadersEngine,gameId,set,soundOn,voice,
   onSound:value=>{soundOn=value;},onMenu:()=>void render(),
   onError:message=>{void render().then(()=>{notice.textContent=message+' Return to the game card to retry.';});}});
 }});
