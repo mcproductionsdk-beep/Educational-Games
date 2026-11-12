@@ -10,7 +10,8 @@ const button=(text,action)=>{const n=node('button',text);n.addEventListener('cli
 const root=document.querySelector('main'),notice=document.querySelector('#notice');
 const workspace=createSentenceWorkspace({node,button,notice,voice:{speak:(...args)=>spoken.push(args),cancel(){}},
 renderPairPreview:(root,rows,locales)=>{preview={rows,locales};root.replaceChildren(...rows.map(row=>node('p',row.pair?.join(' | ')||'Invalid')))},launch:(set,game)=>launched.push({set,game})});
-await workspace.render(root,location.hash,()=>true);`;
+async function render(){root.replaceChildren();await workspace.render(root,location.hash,()=>true)}
+addEventListener('hashchange',render);await render();`;
 const server=createServer((req,res)=>{
  const path=new URL(req.url,'http://localhost').pathname;
  if(path==='/sentence.mjs')return res.writeHead(200,{'Content-Type':'text/javascript'}).end(module);
@@ -46,7 +47,7 @@ try{
   // Copy failure preserves the visible student link and canonical API orientation.
   await p.getByRole('button',{name:'STUDENT LINK',exact:true}).click();await p.locator('#shared-link a').waitFor();
   assert.deepEqual(published.pairs,pairs.map(p=>[...p].reverse()));const link=await p.locator('#shared-link a').getAttribute('href');
-  await p.goto(link);await p.locator('[data-game="sentence-cat"]').waitFor();assert.equal(await p.locator('#sentence-pairs').count(),0);
+  await p.goto(link);await p.locator('.student-panel').waitFor();assert.equal(await p.locator('#sentence-pairs').count(),0);
   assert.equal(await p.getByRole('button',{name:'SAVE TO FOLDER',exact:true}).count(),0);assert.equal(await p.getByRole('button',{name:'⇄ SWAP COLUMNS',exact:true}).count(),0);
   await p.locator('[data-game="sentence-cat"]').click();assert.deepEqual(await p.evaluate(()=>launched[0].set.pairs),pairs);
   // Opt-in legacy import explicitly declares which column contains English.
