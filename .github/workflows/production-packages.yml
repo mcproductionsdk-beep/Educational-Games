@@ -1,0 +1,30 @@
+name: Production candidate packages
+on:
+  pull_request:
+    paths: ['release/production/**', 'scripts/production/**', '.github/workflows/production-packages.yml']
+permissions:
+  contents: read
+jobs:
+  packages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/production/build.mjs
+      - run: node scripts/production/verify.mjs
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install chromium
+      - run: node scripts/production/test-browser.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-candidate-${{ github.event.pull_request.head.sha }}
+          path: |
+            dist-production/site/
+            dist-production/engine-host/
+            dist-production/candidate-manifest.json
+          retention-days: 30

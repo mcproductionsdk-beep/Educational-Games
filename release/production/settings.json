@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "environment": "production",
+  "status": "prepared-not-authorized",
+  "shellOrigin": "https://boringteacher.com",
+  "engineOrigin": "https://games.boringteacher.com",
+  "engineHostStatus": "proposed-not-provisioned",
+  "wordApi": "https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev",
+  "sentenceApi": "https://boringteacher-sentences-api.mcproductionsdk.workers.dev",
+  "editorialApproval": "pending"
+}

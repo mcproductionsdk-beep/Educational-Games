@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "central": {
+    "repository": "mcproductionsdk-beep/Educational-Games",
+    "commit": "df0c2fe482647d29f9330c902e1f144f2b4842b3",
+    "files": {
+      "platform/staging/app.mjs": "083015ce573010ed65cde82ca850cdb665e780ca04bdf3d20e8f9dff4330e9eb",
+      "platform/staging/sentence.mjs": "23e58f6ea782d992a7f56ed8ac0004a9d27c4bff06390b515779a9f93dedd362",
+      "platform/staging/app.css": "798cc80f09b59be0b0da020746b21175550658015d982331999fcd74cc2c5bcf",
+      "platform/staging/index.html": "f30ee0d25de1158905bfa0fbe8c4deb4ee2213df78aa28681634d568fd12223b",
+      "platform/config.mjs": "333bc46aa84f37a31739dd549bddc547967d9c05254e5c9cdc003372cabfa369",
+      "platform/content.mjs": "f5db73135d3e7aef754c3785214cd0fd675011a1e0136ff26a780884e1ee914a",
+      "platform/editor.mjs": "d138b5e8d86a0f0d8680c9ecd301d2a5610c4fa8b77560f5449e90ace1fc1feb",
+      "platform/runtime.mjs": "a260a07c85bd506b67eec08d9498f9c14fd00a262a90e7364775af8029acfdd5",
+      "platform/voice.mjs": "9d6c9d8ca47c8f04b07e5b6d401cfb00ae7fce44fab5456358578a18d558a24e",
+      "platform/session-client.mjs": "7f4d084e8b407531634370d846aba5f197792aa37e224efa196306262a770b8d",
+      "platform/shell.mjs": "41c22854f7dfe13f58c6632dd73ab239656c04630022d0bd23df21d6aa6ced24",
+      "platform/shell.css": "938ddd53481de9e4b73d0b3d8b1882449ecec59a915ab27691178347da0fe05a",
+      "libraries/vocabulary/v2.json": "ea54493a6180560429b6e6f1ca7e07f17cd7eb3533d51870c1ad874453eeb28f",
+      "sentence-games-release-candidate/grammar-candidate.json": "39293becfdc97af37451f33adbbfbbd46ad50351da6e0b516fb3e36f167ddf7a"
+    }
+  },
+  "engines": [
+    {
+      "id": "vocabulary-snake",
+      "repository": "mcproductionsdk-beep/Vocabulary-Snake",
+      "commit": "431dd74e249711b72a8cdb1448f9483014bd774b",
+      "game": "snake",
+      "build": "preview",
+      "files": {
+        "engine/session.mjs": "057d6123118329ea5ea72dec55d3159d58871d46a6af22e26a6dc63de8c97698",
+        "engine/snake.css": "9ee5e5c4409d83fda9e229ee779028708c10e5db0af0f5814caf7e1a065eabb4",
+        "engine/snake.js": "7977ddb6fbb56a18aa7ab2b5e6623c6bc109ea0985dea289c3bdf8d833741b8d",
+        "scripts/build-preview.mjs": "01084bd3846495449f4bdf8c8113fefeb13ec3fa213816d36daedee76261d3a8",
+        "snake-game.html": "4734c757b3d4ba8eb1ace5f5ee1456b6cbf2a7b2439b5775a5fba08e1f5fccd8"
+      }
+    },
+    {
+      "id": "vocabulary-racer",
+      "repository": "mcproductionsdk-beep/Vocabulary-Racer",
+      "commit": "b3abbb39b6baab8053ce06edfdaee344a598f115",
+      "game": "racer",
+      "build": "preview",
+      "files": {
+        "baseline/desktop.html.txt": "46a35972a5d76ae8d438f4af3d100d4241f4d053e53198bce06e9d8fe4c999f2",
+        "baseline/mobile.html.txt": "4412bf7b6be624f24a3b57d2c549f55c4d8915a15d9c6a923efbf392acc9a814",
+        "engine/adapter.js": "68ac7a7627d141cf0bfe5113a59594e1e56b58b5ae03f957dd6a6869069f32f1",
+        "engine/bootstrap.mjs": "d79213d47aae2e1d22581ff67488452065194d42d3a528603fca1fae0b5c023c",
+        "engine/layout.css": "f33be12070d8777d57c6179b9aa14203f10daece7f08b51974574c3be2e7df49",
+        "engine/session.mjs": "c3b53c4f69474028647ab3237470b41fdb6f7c592f03e3792f4e69df35265f53",
+        "preview/index.html": "07d0b6c48e83b91302c0e1016dd3dc6d5c2621e0a95c8bc5a7d30b3cda6af499",
+        "preview/launcher.js": "4dca67821e5294aa33b9db93b1c642f379122058e90d9f48a2b7c42cf3d6fe38",
+        "scripts/build-preview.mjs": "923de4a887d06e97efdd6a513a5d6139fd31e6145f219c1a5e2655a20cc04e92"
+      }
+    },
+    {
+      "id": "vocabulary-jumper",
+      "repository": "mcproductionsdk-beep/Vocabulary-Jumper",
+      "commit": "2ff3ccea75bd87c61c17d641bed2722913d76176",
+      "game": "jumper",
+      "build": "preview",
+      "files": {
+        "engine/adapter.js": "71d169075925a65bdd427a881b294c6cc3417e5084335898d5d16f6190934f5d",
+        "engine/bootstrap.mjs": "3aa0293e1ae6a95709af85f7a651ed95b6f3c9f07917391425934de20c2f78b5",
+        "engine/layout.css": "121512739b8f59fbb9b3c338626538988c5c1d6ae72acc1b268db75c3ae629a0",
+        "engine/session.mjs": "d6eed3ba5c5e655c92046b4526034e893f378b97b4295a02e5c8f30cfbda2c53",
+        "index.html": "ce7391d56289dc9aabd04fb38c55b651ae4569b4e289aaab41d2b7aab6fe74ea",
+        "jumper-game.html": "ea72d4b3c0027165444bd9de4ab2016bcfb9fcc51e6650513551a7cfea841dc1",
+        "launcher.js": "4044113c64523fb08d2a306ea02062c1a2e6e96e793828a90670dc1dbe2d4312",
+        "scripts/build-preview.mjs": "e54f07fff518af92baa7b394501ee78fdbc6954b537e272a009e99993467a803"
+      }
+    },
+    {
+      "id": "vocabulary-invaders",
+      "repository": "mcproductionsdk-beep/Vocabulary-Invaders",
+      "commit": "32644f495b60e26736a6d48d1a52431baca3b751",
+      "game": "invaders",
+      "build": "preview",
+      "files": {
+        "bootstrap.mjs": "ee89a775f526112e226cbeaa4abd20211cad2fcd6f8b94997999be9a1e407fdf",
+        "index.html": "218864fb36cb8b5bd6e9935746ac3c317a8535c10a83a9e7ec5db6d4c0e0050b",
+        "invaders-game.html": "5dbdbeebaab4ac7ef45a8bdb2548f663e54364b2198b4a6ed28809e904398fe1",
+        "launcher.js": "8559a24452cbe1d2463f834d9dcd0a63ac62401f6025755114b682436228a507",
+        "scripts/build-preview.mjs": "2e1eed73631ac846f25f1198855dece55fe7fa00a6db13890b8d27c2dbeaca25",
+        "session.mjs": "9f6e85d59663fc2e08516b04ffb7c8898b37033841b56ba1eb0588a3efb0760e"
+      }
+    },
+    {
+      "id": "vocabulary-frog",
+      "repository": "mcproductionsdk-beep/Vocabulary-Frog",
+      "commit": "4313556bdad33f2511185a8ae4b550acd273e575",
+      "game": "frog",
+      "build": "copy",
+      "files": {
+        "bootstrap.mjs": "0debe3dc2b1ed567cd7d9790501f2a6aed98dfc23cce3d06d99acee740bc2f57",
+        "index.html": "8faad0472af7fc977863ae4a2c6031b458ce186a302e71aeca73e434f26cb2c6",
+        "session.mjs": "fb0fdac89c664b186e8998cb4d0e04b411f050a3d12a607d7c571900c69f3b22"
+      }
+    },
+    {
+      "id": "vocabulary-match",
+      "repository": "mcproductionsdk-beep/Vocabulary-Match",
+      "commit": "6b67c7ea05d1caadaeddaf8434bd3dca3e75ea1e",
+      "game": "match",
+      "build": "copy",
+      "files": {
+        "bootstrap.mjs": "4a79a8da03ad0172805ca6999f7caac1043df09a5a3e5078fade51ecd9f43c33",
+        "index.html": "b4c4f523c13a9a7769048db1b0e35cd2e32be818914816d128f903e470eac00b",
+        "session.mjs": "9aa824f8ef8a524c43576e9a0c9ed8e1ebcbfd9d50d7a835cacf0056415674eb"
+      }
+    },
+    {
+      "id": "vocabulary-eater",
+      "repository": "mcproductionsdk-beep/Vocabulary-Eater",
+      "commit": "97fa2f809a908c2ce07c19770cb5009b467316a9",
+      "game": "eater",
+      "build": "copy",
+      "files": {
+        "bootstrap.mjs": "b9b3e0aa9a39e9285aab46ded62622a4ff415660d6a7f44b38fbd9392877f408",
+        "eater-game.html": "03cb70eb5b60139ce9e25ff591bd1d8356be30a975c41c8cf3931dbeabec39be",
+        "engine.js": "93e83ee26b8cfb4a061f0e103cb8fa45e669a7d385d5ce8af0d5bc1a8e534770",
+        "gameplay.css": "62af78cb95f357e0f61b3b609fb5ebe8d02477101e87bf36a0217288ed740d3d",
+        "session.mjs": "14c58ccbebced48a910de50b9ff00ca1499e87a2f9fc2a996513545762ecb41b"
+      }
+    },
+    {
+      "id": "vocabulary-warehouse",
+      "repository": "mcproductionsdk-beep/Vocabulary-Warehouse",
+      "commit": "06d92784885855d107ee1c6603addbc67197459d",
+      "game": "warehouse",
+      "build": "copy",
+      "files": {
+        "electric/arcade.css": "e3e1c12e7419580ccc3f04479e1e3a16f9ebf37cd505d1196f29cd68bc2b351b",
+        "electric/bootstrap.mjs": "6d4706b2630609b2c6ca854665792a4fc1657240b775a2388910dba673fc8c40",
+        "electric/electrical.js": "348269aecdcb97c2247828ae8b38c0bc99f28acc2173e700eb57d404972c9390",
+        "electric/game-multilingual-v2.html": "55957911ed12051bb4022e66498ff10b674999c8116e64f699f0f5995c142981",
+        "electric/mobile-preview.html": "954d3ccb66cfe3cda472a54f8a76a3abf30623aef343e37aa2701c337c1af68d",
+        "electric/session.mjs": "77ef1699cc573d7480eb2db543e9e9d4bdeb890c93bcddd5aaadbbcc2108f8fa"
+      }
+    },
+    {
+      "id": "sentence-cat",
+      "repository": "mcproductionsdk-beep/Sentence-Cat-Engine",
+      "commit": "62e0f812faaf227a3b38a94578cab7b5e76dda40",
+      "game": "cat",
+      "build": "sentence",
+      "files": {
+        "engine/cat.css": "bc01c5bb099f44c75714339509a16bc3e7a5e03720ae983cc9dcf039fc430f77",
+        "engine/cat.js": "004a912ab94a0d4668b424fb2abc7029c36ed9533ba5b1ef34cb99f66f38428d",
+        "engine/lifecycle.js": "9faee93474399e685fd122530daa7103b4f596a36b1ffc877aa65ae95a1f33f8",
+        "engine/sentence-session.mjs": "b387c6a9992e563305fbe0a6f4f0b471f24f72f8dbf5d5c27412c1d58c33870c",
+        "preview/index.html": "4efafbb580dfce138f08711e846ab54cd9d63d32ddc3a2127c2883fedbb7a1e3"
+      }
+    },
+    {
+      "id": "sentence-eater",
+      "repository": "mcproductionsdk-beep/Sentence-Eater-Engine",
+      "commit": "9f32470ac8d09b6ea42f87345a8eea5ed8e7b6de",
+      "game": "eater",
+      "build": "sentence",
+      "files": {
+        "engine/eater.css": "c1ab627781818f66989ec8cdf3a6aefe462a3297551f761f95330f82f17d122e",
+        "engine/eater.js": "515e8436b810a39026b78ae523acb0dba2ec412d4adeae3e09aeacd04afa0536",
+        "engine/lifecycle.js": "9faee93474399e685fd122530daa7103b4f596a36b1ffc877aa65ae95a1f33f8",
+        "preview/index.html": "a0e31ebda7cf558dd9a385b438c44cb912350261bb0513deac5546836f096e8b"
+      }
+    },
+    {
+      "id": "sentence-warehouse",
+      "repository": "mcproductionsdk-beep/Sentence-Warehouse-Engine",
+      "commit": "f46b12dc5def29901424147b196e048b7881862e",
+      "game": "warehouse",
+      "build": "sentence",
+      "files": {
+        "engine/lifecycle.js": "9faee93474399e685fd122530daa7103b4f596a36b1ffc877aa65ae95a1f33f8",
+        "engine/warehouse.css": "66c45555141d3c98e664f592d2f7c00e104a1863da1b0211e988ee5ef82703a2",
+        "engine/warehouse.js": "503b2197631d03b101fed7bf0085f8b472f03a2838b1c4e182718a4ad7d96e20",
+        "preview/index.html": "80a2702fe03e070574c055aedebfa742e322a3b32826a98a3416c47d4326c356"
+      }
+    },
+    {
+      "id": "sentence-invaders",
+      "repository": "mcproductionsdk-beep/1.-Sentence-Invaders-Engine",
+      "commit": "0735ce38d89e07ee08e72283e8b0614ed2e4402c",
+      "game": "invaders",
+      "build": "sentence",
+      "files": {
+        "engine/invaders.css": "8efd4453874ad4fcef1ec8243c4d7ce1e103bcce66e40d01dce8c802a9297d53",
+        "engine/invaders.js": "c882c582e1da5f6540302d520cd26efa1507baadea4b3e6d2bcef0e16519367b",
+        "engine/lifecycle.js": "9faee93474399e685fd122530daa7103b4f596a36b1ffc877aa65ae95a1f33f8",
+        "preview/index.html": "f19a0454309cfe65d8b2790bbe628032dd56be24c819b580424b67a8ee436b76"
+      }
+    }
+  ]
+}
