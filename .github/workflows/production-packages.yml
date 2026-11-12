@@ -17,6 +17,7 @@ jobs:
           node-version: 22
       - run: node scripts/production/build.mjs
       - run: node scripts/production/verify.mjs
+      - run: node scripts/production/test-integrity.mjs
       - run: npm install --no-save playwright@1.56.1
       - run: npx playwright install chromium
       - run: node scripts/production/test-browser.mjs

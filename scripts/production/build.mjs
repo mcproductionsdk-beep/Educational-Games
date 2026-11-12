@@ -89,6 +89,7 @@ function cleanSentence(code,g){
  return code;
 }
 function prepareHtml(html,files,name){
+ const sentence=name.startsWith('Sentence');
  const scripts=[];let sequence=0;
  html=html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,(_,attrs,body)=>{
   const src=attrs.match(/\bsrc=["']([^"']+)/)?.[1],module=/\btype=["']module/.test(attrs);
@@ -97,7 +98,7 @@ function prepareHtml(html,files,name){
  });
  html=html.replace(/<title>[\s\S]*?<\/title>/i,'<title>'+name+'</title>');
  html=html.replace(/<body([^>]*)>/,'<body$1 style="visibility:hidden">').replace('</body>','<script type="module" src="./launch.mjs"></script></body>');
- files['launch.mjs']=`const allowed=${JSON.stringify(settings.shellOrigin)};let source;try{source=new URL(document.referrer).origin}catch{}\nif(parent===window||source!==allowed){document.body.replaceChildren();const h=document.createElement('h1');h.textContent='Choose a set to play';const a=document.createElement('a');a.href=${JSON.stringify(home)};a.textContent='OPEN BORING TEACHER';document.body.append(h,a)}else{for(const item of ${JSON.stringify(scripts)}){await new Promise((resolve,reject)=>{const script=document.createElement('script');if(item.module)script.type='module';script.src=new URL(item.path,import.meta.url);script.onload=resolve;script.onerror=reject;document.body.append(script)})}}document.body.style.visibility='visible';\n`;
+ files['launch.mjs']=`const allowed=${JSON.stringify(settings.shellOrigin)};let source;try{source=new URL(document.referrer).origin}catch{}\nif(parent===window||source!==allowed){document.body.replaceChildren();const h=document.createElement('h1');h.textContent='Choose a set to play';const a=document.createElement('a');a.href=${JSON.stringify(home)};a.textContent='OPEN BORING TEACHER';const hash=location.hash;const sentence=${sentence};if(sentence&&/^#(?:sentence-set|set)=S[A-HJ-NP-Z2-9]{8}$/.test(hash))a.hash='#sentence-set='+hash.split('=')[1];else if(!sentence&&/^#set=[A-Z0-9]{6}$/.test(hash))a.hash=hash;document.body.append(h,a)}else{for(const item of ${JSON.stringify(scripts)}){await new Promise((resolve,reject)=>{const script=document.createElement('script');if(item.module)script.type='module';script.src=new URL(item.path,import.meta.url);script.onload=resolve;script.onerror=reject;document.body.append(script)})}}document.body.style.visibility='visible';\n`;
  return html;
 }
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
@@ -176,6 +177,7 @@ app=app.slice(0,a)+`function configuration(gameId='vocabulary-snake'){
  return{config,registry,policy};
 }
 `+app.slice(b);
+app=app.replaceAll('Publishing to staging…','Creating student link…').replaceAll('Not yet migrated to isolated staging','Not yet available').replaceAll('Unable to start the staging game','Unable to start the game').replaceAll('Staging publication failed:','Could not create student link:').replaceAll('staging homepage to create a test set','homepage to create a set').replaceAll('shared staging vocabulary','shared vocabulary');
 app=app.replaceAll('bt-staging-word-sets-v1','bt-word-sets-v1').replaceAll('staging site','site').replaceAll('browser and staging','browser and this site').replaceAll('Staging','').replaceAll('staging','');
 await put(join(site,'platform/production/app.mjs'),app);
 let sentence=await readCentral('platform/staging/sentence.mjs');
