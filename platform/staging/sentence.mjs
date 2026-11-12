@@ -17,11 +17,13 @@ const languages = {
 };
 const words = text => text.match(/[\p{L}\p{N}]+(?:[’'\-][\p{L}\p{N}]+)*/gu) ?? [];
 
-export function inspectSentences(text) {
+export function inspectSentences(text, columnOrder = 'english-first') {
+  if (!['english-first', 'target-first'].includes(columnOrder)) throw Error('Invalid sentence column order.');
   const pairs = [], errors = [], rows = [];
   text.split(/\r?\n/).forEach((row, index) => {
     if (!row.trim()) return;
     const pair = row.split(row.includes('\t') ? '\t' : '|').map(value => value.trim());
+    if (columnOrder === 'target-first') pair.reverse();
     const valid = pair.length === 2 && pair.every(value => value && value.length <= 1000) && words(pair[1]).length > 0;
     const number = index + 1;
     rows.push({ number, raw: row, pair: valid ? pair : null });
@@ -151,10 +153,33 @@ export function mountSentenceCat({ root, engine, set, soundOn, voice, onSound, o
   return { destroy };
 }
 
+// Browser-local prototype only. Public-origin draft compatibility is explicit;
+// preview origins cannot read data saved on boringteacher.com.
+export const SENTENCE_DRAFT_KEY = 'bt-staging-sentence-sets-v1';
+export function readSentenceDrafts(storage) {
+  const saved = JSON.parse(storage.getItem(SENTENCE_DRAFT_KEY) || '[]');
+  if (!Array.isArray(saved)) throw Error('Saved sentence storage is invalid. Existing data was not changed.');
+  return saved;
+}
+export function validateSavedSentenceDraft(item) {
+  if (item?.schemaVersion !== 1 || item.family !== 'sentence' ||
+      !['english-first', 'target-first'].includes(item.columnOrder)) throw Error('This saved sentence set is invalid.');
+  return { ...validateSentenceSet(item), columnOrder: item.columnOrder };
+}
+export function saveSentenceDraft(storage, set, folder, columnOrder) {
+  const validated = validateSentenceSet(set);
+  if (typeof folder !== 'string' || !folder.trim() || folder.trim().length > 80) throw Error('Enter a folder name of 1–80 characters.');
+  if (!['english-first', 'target-first'].includes(columnOrder)) throw Error('Invalid sentence column order.');
+  const saved = readSentenceDrafts(storage);
+  saved.push({ ...validated, family: 'sentence', schemaVersion: 1, columnOrder,
+    folder: folder.trim(), savedAt: new Date().toISOString() });
+  storage.setItem(SENTENCE_DRAFT_KEY, JSON.stringify(saved));
+}
+
 export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch }) {
-  let draft = { title: '', language: 'es-ES', text: '', topic: '' };
+  let draft = { title: '', language: 'es-ES', text: '', topic: '', columnOrder: 'english-first' };
   let catalog;
-  const textFor = pairs => pairs.map(pair => pair.join('\t')).join('\n');
+  const textFor = (pairs, order = 'english-first') => pairs.map(pair => (order === 'target-first' ? [...pair].reverse() : pair).join('\t')).join('\n');
   function field(parent, tag, id, title) {
     const label = node('label', title), control = node(tag);
     label.htmlFor = control.id = id;
@@ -205,6 +230,12 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     const text = field(editor, 'textarea', 'sentence-pairs', 'ENGLISH FIRST · TARGET SECOND');
     text.value = draft.text;
     text.spellcheck = false;
+    const order = field(editor, 'select', 'sentence-column-order', 'EDITOR COLUMN ORDER');
+    order.add(new Option('English first · target second', 'english-first'));
+    order.add(new Option('Target first · English second', 'target-first'));
+    order.value = draft.columnOrder;
+    const directionNote = node('p', 'Games use English prompts → the selected target language. Swap changes editor column order only.');
+    directionNote.className = 'small';editor.append(directionNote);
     const review = node('p'), preview = node('section'), summary = node('p'), previewRows = node('div');
     preview.className = 'preview';
     summary.className = 'small';
@@ -215,11 +246,12 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     shareArea.id = 'shared-link';
     shareArea.setAttribute('role', 'status');
     function refresh() {
-      const { pairs, errors, rows } = inspectSentences(text.value);
+      const { pairs, errors, rows } = inspectSentences(text.value, order.value);
+      editor.querySelector('label[for="sentence-pairs"]').textContent = order.value === 'english-first' ? 'ENGLISH FIRST · TARGET SECOND' : 'TARGET FIRST · ENGLISH SECOND';
       review.textContent = pairs.length + ' valid pairs' + (errors.length ? ' · Review lines ' + errors.join(', ') : '');
       summary.textContent = 'en-US → ' + language.value + ' · ' + pairs.length + ' pairs · at least 2 required to play/share';
       renderPairPreview(previewRows, rows, ['en-US', language.value]);
-      draft = { title: title.value, language: language.value, text: text.value, topic: topic.value };
+      draft = { title: title.value, language: language.value, text: text.value, topic: topic.value, columnOrder: order.value };
       return { pairs, errors };
     }
     function selectedSet() {
@@ -245,17 +277,27 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     topic.addEventListener('change', () => {
       if (topic.value) {
         if (text.value.trim() && !window.confirm('Replace the current sentences with this topic?')) { topic.value = draft.topic; return; }
-        text.value = textFor(catalog.languages[language.value][topic.value]);
+        text.value = textFor(catalog.languages[language.value][topic.value], order.value);
         title.value = topic.value;
       }
       refresh();
     });
     language.addEventListener('change', () => { fillTopics(); refresh(); });
+    order.addEventListener('change', () => { topic.value = ''; refresh(); });
     title.addEventListener('input', refresh);
     text.addEventListener('input', () => { topic.value = ''; refresh(); });
-    settings.append(button('TEST VOICE', () => void voice.speak(inspectSentences(text.value).pairs[0]?.[1] ||
+    settings.append(button('TEST VOICE', () => void voice.speak(inspectSentences(text.value, order.value).pairs[0]?.[1] ||
       languages[language.value][1], language.value)));
     editor.append(button('CHECK IMPORT', refresh), button('CLEAR', () => { text.value = ''; title.value = ''; topic.value = ''; refresh(); }));
+    const swap = button('⇄ SWAP COLUMNS', () => {
+      const parsed = inspectSentences(text.value, order.value);
+      if (parsed.errors.length || !parsed.pairs.length) { notice.textContent = 'Enter valid sentence pairs before swapping columns.'; return; }
+      order.value = order.value === 'english-first' ? 'target-first' : 'english-first';
+      text.value = textFor(parsed.pairs, order.value);
+      voice.cancel();refresh();
+      notice.textContent = 'Editor columns swapped. Games still use English prompts and the selected target language.';
+    });
+    swap.className = 'swap';editor.append(swap);
     const share = button('STUDENT LINK', async () => {
       share.disabled = true;
       shareArea.replaceChildren();
@@ -275,13 +317,61 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
       } catch (error) { if (current()) notice.textContent = error.message; }
       finally { share.disabled = false; }
     });
-    const actions = node('div'), sharing = node('div');
+    const actions = node('div'), sharing = node('div'), saving = node('div'), dialog = node('dialog');
+    dialog.className = 'dialog';dialog.setAttribute('aria-label', 'Save Sentence sets');
+    function loadSaved(item, result) {
+      try {
+        const saved = validateSavedSentenceDraft(item);
+        if (text.value.trim() && !window.confirm('Replace the current sentences with this saved set?')) return;
+        language.value = saved.language;title.value = saved.title;order.value = saved.columnOrder;
+        text.value = textFor(saved.pairs, order.value);fillTopics();refresh();voice.cancel();dialog.close();
+        notice.textContent = 'Sentence set loaded from this browser.';
+      } catch (error) { result.textContent = error.message; }
+    }
+    const save = button('SAVE TO FOLDER', () => {
+      dialog.replaceChildren(node('h3', 'SAVE TO FOLDER'), node('p', 'Local prototype only: this browser and this staging site. No account or cloud sync.'));
+      const folder = field(dialog, 'input', 'sentence-folder', 'FOLDER NAME');folder.value = 'My Sentence Sets';folder.maxLength = 80;
+      const result = node('p');result.setAttribute('role', 'status');
+      const entries = node('div');
+      function refreshSaved() {
+        entries.replaceChildren();
+        try {
+          const saved = readSentenceDrafts(localStorage);
+          if (!saved.length) entries.append(node('p', 'No Sentence sets saved on this site.'));
+          for (const item of saved.slice().reverse()) entries.append(button('LOAD · ' + String(item?.folder || '') + ' / ' + String(item?.title || 'Untitled'), () => loadSaved(item, result)));
+        } catch { result.textContent = 'Local storage could not be read. Existing data was not changed.'; }
+      }
+      dialog.append(button('SAVE LOCALLY', () => {
+        try { saveSentenceDraft(localStorage, selectedSet(), folder.value, order.value);refreshSaved();result.textContent = 'Saved on this device.'; }
+        catch (error) { result.textContent = 'Could not save: ' + error.message; }
+      }), result, entries);
+      refreshSaved();
+      // Import is opt-in and never rewrites the old, unversioned draft.
+      try {
+        const legacy = localStorage.getItem('bt-sentence-universal-preview');
+        if (legacy) {
+          dialog.append(node('p', 'An older Sentence draft exists on this site. Choose its English column before importing.'));
+          const legacyOrder = field(dialog, 'select', 'legacy-sentence-order', 'OLDER DRAFT COLUMN ORDER');
+          legacyOrder.add(new Option('English first', 'english-first'));legacyOrder.add(new Option('English second', 'target-first'));
+          dialog.append(button('IMPORT OLDER DRAFT', () => {
+            try {
+              const old = JSON.parse(legacy), parsed = inspectSentences(old.editor, legacyOrder.value);
+              if (parsed.errors.length) throw Error('The older draft has invalid rows.');
+              loadSaved({ ...validateSentenceSet({title: old.title || 'Imported sentences', language: old.target, pairs: parsed.pairs}),
+                family: 'sentence', schemaVersion: 1, columnOrder: legacyOrder.value }, result);
+            } catch { result.textContent = 'The older draft could not be imported. Existing data was not changed.'; }
+          }));
+        }
+      } catch { result.textContent = 'Local storage is unavailable.'; }
+      dialog.append(button('CLOSE', () => dialog.close()));dialog.showModal();
+    });
+    saving.className = 'actionbox';saving.append(save, node('p', 'Save and load on this device and site. Cloud sync is not available.'));
     actions.className = 'actions';
     sharing.className = 'actionbox';
     sharing.append(share, shareArea);
-    actions.append(sharing);
+    actions.append(sharing, saving);
     grid.append(settings, editor);
-    workspace.append(grid, actions, node('h3', 'CHOOSE YOUR GAME'), gameButton(selectedSet), preview);
+    workspace.append(grid, actions, dialog, node('h3', 'CHOOSE YOUR GAME'), gameButton(selectedSet), preview);
     refresh();
   }
   return { render };

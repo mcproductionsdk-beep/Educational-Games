@@ -1,0 +1,19 @@
+name: Sentence menu workflows
+on:
+  pull_request:
+    paths: ['platform/staging/sentence.mjs', 'scripts/test-sentence-menu*.mjs', '.github/workflows/sentence-menu.yml']
+permissions:
+  contents: read
+jobs:
+  menu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/test-sentence-menu-contracts.mjs
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install chromium
+      - run: node scripts/test-sentence-menu.mjs
