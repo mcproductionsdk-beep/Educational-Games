@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Editorial V1.7 candidate: 5 languages, 123 topics, 9 sentence pairs per topic. Corrected German subordinate-clause commas; relabeled Italian congiuntivo imperfetto topic; corrected Italian conditional punctuation. Not approved for production.",
+  "description": "Editorial V1.8: 5 languages, 123 topics, 1107 pairs; reviewed revisions approved for release preparation on 2026-11-12. See docs/catalogue-and-device-signoff-2026-11-12.md. Physical-device, audible-voice and production cutover approval remain pending.",
   "languages": {
     "es-ES": {
       "Present tense": [
@@ -569,8 +569,8 @@
           "No encuentro mi cuaderno; lo dejé en el colegio"
         ],
         [
-          "We watched the film yesterday and we really liked it",
-          "Vimos la película ayer y nos gustó mucho"
+          "We watched the film yesterday and really enjoyed it",
+          "Vimos la película ayer y la disfrutamos mucho"
         ]
       ],
       "Indirect object pronouns": [
@@ -803,12 +803,12 @@
       ],
       "Questions": [
         [
-          "Where do you live",
-          "Dónde vives"
+          "Where do you live?",
+          "¿Dónde vives?"
         ],
         [
-          "What are you doing",
-          "Qué estás haciendo"
+          "What are you doing?",
+          "¿Qué estás haciendo?"
         ],
         [
           "Who is your teacher?",
@@ -1703,7 +1703,7 @@
           "Wir wohnen in einer kleinen Wohnung"
         ],
         [
-          "She helps the young child",
+          "She helps the small child",
           "Sie hilft dem kleinen Kind"
         ],
         [
@@ -1869,12 +1869,12 @@
       ],
       "Questions": [
         [
-          "Where do you live",
-          "Wo wohnst du"
+          "Where do you live?",
+          "Wo wohnst du?"
         ],
         [
-          "Are you coming tomorrow",
-          "Kommst du morgen"
+          "Are you coming tomorrow?",
+          "Kommst du morgen?"
         ],
         [
           "What is your name?",
@@ -1946,11 +1946,11 @@
       "Relative clauses": [
         [
           "The man who lives here is friendly",
-          "Der Mann der hier wohnt ist freundlich"
+          "Der Mann, der hier wohnt, ist freundlich"
         ],
         [
           "The book that I read is interesting",
-          "Das Buch das ich lese ist interessant"
+          "Das Buch, das ich lese, ist interessant"
         ],
         [
           "The woman who sings is my aunt",
@@ -2373,7 +2373,7 @@
           "Hun siger at hun ikke er træt"
         ],
         [
-          "I think that she does not know",
+          "I think that she does not know it",
           "Jeg tror, at hun ikke ved det"
         ],
         [
@@ -2403,12 +2403,12 @@
       ],
       "Questions": [
         [
-          "Where do you live",
-          "Hvor bor du"
+          "Where do you live?",
+          "Hvor bor du?"
         ],
         [
-          "Do you speak Danish",
-          "Taler du dansk"
+          "Do you speak Danish?",
+          "Taler du dansk?"
         ],
         [
           "What is your name?",
@@ -2863,12 +2863,12 @@
           "Jeg vil læse i morgen"
         ],
         [
-          "She will make dinner",
-          "Hun vil lave aftensmad"
+          "She is going to make dinner",
+          "Hun skal lave aftensmad"
         ],
         [
-          "We will play football",
-          "Vi vil spille fodbold"
+          "We are going to play football",
+          "Vi skal spille fodbold"
         ],
         [
           "Tomorrow I will buy bread",
@@ -3303,8 +3303,8 @@
           "Mes parents se réveillent à six heures tous les matins"
         ],
         [
-          "I put on my coat before leaving",
-          "Je mets mon manteau avant de partir"
+          "I get dressed before leaving",
+          "Je m'habille avant de partir"
         ],
         [
           "After school, the children wash and change clothes",
@@ -3375,7 +3375,7 @@
           "Elle nous explique la règle"
         ],
         [
-          "The teacher gives the students homework",
+          "The teacher gives them homework",
           "Le professeur leur donne des devoirs"
         ],
         [
@@ -3383,7 +3383,7 @@
           "Ma mère me raconte une histoire chaque soir"
         ],
         [
-          "We bought our grandparents a present",
+          "We bought them a present",
           "Nous leur avons acheté un cadeau"
         ],
         [
@@ -3583,12 +3583,12 @@
       ],
       "Questions": [
         [
-          "Where do you live",
-          "Où habites-tu"
+          "Where do you live?",
+          "Où habites-tu ?"
         ],
         [
-          "Do you speak French",
-          "Parles-tu français"
+          "Do you speak French?",
+          "Parles-tu français ?"
         ],
         [
           "What is your name?",

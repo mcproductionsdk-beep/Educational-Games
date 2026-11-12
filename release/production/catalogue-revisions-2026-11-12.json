@@ -1,0 +1,236 @@
+[
+  {
+    "language": "es-ES",
+    "topic": "Questions",
+    "row": 1,
+    "before": [
+      "Where do you live",
+      "Dónde vives"
+    ],
+    "after": [
+      "Where do you live?",
+      "¿Dónde vives?"
+    ]
+  },
+  {
+    "language": "es-ES",
+    "topic": "Questions",
+    "row": 2,
+    "before": [
+      "What are you doing",
+      "Qué estás haciendo"
+    ],
+    "after": [
+      "What are you doing?",
+      "¿Qué estás haciendo?"
+    ]
+  },
+  {
+    "language": "de-DE",
+    "topic": "Questions",
+    "row": 1,
+    "before": [
+      "Where do you live",
+      "Wo wohnst du"
+    ],
+    "after": [
+      "Where do you live?",
+      "Wo wohnst du?"
+    ]
+  },
+  {
+    "language": "de-DE",
+    "topic": "Questions",
+    "row": 2,
+    "before": [
+      "Are you coming tomorrow",
+      "Kommst du morgen"
+    ],
+    "after": [
+      "Are you coming tomorrow?",
+      "Kommst du morgen?"
+    ]
+  },
+  {
+    "language": "da-DK",
+    "topic": "Questions",
+    "row": 1,
+    "before": [
+      "Where do you live",
+      "Hvor bor du"
+    ],
+    "after": [
+      "Where do you live?",
+      "Hvor bor du?"
+    ]
+  },
+  {
+    "language": "da-DK",
+    "topic": "Questions",
+    "row": 2,
+    "before": [
+      "Do you speak Danish",
+      "Taler du dansk"
+    ],
+    "after": [
+      "Do you speak Danish?",
+      "Taler du dansk?"
+    ]
+  },
+  {
+    "language": "fr-FR",
+    "topic": "Questions",
+    "row": 1,
+    "before": [
+      "Where do you live",
+      "Où habites-tu"
+    ],
+    "after": [
+      "Where do you live?",
+      "Où habites-tu ?"
+    ]
+  },
+  {
+    "language": "fr-FR",
+    "topic": "Questions",
+    "row": 2,
+    "before": [
+      "Do you speak French",
+      "Parles-tu français"
+    ],
+    "after": [
+      "Do you speak French?",
+      "Parles-tu français ?"
+    ]
+  },
+  {
+    "language": "es-ES",
+    "topic": "Direct object pronouns",
+    "row": 9,
+    "before": [
+      "We watched the film yesterday and we really liked it",
+      "Vimos la película ayer y nos gustó mucho"
+    ],
+    "after": [
+      "We watched the film yesterday and really enjoyed it",
+      "Vimos la película ayer y la disfrutamos mucho"
+    ]
+  },
+  {
+    "language": "de-DE",
+    "topic": "Relative clauses",
+    "row": 1,
+    "before": [
+      "The man who lives here is friendly",
+      "Der Mann der hier wohnt ist freundlich"
+    ],
+    "after": [
+      "The man who lives here is friendly",
+      "Der Mann, der hier wohnt, ist freundlich"
+    ]
+  },
+  {
+    "language": "de-DE",
+    "topic": "Relative clauses",
+    "row": 2,
+    "before": [
+      "The book that I read is interesting",
+      "Das Buch das ich lese ist interessant"
+    ],
+    "after": [
+      "The book that I read is interesting",
+      "Das Buch, das ich lese, ist interessant"
+    ]
+  },
+  {
+    "language": "de-DE",
+    "topic": "Adjective endings",
+    "row": 7,
+    "before": [
+      "She helps the young child",
+      "Sie hilft dem kleinen Kind"
+    ],
+    "after": [
+      "She helps the small child",
+      "Sie hilft dem kleinen Kind"
+    ]
+  },
+  {
+    "language": "fr-FR",
+    "topic": "Reflexive verbs",
+    "row": 7,
+    "before": [
+      "I put on my coat before leaving",
+      "Je mets mon manteau avant de partir"
+    ],
+    "after": [
+      "I get dressed before leaving",
+      "Je m'habille avant de partir"
+    ]
+  },
+  {
+    "language": "fr-FR",
+    "topic": "Indirect object pronouns",
+    "row": 6,
+    "before": [
+      "The teacher gives the students homework",
+      "Le professeur leur donne des devoirs"
+    ],
+    "after": [
+      "The teacher gives them homework",
+      "Le professeur leur donne des devoirs"
+    ]
+  },
+  {
+    "language": "fr-FR",
+    "topic": "Indirect object pronouns",
+    "row": 8,
+    "before": [
+      "We bought our grandparents a present",
+      "Nous leur avons acheté un cadeau"
+    ],
+    "after": [
+      "We bought them a present",
+      "Nous leur avons acheté un cadeau"
+    ]
+  },
+  {
+    "language": "da-DK",
+    "topic": "Subordinate clause negation",
+    "row": 3,
+    "before": [
+      "I think that she does not know",
+      "Jeg tror, at hun ikke ved det"
+    ],
+    "after": [
+      "I think that she does not know it",
+      "Jeg tror, at hun ikke ved det"
+    ]
+  },
+  {
+    "language": "da-DK",
+    "topic": "Future with vil and skal",
+    "row": 2,
+    "before": [
+      "She will make dinner",
+      "Hun vil lave aftensmad"
+    ],
+    "after": [
+      "She is going to make dinner",
+      "Hun skal lave aftensmad"
+    ]
+  },
+  {
+    "language": "da-DK",
+    "topic": "Future with vil and skal",
+    "row": 3,
+    "before": [
+      "We will play football",
+      "Vi vil spille fodbold"
+    ],
+    "after": [
+      "We are going to play football",
+      "Vi skal spille fodbold"
+    ]
+  }
+]
