@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "central": {
     "repository": "mcproductionsdk-beep/Educational-Games",
-    "commit": "df0c2fe482647d29f9330c902e1f144f2b4842b3",
+    "commit": "789119d03dbd8a0595ae491b85efe735eb7f8b55",
     "files": {
       "platform/staging/app.mjs": "083015ce573010ed65cde82ca850cdb665e780ca04bdf3d20e8f9dff4330e9eb",
       "platform/staging/sentence.mjs": "23e58f6ea782d992a7f56ed8ac0004a9d27c4bff06390b515779a9f93dedd362",
@@ -17,7 +17,7 @@
       "platform/shell.mjs": "41c22854f7dfe13f58c6632dd73ab239656c04630022d0bd23df21d6aa6ced24",
       "platform/shell.css": "938ddd53481de9e4b73d0b3d8b1882449ecec59a915ab27691178347da0fe05a",
       "libraries/vocabulary/v2.json": "ea54493a6180560429b6e6f1ca7e07f17cd7eb3533d51870c1ad874453eeb28f",
-      "sentence-games-release-candidate/grammar-candidate.json": "39293becfdc97af37451f33adbbfbbd46ad50351da6e0b516fb3e36f167ddf7a"
+      "sentence-games-release-candidate/grammar-candidate.json": "80d167114340c5a6eb0ca203c00d3a342939c74055546a8c5c77b52a9f8aa184"
     }
   },
   "engines": [

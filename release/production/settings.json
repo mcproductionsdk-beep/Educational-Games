@@ -7,5 +7,7 @@
   "engineHostStatus": "proposed-not-provisioned",
   "wordApi": "https://boringteacher-vocabulary-api.mcproductionsdk.workers.dev",
   "sentenceApi": "https://boringteacher-sentences-api.mcproductionsdk.workers.dev",
-  "editorialApproval": "pending"
+  "editorialApproval": "reviewed-revisions-approved-2026-11-12",
+  "physicalDeviceApproval": "pending",
+  "audibleVoiceApproval": "pending"
 }
