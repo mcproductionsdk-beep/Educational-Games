@@ -11,10 +11,12 @@ const invaders=JSON.parse(await readFile(new URL('./staging/invaders-lock.json',
 if(!/^https:\/\/[a-f0-9]+\.bt-sentence-invaders-preview\.pages\.dev\/$/.test(invaders.url)||!/^[a-f0-9]{64}$/.test(invaders.buildId))throw new Error('Invalid Sentence Invaders engine lock.');
 const cat=JSON.parse(await readFile(new URL('./staging/cat-lock.json',import.meta.url),'utf8'));
 if(!/^https:\/\/[a-f0-9]+\.bt-sentence-cat-preview\.pages\.dev\/$/.test(cat.url)||!/^[a-f0-9]{64}$/.test(cat.buildId))throw new Error('Invalid Sentence Cat engine lock.');
-const files=['platform/config.mjs','platform/content.mjs','platform/runtime.mjs','platform/editor.mjs','platform/voice.mjs','platform/session-client.mjs','platform/shell.mjs','platform/shell.css','platform/staging/app.mjs','platform/staging/app.css','platform/staging/engine-lock.json','platform/staging/cat-lock.json','platform/staging/eater-lock.json','platform/staging/warehouse-lock.json','platform/staging/invaders-lock.json','platform/staging/sentence.mjs'];
+const files=['platform/config.mjs','platform/content.mjs','platform/runtime.mjs','platform/editor.mjs','platform/voice.mjs','platform/session-client.mjs','platform/shell.mjs','platform/shell.css','platform/staging/accounts.mjs','platform/staging/app.mjs','platform/staging/app.css','platform/staging/engine-lock.json','platform/staging/cat-lock.json','platform/staging/eater-lock.json','platform/staging/warehouse-lock.json','platform/staging/invaders-lock.json','platform/staging/sentence.mjs'];
 for(const name of files.filter(name=>name.endsWith('.mjs')))execFileSync(process.execPath,['--check',new URL(name,root).pathname]);
 await rm(out,{recursive:true,force:true});
 for(const name of files){const target=new URL(name,out);await mkdir(new URL('./',target),{recursive:true});await writeFile(target,await readFile(new URL(name,root)));}
+await writeFile(new URL('_worker.js',out),await readFile(new URL('platform/staging/accounts-gateway.mjs',root)));
+await writeFile(new URL('_routes.json',out),JSON.stringify({version:1,include:['/auth','/auth/*','/me'],exclude:[]}));
 await writeFile(new URL('index.html',out),await readFile(new URL('platform/staging/index.html',root)));
 await writeFile(new URL('404.html',out),'<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title><h1>Staging page not found</h1></html>');
 await writeFile(new URL('catalog.json',out),await readFile(new URL('libraries/vocabulary/v2.json',root)));

@@ -1,7 +1,7 @@
 name: Central runtime contracts
 on:
   push:
-    branches: ['feature/central-runtime-config-20261104']
+    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui']
   pull_request:
     paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
 permissions:
@@ -19,6 +19,8 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright-core@1.56.1
       - name: Prepare pinned engine test dependency
         run: python3 platform/tests/prepare-engine.py
+      - name: Test account controls in Chromium
+        run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/accounts-browser.mjs
       - name: Test central shell with actual engine
         shell: bash
         run: |

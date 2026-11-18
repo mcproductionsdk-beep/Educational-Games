@@ -1,3 +1,4 @@
+import {mountAccounts} from './accounts.mjs';
 import {LOCALES} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 import {createVocabularyRuntime} from '../runtime.mjs';
@@ -69,7 +70,23 @@ function renderPairPreview(container,rows,locales){
 
 const wordTab=document.getElementById('word-tab'),sentenceTab=document.getElementById('sentence-tab');
 const familyTabs=document.getElementById('family-tabs');
-let family='word';
+const accountDraftKey='bt-staging-signin-draft-v1';
+const draftFields=['prompt-language','target-language','category','set-title','pairs','sentence-language','sentence-topic','sentence-title','sentence-pairs','sentence-column-order'];
+let savedAccountDraft=null;
+try{const raw=sessionStorage.getItem(accountDraftKey);if(raw&&raw.length<150000)savedAccountDraft=JSON.parse(raw);}catch{}
+let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
+const accounts=mountAccounts({root:document.getElementById('account-controls'),beforeSignIn:()=>{
+ const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
+ const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
+ sessionStorage.setItem(accountDraftKey,saved);
+}});
+function restoreAccountDraft(){
+ const saved=savedAccountDraft;savedAccountDraft=null;if(!saved)return;
+ if(saved.hash!==location.hash&&/^#(?:set|sentence-set)=[A-Z0-9]{6}$/.test(saved.hash)){location.hash=saved.hash;return;}
+ for(const id of draftFields){const field=document.getElementById(id),value=saved.fields?.[id];if(field&&typeof value==='string')field.value=value;}
+ const text=document.getElementById(family==='sentence'?'sentence-pairs':'pairs');text?.dispatchEvent(new Event('input',{bubbles:true}));
+ try{sessionStorage.removeItem(accountDraftKey);}catch{}
+}
 const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,launch:(set,gameId='cat')=>{
  showWorkspace();
  document.body.classList.add('playing');
@@ -141,6 +158,7 @@ async function render(){
 try{
  runtime=createVocabularyRuntime(configuration());
  await render();
+ restoreAccountDraft();
 }catch(error){notice.textContent='Staging initialization failed: '+error.message;}
 window.addEventListener('hashchange',()=>void render());
 window.addEventListener('pagehide',()=>{game?.destroy();voice.cancel();});
