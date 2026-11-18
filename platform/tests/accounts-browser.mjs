@@ -14,8 +14,7 @@ const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||'/us
 try{
  const page=await browser.newPage();await page.goto('http://127.0.0.1:'+server.address().port);
  await page.getByRole('status').filter({hasText:'Guest'}).waitFor();assert.equal(await page.getByRole('link',{name:'Sign in'}).getAttribute('href'),'/auth/start');
- assert.equal(await page.getByRole('link',{name:'Create account'}).getAttribute('href'),'/auth/register');
- state='signed';await page.evaluate(()=>accounts.refresh());assert.equal(await page.getByRole('link',{name:'Create account'}).isVisible(),false);assert.match(await page.getByRole('status').textContent(),/Account b8ce6c1a/);
+ state='signed';await page.evaluate(()=>accounts.refresh());assert.match(await page.getByRole('status').textContent(),/Account b8ce6c1a/);
  assert.equal(await page.getByRole('button',{name:'Log out',exact:true}).isVisible(),true);
  state='unavailable';await page.evaluate(()=>accounts.refresh());assert.equal(await page.getByRole('link',{name:'Sign in'}).isVisible(),false);assert.match(await page.getByRole('status').textContent(),/unavailable/);
  state='signed';await page.getByRole('button',{name:'Retry'}).click();await page.getByRole('button',{name:'Log out',exact:true}).waitFor();

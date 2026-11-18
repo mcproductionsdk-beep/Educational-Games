@@ -3,13 +3,12 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  let disposed=false,epoch=0;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
- const signIn=doc.createElement('a');signIn.textContent='Sign in';signIn.href='/auth/start';signIn.className='account-button account-signin';
- const signUp=doc.createElement('a');signUp.textContent='Create account';signUp.href='/auth/register';signUp.className='account-button account-signup';
+ const signIn=doc.createElement('a');signIn.textContent='Sign in';signIn.href='/auth/start';
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
- root.replaceChildren(status,signIn,signUp,logout,retry);
+ root.replaceChildren(status,signIn,logout,retry);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;signIn.hidden=signed||unavailable;signUp.hidden=signed||unavailable;logout.hidden=!signed;retry.hidden=!unavailable;
+  status.textContent=text;signIn.hidden=signed||unavailable;logout.hidden=!signed;retry.hidden=!unavailable;
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -25,7 +24,7 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}
  }
- for(const link of [signIn,signUp])link.addEventListener('click',event=>{try{beforeSignIn();}catch{event.preventDefault();status.textContent='Unable to preserve your draft. Sign-in cancelled.';}});
+ signIn.addEventListener('click',event=>{try{beforeSignIn();}catch{event.preventDefault();status.textContent='Unable to preserve your draft. Sign-in cancelled.';}});
  logout.addEventListener('click',async()=>{
   ++epoch;logout.disabled=true;retry.hidden=true;status.textContent='Signing out…';
   const abort=new AbortController(),timer=host.setTimeout(()=>abort.abort(),8000);

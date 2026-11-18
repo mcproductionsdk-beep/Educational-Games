@@ -17,16 +17,3 @@ test('missing or failing binding returns unavailable; guest assets remain access
  assert.equal((await gateway.fetch(new Request(site+'/me'),{ACCOUNTS_SERVICE:{fetch(){throw Error();}}})).status,503);
  assert.equal(await (await gateway.fetch(new Request(site+'/'),{ASSETS:{fetch:()=>new Response('guest games')}})).text(),'guest games');
 });
-test('registration uses normal OIDC flow while preserving state, PKCE and flow cookie',async()=>{
- let seen;
- const location='https://boringeducation-staging-iig2s7.eu1.zitadel.cloud/oauth/v2/authorize?client_id=fixture&state=state-fixture&nonce=nonce-fixture&code_challenge=pkce-fixture&prompt=login&max_age=0';
- const result=await gateway.fetch(new Request(site+'/auth/register'),{ACCOUNTS_SERVICE:{fetch(r){seen=r;return new Response(null,{status:302,headers:{Location:location,'Set-Cookie':'flow=fixture; HttpOnly; Secure; SameSite=Lax'}});}}});
- assert.equal(seen.url,site+'/auth/start');assert.equal(result.status,302);
- const redirect=new URL(result.headers.get('Location'));assert.equal(redirect.searchParams.get('prompt'),'create');
- for(const key of ['state','nonce','code_challenge','max_age','client_id'])assert.equal(redirect.searchParams.get(key),new URL(location).searchParams.get(key));
- assert.match(result.headers.get('Set-Cookie'),/HttpOnly/);
-});
-test('registration rejects unexpected provider redirects and non-GET requests',async()=>{
- assert.equal((await gateway.fetch(new Request(site+'/auth/register'),{ACCOUNTS_SERVICE:{fetch:()=>new Response(null,{status:302,headers:{Location:'https://evil.test/authorize'}})}})).status,503);
- assert.equal((await gateway.fetch(new Request(site+'/auth/register',{method:'POST'}),{})).status,405);
-});
