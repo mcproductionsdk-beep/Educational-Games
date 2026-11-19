@@ -45,7 +45,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   function endPanel(){panel.hidden=true;panel.replaceChildren();}
   async function run(action){if(busy)return;busy=true;d.setAttribute('aria-busy','true');try{await action();}catch(e){if(current===epoch)showError(status,e);}finally{busy=false;if(current===epoch)d.removeAttribute('aria-busy');}}
   async function navigate(id){if(busy)return;closeMenu();location=id;offset=0;selected=null;search.value='';endPanel();await run(load);}
-  function choose(item,kind){selected={item,kind};endPanel();drawActions();for(const c of grid.children)c.classList.toggle('is-selected',c.dataset.item===((kind==='folder'?'folder:':'set:')+(item.folder_id&&kind==='folder'?item.folder_id:item.set_id)));}
+  function choose(item,kind){const gridTop=grid.getBoundingClientRect().top;selected={item,kind};endPanel();drawActions();for(const c of grid.children)c.classList.toggle('is-selected',c.dataset.item===((kind==='folder'?'folder:':'set:')+(item.folder_id&&kind==='folder'?item.folder_id:item.set_id)));main.scrollTop+=grid.getBoundingClientRect().top-gridTop;}
   function destinationPicker(container,excluded=null){
    const select=field(container,'Destination','','select'),root=node('option',excluded?'My Library (top level)':'Unfiled');root.value='';select.append(root);
    for(const f of folders){if(excluded&&!canMoveFolder(folders,excluded,f.folder_id))continue;const o=node('option',folderLabel(folders,f.folder_id));o.value=f.folder_id;select.append(o);}return select;
