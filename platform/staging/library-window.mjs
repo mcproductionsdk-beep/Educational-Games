@@ -14,7 +14,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   d.append(head,status);host.append(d);active=d;d.addEventListener('close',()=>{if(active===d)close();},{once:true});d.showModal();return {d,status,current:epoch};
  }
  function field(parent,label,value='',type='input'){
-  const l=node('label',label),control=node(type);control.value=value;l.append(control);parent.append(l);return control;
+  const l=node('label',label),control=node(type);control.setAttribute('aria-label',label);control.value=value;l.append(control);parent.append(l);return control;
  }
  const showError=(status,e)=>{
   status.textContent=e.message||'My Library is unavailable. Please try again.';

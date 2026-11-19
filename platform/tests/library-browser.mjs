@@ -6,10 +6,11 @@ import {chromium} from 'playwright-core';
 const origin='https://feature-accounts-ui.bt-vocabulary-platform-staging.pages.dev';
 const root=new URL('../../',import.meta.url);
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+let lastPage;
 try{
  for(const viewport of [{width:1280,height:900},{width:390,height:740}]){
   let folders=[],sets=[],signed=true,failSave=false;
-  const page=await browser.newPage({viewport});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>void d.accept());
+  const page=await browser.newPage({viewport});lastPage=page;const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>void d.accept());
   await page.route('**/*',async route=>{
    const req=route.request(),u=new URL(req.url());
    if(u.origin!==origin){await route.abort();return;}
@@ -88,5 +89,5 @@ try{
   assert.deepEqual(errors,[]);await page.close();
  }
  console.log('Library browser checks passed: actual homepage on desktop/mobile, both editors, private save, nested folders, V/S icons, desktop drag and mobile Move to, cycle filtering, preserving descendants on deletion, title search, exact sentence direction, draft preservation, literal rendering, Trash restore and sign-out cleanup.');
-}finally{await browser.close();}
+}catch(e){if(lastPage&&!lastPage.isClosed()){console.error(await lastPage.locator('body').innerText());await mkdir('artifacts',{recursive:true});await lastPage.screenshot({path:'artifacts/library-explorer-failure.png'});}throw e;}finally{await browser.close();}
 
