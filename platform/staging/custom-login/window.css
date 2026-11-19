@@ -16,3 +16,11 @@
 .bt-login-window .bt-login-recovery{margin:8px 0 0}
 .bt-login-window .bt-login-recovery a{display:inline-flex;align-items:center;min-height:44px}
 .bt-login-window .bt-login-submit{margin-top:12px}
+
+
+.bt-login-window [hidden]{display:none!important}
+.bt-login-window .bt-login-switch{display:inline-flex;align-items:center;min-height:44px;padding:6px 0;background:transparent;border:0;box-shadow:none;color:#ffda67;font:14px/1.5 Arial,sans-serif;text-decoration:underline}
+.bt-login-window .bt-login-create{display:flex;margin-top:4px}
+.bt-login-window .bt-registration-names{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.bt-login-window .bt-register-requirements{font:13px/1.5 Arial,sans-serif;margin:8px 0;color:#f0e6cb}
+.bt-login-window .bt-register-resend{margin-top:8px}

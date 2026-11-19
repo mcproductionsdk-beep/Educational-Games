@@ -1,14 +1,16 @@
 // Account state is verified by same-origin /me. Never infer authentication from storage.
-export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null}){
+export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null}){
  let disposed=false,epoch=0;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
  const signIn=doc.createElement('a');signIn.textContent='Sign in';signIn.href='/auth/start';
+ const createAccount=doc.createElement('button');createAccount.type='button';createAccount.textContent='Create account';createAccount.className='account-create';
+ createAccount.addEventListener('click',()=>{try{beforeSignIn();void openRegistration?.();}catch{status.textContent='Unable to preserve your draft. Registration cancelled.';}});
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
- root.replaceChildren(status,signIn,logout,retry);
+ root.replaceChildren(status,signIn,createAccount,logout,retry);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;signIn.hidden=signed||unavailable;logout.hidden=!signed;retry.hidden=!unavailable;
+  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;logout.hidden=!signed;retry.hidden=!unavailable;
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -39,4 +41,5 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  void refresh();
  return {refresh,destroy(){disposed=true;++epoch;host.removeEventListener('focus',resume);host.removeEventListener('pageshow',resume);doc.removeEventListener('visibilitychange',resume);}};
 }
+
 

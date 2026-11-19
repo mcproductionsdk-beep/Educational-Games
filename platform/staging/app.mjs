@@ -1,5 +1,6 @@
 import {mountAccounts} from './accounts.mjs';
 import {mountCombinedLogin} from './custom-login/window.mjs';
+import {mountRegistration} from './custom-login/register.mjs';
 import {LOCALES} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 import {createVocabularyRuntime} from '../runtime.mjs';
@@ -77,10 +78,11 @@ let savedAccountDraft=null;
 try{const raw=sessionStorage.getItem(accountDraftKey);if(raw&&raw.length<150000)savedAccountDraft=JSON.parse(raw);}catch{}
 let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
 let loginWindow=null;
-const accounts=mountAccounts({root:document.getElementById('account-controls'),openSignIn:async()=>{
+async function openAccountWindow(mode,initialCode=''){
  if(loginWindow)return;loginWindow=true;
- try{const mounted=await mountCombinedLogin({onClose:()=>{loginWindow=null;}});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Sign-in could not open. Please try again.';}
-},beforeSignIn:()=>{
+ try{const mounted=await (mode==='register'?mountRegistration:mountCombinedLogin)({initialCode,onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
+}
+const accounts=mountAccounts({root:document.getElementById('account-controls'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
  const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
  sessionStorage.setItem(accountDraftKey,saved);
@@ -168,3 +170,10 @@ try{
 window.addEventListener('hashchange',()=>void render());
 window.addEventListener('pagehide',()=>{game?.destroy();voice.cancel();});
 
+
+
+if(location.hash.startsWith('#verify-email=')){
+ let code='';try{code=decodeURIComponent(location.hash.slice(14));}catch{}
+ history.replaceState(null,'',location.pathname+location.search);
+ void openAccountWindow('register',code.length<=20?code:'');code='';
+}

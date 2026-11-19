@@ -23,6 +23,8 @@ jobs:
         run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/accounts-browser.mjs
       - name: Test combined login window
         run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/custom-login-browser.mjs
+      - name: Test email registration window
+        run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/registration-browser.mjs
       - name: Test central shell with actual engine
         shell: bash
         run: |
@@ -30,4 +32,5 @@ jobs:
           export CHROME_BIN="$(command -v google-chrome || command -v chromium || true)"
           test -n "$CHROME_BIN"
           node platform/tests/shell-browser.mjs
+
 
