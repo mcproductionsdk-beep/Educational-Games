@@ -1,5 +1,5 @@
 // Account state is verified by same-origin /me. Never infer authentication from storage.
-export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{}}){
+export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null}){
  let disposed=false,epoch=0;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
@@ -24,7 +24,7 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}
  }
- signIn.addEventListener('click',event=>{try{beforeSignIn();}catch{event.preventDefault();status.textContent='Unable to preserve your draft. Sign-in cancelled.';}});
+ signIn.addEventListener('click',event=>{try{beforeSignIn();if(openSignIn&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();void openSignIn();}}catch{event.preventDefault();status.textContent='Unable to preserve your draft. Sign-in cancelled.';}});
  logout.addEventListener('click',async()=>{
   ++epoch;logout.disabled=true;retry.hidden=true;status.textContent='Signing out…';
   const abort=new AbortController(),timer=host.setTimeout(()=>abort.abort(),8000);
@@ -39,3 +39,4 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  void refresh();
  return {refresh,destroy(){disposed=true;++epoch;host.removeEventListener('focus',resume);host.removeEventListener('pageshow',resume);doc.removeEventListener('visibilitychange',resume);}};
 }
+

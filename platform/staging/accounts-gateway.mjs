@@ -7,17 +7,19 @@ export default {
   const auth=url.pathname==='/me'||url.pathname==='/auth'||url.pathname.startsWith('/auth/');
   if(!auth)return env.ASSETS.fetch(request);
   if(url.origin!==origin)return new Response('Not found',{status:404,headers});
-  if(!['/me','/auth/start','/auth/callback','/auth/logout'].includes(url.pathname))return new Response('Not found',{status:404,headers});
-  if(url.pathname==='/auth/logout'&&(request.method!=='POST'||request.headers.get('Origin')!==origin))return new Response('Forbidden',{status:403,headers});
-  if(url.pathname!=='/auth/logout'&&request.method!=='GET')return new Response('Method not allowed',{status:405,headers});
+  if(!['/me','/auth/start','/auth/callback','/auth/logout','/auth/custom/context','/auth/custom/password'].includes(url.pathname))return new Response('Not found',{status:404,headers});
+  if(['/auth/logout','/auth/custom/password'].includes(url.pathname)&&(request.method!=='POST'||request.headers.get('Origin')!==origin))return new Response('Forbidden',{status:403,headers});
+  if(!['/auth/logout','/auth/custom/password'].includes(url.pathname)&&request.method!=='GET')return new Response('Method not allowed',{status:405,headers});
   try{
    if(!env.ACCOUNTS_SERVICE?.fetch)throw Error();
    // Preserve the actual URL, Origin and HttpOnly cookies; never trust forwarded headers.
    const response=await env.ACCOUNTS_SERVICE.fetch(request);
    const safe=new Headers(response.headers);
+   safe.delete('Set-Cookie');for(const value of response.headers.getSetCookie())safe.append('Set-Cookie',value);
    for(const [key,value] of Object.entries(headers))safe.set(key,value);
    safe.set('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
    return new Response(response.body,{status:response.status,headers:safe});
   }catch{return new Response('Authentication unavailable',{status:503,headers});}
  }
 };
+

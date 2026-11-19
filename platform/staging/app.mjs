@@ -1,4 +1,5 @@
 import {mountAccounts} from './accounts.mjs';
+import {mountCombinedLogin} from './custom-login/window.mjs';
 import {LOCALES} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 import {createVocabularyRuntime} from '../runtime.mjs';
@@ -75,7 +76,11 @@ const draftFields=['prompt-language','target-language','category','set-title','p
 let savedAccountDraft=null;
 try{const raw=sessionStorage.getItem(accountDraftKey);if(raw&&raw.length<150000)savedAccountDraft=JSON.parse(raw);}catch{}
 let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
-const accounts=mountAccounts({root:document.getElementById('account-controls'),beforeSignIn:()=>{
+let loginWindow=null;
+const accounts=mountAccounts({root:document.getElementById('account-controls'),openSignIn:async()=>{
+ if(loginWindow)return;loginWindow=true;
+ try{const mounted=await mountCombinedLogin({onClose:()=>{loginWindow=null;}});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Sign-in could not open. Please try again.';}
+},beforeSignIn:()=>{
  const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
  const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
  sessionStorage.setItem(accountDraftKey,saved);
@@ -162,3 +167,4 @@ try{
 }catch(error){notice.textContent='Staging initialization failed: '+error.message;}
 window.addEventListener('hashchange',()=>void render());
 window.addEventListener('pagehide',()=>{game?.destroy();voice.cancel();});
+
