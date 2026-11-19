@@ -1,7 +1,7 @@
 name: Central runtime contracts
 on:
   push:
-    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119']
+    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119', 'feature/library-explorer-20261119']
   pull_request:
     paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
 permissions:
@@ -36,5 +36,6 @@ jobs:
           export CHROME_BIN="$(command -v google-chrome || command -v chromium || true)"
           test -n "$CHROME_BIN"
           node platform/tests/shell-browser.mjs
+
 
 

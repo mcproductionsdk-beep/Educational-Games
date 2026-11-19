@@ -21,3 +21,13 @@ test('malformed, oversized and interrupted responses fail closed',async()=>{
   const client=createLibraryClient({fetcher});await assert.rejects(()=>client.context(),LibraryError);
  }
 });
+
+
+test('folder hierarchy and scoped searches use the authenticated library API',async()=>{
+ const calls=[],client=createLibraryClient({fetcher:async(path,options)=>{calls.push({path,options});return Response.json(path.endsWith('context')?{csrf:'x'.repeat(43)}:{});}});
+ const id='668f7475-8c19-45ed-b273-8b3a820c1e05',f={folder_id:id,revision:3};
+ await client.createFolder('Child',id);assert.deepEqual(JSON.parse(calls.at(-1).options.body),{name:'Child',parent_folder_id:id});
+ await client.moveFolder(f,null);assert.deepEqual(JSON.parse(calls.at(-1).options.body),{parent_folder_id:null,revision:3});
+ await client.sets(false,50,{folder:id,search:'100% café & test'});let u=new URL(calls.at(-1).path,'https://example.test');assert.equal(u.searchParams.get('q'),'100% café & test');assert.equal(u.searchParams.get('folder_id'),id);assert.equal(u.searchParams.get('offset'),'50');
+ await client.sets(false,0,{folder:null});u=new URL(calls.at(-1).path,'https://example.test');assert.equal(u.searchParams.get('folder_id'),'unfiled');
+});
