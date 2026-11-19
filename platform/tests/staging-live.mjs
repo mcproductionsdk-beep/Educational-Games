@@ -21,7 +21,7 @@ try{
  const engineHeaders=await context.request.get(engine.origin+'/snake-game.html');evidence.headers.engineCsp=engineHeaders.headers()['content-security-policy'];assert.ok(evidence.headers.engineCsp?.includes("connect-src 'none'"));
  for(const path of ['/platform/tests/runtime.test.mjs','/README.md','/.github/workflows/central-runtime-contracts.yml']){const r=await context.request.get(base.origin+path);assert.equal(r.status(),404,'Excluded artifact exposed: '+path);}
  await page.locator('[data-game="vocabulary-snake"]').waitFor();assert.equal(await page.locator('#family-tabs button').count(),4);assert.equal(await page.locator('[data-game]').count(),8);assert.equal(await page.locator('[data-game]:disabled').count(),7);
- await page.getByRole('button',{name:'SAVE TO FOLDER',exact:true}).click();await page.getByRole('button',{name:'SAVE LOCALLY',exact:true}).click();assert.ok(await page.locator('dialog').textContent().then(t=>t.includes('Saved on this device.')));await page.getByRole('button',{name:'CLOSE',exact:true}).click();
+ await page.getByRole('button',{name:'SAVE TO FOLDER',exact:true}).click();await page.getByRole('dialog',{name:'SAVE TO FOLDER',exact:true}).getByRole('button',{name:'Sign in',exact:true}).waitFor();assert.equal(await page.locator('.bt-library-save-submit').isDisabled(),true);await page.getByRole('button',{name:'Close ×',exact:true}).click();
  await page.locator('#category').selectOption('Animals');await page.locator('#prompt-language').selectOption('da-DK');
  const title='STAGING Snake '+Date.now();await page.locator('#set-title').fill(title);
  const mixed=['ice cream  helado','red apple : manzana roja','ice-cream — helado artesanal','pear;pera','grapes | uvas'].join('\n');
@@ -90,3 +90,4 @@ try{
  console.log('PASS real staging publication, frozen snapshots, fresh desktop/phone-sized guest journey; no production requests');
  await context.close();
 }finally{await browser.close();}
+

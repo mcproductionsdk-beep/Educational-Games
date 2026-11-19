@@ -1,7 +1,7 @@
 name: Central runtime contracts
 on:
   push:
-    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119', 'feature/library-explorer-20261119']
+    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119', 'feature/library-explorer-20261119', 'feature/library-save-picker-20261119']
   pull_request:
     paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
 permissions:
@@ -41,6 +41,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: library-explorer-browser-evidence
-          path: artifacts/library-explorer-*.png
+          path: artifacts/library-*.png
           if-no-files-found: ignore
 

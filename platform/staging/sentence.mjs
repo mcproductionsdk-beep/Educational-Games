@@ -317,63 +317,16 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
       } catch (error) { if (current()) notice.textContent = error.message; }
       finally { share.disabled = false; }
     });
-    const actions = node('div'), sharing = node('div'), saving = node('div'), dialog = node('dialog');
-    dialog.className = 'dialog';dialog.setAttribute('aria-label', 'Save Sentence sets');
-    function loadSaved(item, result) {
-      try {
-        const saved = validateSavedSentenceDraft(item);
-        if (text.value.trim() && !window.confirm('Replace the current sentences with this saved set?')) return;
-        language.value = saved.language;title.value = saved.title;order.value = saved.columnOrder;
-        text.value = textFor(saved.pairs, order.value);fillTopics();refresh();voice.cancel();dialog.close();
-        notice.textContent = 'Sentence set loaded from this browser.';
-      } catch (error) { result.textContent = error.message; }
-    }
-    const save = button('SAVE TO FOLDER', () => {
-      dialog.replaceChildren(node('h3', 'SAVE TO FOLDER'), node('p', 'Local prototype only: this browser and this staging site. No account or cloud sync.'));
-      const folder = field(dialog, 'input', 'sentence-folder', 'FOLDER NAME');folder.value = 'My Sentence Sets';folder.maxLength = 80;
-      const result = node('p');result.setAttribute('role', 'status');
-      const entries = node('div');
-      function refreshSaved() {
-        entries.replaceChildren();
-        try {
-          const saved = readSentenceDrafts(localStorage);
-          if (!saved.length) entries.append(node('p', 'No Sentence sets saved on this site.'));
-          for (const item of saved.slice().reverse()) entries.append(button('LOAD · ' + String(item?.folder || '') + ' / ' + String(item?.title || 'Untitled'), () => loadSaved(item, result)));
-        } catch { result.textContent = 'Local storage could not be read. Existing data was not changed.'; }
-      }
-      dialog.append(button('SAVE LOCALLY', () => {
-        try { saveSentenceDraft(localStorage, selectedSet(), folder.value, order.value);refreshSaved();result.textContent = 'Saved on this device.'; }
-        catch (error) { result.textContent = 'Could not save: ' + error.message; }
-      }), result, entries);
-      refreshSaved();
-      // Import is opt-in and never rewrites the old, unversioned draft.
-      try {
-        const legacy = localStorage.getItem('bt-sentence-universal-preview');
-        if (legacy) {
-          dialog.append(node('p', 'An older Sentence draft exists on this site. Choose its English column before importing.'));
-          const legacyOrder = field(dialog, 'select', 'legacy-sentence-order', 'OLDER DRAFT COLUMN ORDER');
-          legacyOrder.add(new Option('English first', 'english-first'));legacyOrder.add(new Option('English second', 'target-first'));
-          dialog.append(button('IMPORT OLDER DRAFT', () => {
-            try {
-              const old = JSON.parse(legacy), parsed = inspectSentences(old.editor, legacyOrder.value);
-              if (parsed.errors.length) throw Error('The older draft has invalid rows.');
-              loadSaved({ ...validateSentenceSet({title: old.title || 'Imported sentences', language: old.target, pairs: parsed.pairs}),
-                family: 'sentence', schemaVersion: 1, columnOrder: legacyOrder.value }, result);
-            } catch { result.textContent = 'The older draft could not be imported. Existing data was not changed.'; }
-          }));
-        }
-      } catch { result.textContent = 'Local storage is unavailable.'; }
-      dialog.append(button('CLOSE', () => dialog.close()));dialog.showModal();
-    });
+    const actions = node('div'), sharing = node('div'), saving = node('div');
     saving.className = 'actionbox';
-    if(saveToAccount)saving.append(button('SAVE TO ACCOUNT',()=>{try{const set=selectedSet();void saveToAccount(()=>({...set,...selectedSet(),family:'sentence',schemaVersion:1,promptLanguage:'en-US',metadata:{topic:topic.value,columnOrder:order.value,source:draft.source||(topic.value?'catalog':'custom')}}));}catch(error){notice.textContent=error.message;}}));
-    saving.append(save, node('p', 'Device-only saves stay in this browser. Use Save to account for your private library.'));
+    const save=button('SAVE TO FOLDER',()=>{try{const set=selectedSet();if(!saveToAccount)throw Error('Account saving is unavailable. Your draft is still here.');void saveToAccount(()=>({...set,...selectedSet(),family:'sentence',schemaVersion:1,promptLanguage:'en-US',metadata:{topic:topic.value,columnOrder:order.value,source:draft.source||(topic.value?'catalog':'custom')}}));}catch(error){notice.textContent=error.message;}});
+    saving.append(save,node('p','Save privately to your account. Choose a folder or create a new one.'));
     actions.className = 'actions';
     sharing.className = 'actionbox';
     sharing.append(share, shareArea);
     actions.append(sharing, saving);
     grid.append(settings, editor);
-    workspace.append(grid, actions, dialog, node('h3', 'CHOOSE YOUR GAME'), gameButton(selectedSet), preview);
+    workspace.append(grid, actions, node('h3', 'CHOOSE YOUR GAME'), gameButton(selectedSet), preview);
     refresh();
   }
   return { render,loadPrivate(payload){
@@ -381,3 +334,4 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     draft={title:set.title,language:set.language,text:textFor(set.pairs,payload.metadata.columnOrder),topic:payload.metadata.topic,columnOrder:payload.metadata.columnOrder,source:payload.metadata.source};
   } };
 }
+
