@@ -1,7 +1,7 @@
 // Isolated staging login. Credentials are submitted only to the same-origin account service.
-export async function mountCombinedLogin({host=document.body,fetcher=fetch,onClose=()=>{},onCreateAccount=()=>{}}={}){
+export async function mountCombinedLogin({host=document.body,fetcher=fetch,onClose=()=>{},onCreateAccount=()=>{},onVerifyEmail=()=>{}}={}){
  const doc=host.ownerDocument,dialog=doc.createElement('dialog');dialog.className='bt-login-window';dialog.setAttribute('aria-labelledby','bt-login-title');
- dialog.innerHTML=`<button class="bt-login-close" type="button" aria-label="Close sign-in">Close ×</button><h2 id="bt-login-title">Sign in to Boring Teacher</h2><form><label>Email or username<input name="loginName" autocomplete="username" maxlength="320" required></label><label for="bt-login-password">Password</label><div class="bt-login-password-row"><input id="bt-login-password" name="password" type="password" autocomplete="current-password" maxlength="4096" required><button class="bt-login-visibility" type="button" aria-controls="bt-login-password" aria-pressed="false">Show password</button></div><p class="bt-login-recovery"><a href="/auth/start" title="Enter your username, then choose Reset password">Forgot password?</a></p><button class="bt-login-submit" type="submit" disabled>Sign in</button></form><p class="bt-login-status" role="status" aria-live="polite">Preparing secure sign-in…</p><a href="/auth/start">Use existing sign-in</a><button class="bt-login-switch bt-login-create" type="button">Create account</button>`;
+ dialog.innerHTML=`<button class="bt-login-close" type="button" aria-label="Close sign-in">Close ×</button><h2 id="bt-login-title">Sign in to Boring Teacher</h2><form><label>Email or username<input name="loginName" autocomplete="username" maxlength="320" required></label><label for="bt-login-password">Password</label><div class="bt-login-password-row"><input id="bt-login-password" name="password" type="password" autocomplete="current-password" maxlength="4096" required><button class="bt-login-visibility" type="button" aria-controls="bt-login-password" aria-pressed="false">Show password</button></div><p class="bt-login-recovery"><a href="/auth/start" title="Enter your username, then choose Reset password">Forgot password?</a></p><button class="bt-login-submit" type="submit" disabled>Sign in</button></form><p class="bt-login-status" role="status" aria-live="polite">Preparing secure sign-in…</p><a href="/auth/start">Use existing sign-in</a><button class="bt-login-switch bt-login-verify" type="button">Continue email verification</button><button class="bt-login-switch bt-login-create" type="button">Create account</button>`;
  const form=dialog.querySelector('form'),submit=dialog.querySelector('[type=submit]'),status=dialog.querySelector('[role=status]'),password=form.elements.password;
  const visibility=dialog.querySelector('.bt-login-visibility');
  const hidePassword=()=>{password.type='password';visibility.textContent='Show password';visibility.setAttribute('aria-pressed','false');};
@@ -10,6 +10,7 @@ export async function mountCombinedLogin({host=document.body,fetcher=fetch,onClo
  const close=()=>{if(disposed)return;password.value='';hidePassword();csrf=null;disposed=true;abort.abort();dialog.remove();onClose();};
  dialog.querySelector('.bt-login-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',close,{once:true});
  dialog.querySelector('.bt-login-create').addEventListener('click',()=>{close();onCreateAccount();});
+ dialog.querySelector('.bt-login-verify').addEventListener('click',()=>{close();onVerifyEmail();});
  form.addEventListener('submit',async event=>{
   event.preventDefault();if(busy||!csrf||!form.reportValidity())return;
   busy=true;submit.disabled=true;status.textContent='Signing in…';
@@ -20,7 +21,7 @@ export async function mountCombinedLogin({host=document.body,fetcher=fetch,onClo
    if(!response.ok)throw Error();const data=await response.json(),u=new URL(data.callbackUrl,doc.location.origin);
    if(u.origin!==doc.location.origin||u.pathname!=='/auth/callback'||u.hash||!u.searchParams.get('code')||!u.searchParams.get('state'))throw Error();
    doc.defaultView.location.assign(u.href);
-  }catch{if(!disposed){status.textContent='Sign-in could not be completed. Check your details or use the existing sign-in.';password.focus();}}
+  }catch{if(!disposed){status.textContent='Sign-in could not be completed. Check your details. If your email is not verified, choose Continue email verification.';password.focus();}}
   finally{busy=false;if(!disposed)submit.disabled=!csrf;}
  });
  host.append(dialog);dialog.showModal();

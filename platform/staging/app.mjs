@@ -80,7 +80,7 @@ let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
 let loginWindow=null;
 async function openAccountWindow(mode,initialCode=''){
  if(loginWindow)return;loginWindow=true;
- try{const mounted=await (mode==='register'?mountRegistration:mountCombinedLogin)({initialCode,onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
+ try{const mounted=await (mode==='register'||mode==='recover'?mountRegistration:mountCombinedLogin)({initialCode,initialMode:mode==='recover'?'recover':'entry',onVerifyEmail:()=>void openAccountWindow('recover'),onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
 }
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
