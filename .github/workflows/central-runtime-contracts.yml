@@ -36,6 +36,11 @@ jobs:
           export CHROME_BIN="$(command -v google-chrome || command -v chromium || true)"
           test -n "$CHROME_BIN"
           node platform/tests/shell-browser.mjs
-
-
+      - name: Save synthetic library screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-explorer-browser-evidence
+          path: artifacts/library-explorer-*.png
+          if-no-files-found: ignore
 
