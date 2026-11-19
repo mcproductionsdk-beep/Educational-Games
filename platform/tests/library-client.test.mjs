@@ -31,3 +31,14 @@ test('folder hierarchy and scoped searches use the authenticated library API',as
  await client.sets(false,50,{folder:id,search:'100% café & test'});let u=new URL(calls.at(-1).path,'https://example.test');assert.equal(u.searchParams.get('q'),'100% café & test');assert.equal(u.searchParams.get('folder_id'),id);assert.equal(u.searchParams.get('offset'),'50');
  await client.sets(false,0,{folder:null});u=new URL(calls.at(-1).path,'https://example.test');assert.equal(u.searchParams.get('folder_id'),'unfiled');
 });
+
+test('stable share URLs reuse the server ID and public retrieval omits credentials and caches',async()=>{
+ const {libraryShareUrl,loadLibraryShare}=await import('../staging/library-client.mjs'),id='668f7475-8c19-45ed-b273-8b3a820c1e05',origin='https://feature-accounts-ui.bt-vocabulary-platform-staging.pages.dev';
+ assert.equal(libraryShareUrl(id,origin),origin+'/#shared-set='+id);assert.throws(()=>libraryShareUrl('bad',origin));let options;
+ const set={family:'vocabulary',schemaVersion:1,title:'Public',promptLanguage:'en-US',language:'es-ES',pairs:[]};assert.deepEqual(await loadLibraryShare(id,{fetcher:async(path,o)=>{assert.equal(path,'/shared-sets/'+id);options=o;return Response.json({set});}}),set);assert.equal(options.credentials,'omit');assert.equal(options.cache,'no-store');assert.equal(options.redirect,'error');
+ await assert.rejects(()=>loadLibraryShare(id,{fetcher:async()=>Response.json({set:{...set,account_id:'private'}})}));await assert.rejects(()=>loadLibraryShare(id,{fetcher:async()=>Response.json({error:'NOT_FOUND'},{status:404})}));
+});
+test('saved-draft comparison ignores object key order and detects content or direction edits',async()=>{
+ const {sameLibraryPayload}=await import('../staging/library-client.mjs');const a={family:'sentence',schemaVersion:1,title:'A',promptLanguage:'en-US',language:'es-ES',pairs:[['Hello','Hola']],metadata:{topic:'Greetings',columnOrder:'target-first',source:'custom'}};
+ assert.equal(sameLibraryPayload(a,{metadata:{source:'custom',columnOrder:'target-first',topic:'Greetings'},pairs:a.pairs,language:a.language,promptLanguage:a.promptLanguage,title:a.title,schemaVersion:1,family:'sentence'}),true);assert.equal(sameLibraryPayload(a,{...a,title:'B'}),false);assert.equal(sameLibraryPayload(a,{...a,metadata:{...a.metadata,columnOrder:'english-first'}}),false);
+});

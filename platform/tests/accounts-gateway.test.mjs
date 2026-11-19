@@ -34,3 +34,14 @@ test('private library routes require same-origin browser requests and preserve s
  const r=await gateway.fetch(new Request(site+'/library/sets/'+id,{method:'PATCH',headers:{Origin:site,'Sec-Fetch-Site':'same-origin','X-Library-CSRF':'fixture','Content-Type':'application/json',Cookie:'be_session=synthetic'},body:'{"revision":1,"folder_id":null}'}),env);
  assert.equal(r.status,200);assert.equal(seen.method,'PATCH');assert.equal(seen.headers.get('X-Library-CSRF'),'fixture');assert.equal(seen.headers.get('Cookie'),'be_session=synthetic');assert.equal(r.headers.get('Cache-Control'),'no-store');
 });
+
+
+test('stable public shares are GET-only and strip credentials and response cookies',async()=>{
+ const id='668f7475-8c19-45ed-b273-8b3a820c1e05';let seen,calls=0;const env={ACCOUNTS_SERVICE:{fetch:async r=>{seen=r;calls++;return Response.json({set:{title:'Public'}},{headers:{'Set-Cookie':'not-forwarded','X-Private':'no'}});}}};
+ const r=await gateway.fetch(new Request(site+'/shared-sets/'+id,{headers:{Cookie:'be_session=secret',Authorization:'Bearer secret'}}),env);assert.equal(r.status,200);assert.equal(seen.headers.get('Cookie'),null);assert.equal(seen.headers.get('Authorization'),null);assert.equal(r.headers.get('Set-Cookie'),null);assert.equal(r.headers.get('X-Private'),null);assert.equal(r.headers.get('Cache-Control'),'no-store');
+ for(const req of [new Request(site+'/shared-sets/'+id,{method:'POST'}),new Request(site+'/shared-sets/'+id+'?url=https://evil.test'),new Request('https://evil.test/shared-sets/'+id)])assert.ok([404,405].includes((await gateway.fetch(req,env)).status));assert.equal(calls,1);
+});
+test('ensuring a stable link is an authenticated CSRF-protected private operation',async()=>{
+ const id='668f7475-8c19-45ed-b273-8b3a820c1e05';let seen;const env={ACCOUNTS_SERVICE:{fetch:async r=>{seen=r;return Response.json({share_id:id});}}};
+ const result=await gateway.fetch(new Request(site+'/library/sets/'+id+'/share',{method:'POST',headers:{Origin:site,'Sec-Fetch-Site':'same-origin','X-Library-CSRF':'fixture',Cookie:'be_session=fixture','Content-Type':'application/json'},body:'{}'}),env);assert.equal(result.status,200);assert.equal(seen.headers.get('Cookie'),'be_session=fixture');
+});

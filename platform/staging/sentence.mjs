@@ -176,7 +176,7 @@ export function saveSentenceDraft(storage, set, folder, columnOrder) {
   storage.setItem(SENTENCE_DRAFT_KEY, JSON.stringify(saved));
 }
 
-export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch, saveToAccount=null }) {
+export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch, saveToAccount=null,shareSaved=null }) {
   let draft = { title: '', language: 'es-ES', text: '', topic: '', columnOrder: 'english-first' };
   let catalog;
   const textFor = (pairs, order = 'english-first') => pairs.map(pair => (order === 'target-first' ? [...pair].reverse() : pair).join('\t')).join('\n');
@@ -195,11 +195,11 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     }
     return grid;
   }
-  async function render(workspace, hash, current) {
+  async function render(workspace, hash, current, sharedSet=null) {
     if (hash) {
       try {
         notice.textContent = 'Loading shared sentences…';
-        const set = await sentenceRequest(hash.slice('#sentence-set='.length));
+        const set = sharedSet||await sentenceRequest(hash.slice('#sentence-set='.length));
         if (!current()) return;
         notice.textContent = '';
         const box = node('section');
@@ -298,14 +298,16 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
       notice.textContent = 'Editor columns swapped. Games still use English prompts and the selected target language.';
     });
     swap.className = 'swap';editor.append(swap);
+    const libraryPayload=()=>({...selectedSet(),family:'sentence',schemaVersion:1,promptLanguage:'en-US',metadata:{topic:topic.value,columnOrder:order.value,source:draft.source||(topic.value?'catalog':'custom')}});
     const share = button('STUDENT LINK', async () => {
       share.disabled = true;
       shareArea.replaceChildren();
       try {
-        const id = await sentenceRequest(null, selectedSet());
+        const stable=shareSaved?await shareSaved(libraryPayload):null;
+        const id = stable?null:await sentenceRequest(null, selectedSet());
         if (!current()) return;
         const url = new URL('/', location.origin);
-        url.hash = 'sentence-set=' + id;
+        url.hash = stable?new URL(stable.url).hash:'sentence-set=' + id;
         const link = node('a', url.href);
         link.href = url.href;
         link.target = '_blank';
@@ -319,8 +321,8 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     });
     const actions = node('div'), sharing = node('div'), saving = node('div');
     saving.className = 'actionbox';
-    const save=button('SAVE TO FOLDER',()=>{try{const set=selectedSet();if(!saveToAccount)throw Error('Account saving is unavailable. Your draft is still here.');void saveToAccount(()=>({...set,...selectedSet(),family:'sentence',schemaVersion:1,promptLanguage:'en-US',metadata:{topic:topic.value,columnOrder:order.value,source:draft.source||(topic.value?'catalog':'custom')}}));}catch(error){notice.textContent=error.message;}});
-    saving.append(save,node('p','Save privately to your account. Choose a folder or create a new one.'));
+    const save=button('SAVE TO FOLDER',()=>{try{const set=selectedSet();if(!saveToAccount)throw Error('Account saving is unavailable. Your draft is still here.');void saveToAccount(libraryPayload);}catch(error){notice.textContent=error.message;}});
+    saving.append(save,node('p','Save to your account. Its student link will show the latest saved version.'));
     actions.className = 'actions';
     sharing.className = 'actionbox';
     sharing.append(share, shareArea);

@@ -1,10 +1,10 @@
 import {mountAccounts} from './accounts.mjs';
 import {createLibraryWindow} from './library-window.mjs';
-import {createLibraryClient} from './library-client.mjs';
+import {createLibraryClient,libraryShareUrl,sameLibraryPayload,loadLibraryShare} from './library-client.mjs';
 import {mountCombinedLogin} from './custom-login/window.mjs';
 import {mountProfile} from './custom-login/profile.mjs';
 import {mountRegistration} from './custom-login/register.mjs';
-import {LOCALES} from '../content.mjs';
+import {LOCALES,validateVocabulary} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 import {createVocabularyRuntime} from '../runtime.mjs';
 import {mountGameplayShell} from '../shell.mjs';
@@ -108,9 +108,17 @@ function loadPrivateRecord(record){
 const library=createLibraryWindow({client:libraryClient,onSignIn:()=>{preserveAccountDraft();void openAccountWindow('signin');},onSaved:record=>{privateRecords[record.family]=record;},onOpenInTab:item=>{
  const url=new URL('/',location.origin);url.hash='private-set='+item.set_id;window.open(url.href,'_blank','noopener,noreferrer');
 },onShare:async record=>{
- let url;try{if(record.family==='sentence'){const id=await sentenceRequest(null,validateSentenceSet(record.payload));url=new URL('/#sentence-set='+id,location.origin).href;}else url=(await runtime.publishSet(record.payload)).url;}catch{throw Error('The student link could not be created. Your private set was not changed.');}
- try{await navigator.clipboard.writeText(url);return {url,copied:true};}catch{return {url,copied:false};}
+ const url=await ensureStableLink(record);try{await navigator.clipboard.writeText(url);return {url,copied:true};}catch{return {url,copied:false};}
 }});
+async function ensureStableLink(record){
+ if(!record.share_id)record.share_id=(await libraryClient.share(record)).share_id;
+ return libraryShareUrl(record.share_id,location.origin);
+}
+async function savedStudentLink(type,getPayload){
+ let record=privateRecords[type];if(!record)return null;
+ const payload=getPayload();if(!sameLibraryPayload(payload,record.payload)){record=await libraryClient.save(payload,record.folder_id,record);privateRecords[type]=record;}
+ return {url:await ensureStableLink(record)};
+}
 const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save({getPayload,record:privateRecords[type],pending:pendingSaves[type]});};
 let libraryAccountId=null;
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
@@ -123,7 +131,7 @@ function restoreAccountDraft(){
  const text=document.getElementById(family==='sentence'?'sentence-pairs':'pairs');text?.dispatchEvent(new Event('input',{bubbles:true}));
  try{sessionStorage.removeItem(accountDraftKey);}catch{}
 }
-const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,saveToAccount:getPayload=>saveToAccount('sentence',getPayload),launch:(set,gameId='cat')=>{
+const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,renderPairPreview,saveToAccount:getPayload=>saveToAccount('sentence',getPayload),shareSaved:getPayload=>savedStudentLink('sentence',getPayload),launch:(set,gameId='cat')=>{
  showWorkspace();
  document.body.classList.add('playing');
  window.scrollTo(0,0);
@@ -141,6 +149,16 @@ async function render(skipCapture=false){
  if(!skipCapture)captureEditorDraft();
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  let hash=location.hash;
+ const stableStudent=hash.startsWith('#shared-set=');document.getElementById('account-controls').hidden=stableStudent;
+ if(stableStudent){
+  familyTabs.hidden=true;notice.textContent='Loading shared set…';
+  try{const raw=await loadLibraryShare(hash.slice('#shared-set='.length));if(epoch!==renderEpoch)return;
+   if(raw.family==='sentence'){if(raw.promptLanguage!=='en-US')throw Error();await sentenceWorkspace.render(workspace,hash,()=>epoch===renderEpoch,validateSentenceSet(raw));}
+   else{const set=validateVocabulary(raw);notice.textContent='';const box=node('section');box.className='student-panel';box.append(node('h2',set.title),node('p',label[set.promptLanguage]+' → '+label[set.language]+' · '+set.pairs.length+' pairs'),node('h3','CHOOSE YOUR GAME'));gameGrid(box,gameId=>launch(set,null,gameId));workspace.append(box);}
+  }catch(e){if(epoch===renderEpoch){workspace.replaceChildren();notice.textContent=e.message||'This shared set could not be loaded. Check the link and try again.';}}
+  return;
+ }
+
  if(hash.startsWith('#private-set=')){
   const match=hash.match(privateLink);if(!match){notice.textContent='This private set link is invalid.';return;}
   if(openedPrivateId!==match[1]){
@@ -180,6 +198,7 @@ async function render(skipCapture=false){
  const wordsLabel=node('label','PROMPT FIRST · TARGET SECOND');wordsLabel.htmlFor='pairs';const words=node('textarea');words.id='pairs';words.spellcheck=false;words.value=wordEditorDraft?.text??draft?.pairs.map(p=>p.join('\t')).join('\n')??'';
  const importHint=node('p','Use a tab, colon, two or more spaces, spaced dash, pipe, semicolon or arrow. For a row needing review, put one tab between the two phrases.');importHint.className='note';editor.append(titleLabel,title,wordsLabel,importHint,words);
  const current=()=>parseVocabularyDraft({title:title.value.trim()||category.value||'Custom vocabulary',promptLanguage:prompt.value,language:target.value,text:words.value});
+ const libraryPayload=()=>({...current(),metadata:{category:category.value,source:privateRecords.vocabulary?.payload.metadata.source||(category.value?'catalog':'custom')}});
  const parseStatus=node('div');parseStatus.className='status';parseStatus.setAttribute('role','status');
  const preview=node('section');preview.className='preview';preview.append(node('strong','WORD PREVIEW'),node('p','Press ▶ beside a word to hear it in its selected language. Voice availability depends on your browser and device.'));
  const previewSummary=node('p'),previewRows=node('div');previewSummary.className='small';preview.append(previewSummary,previewRows);
@@ -191,10 +210,10 @@ async function render(skipCapture=false){
  const swap=button('⇄ SWAP LANGUAGES + COLUMNS',()=>{const parsed=inspectVocabularyDraft(words.value);if(parsed.errors.length){notice.textContent='Fix invalid rows before swapping.';return;}const p=prompt.value;prompt.value=target.value;target.value=p;words.value=parsed.pairs.map(([p,t])=>t+'\t'+p).join('\n');category.value='';updatePreview();});swap.className='swap';editor.append(swap);grid.append(settings,editor);workspace.append(grid);
  const actions=node('div');actions.className='actions';const sharing=node('div'),saving=node('div');sharing.className=saving.className='actionbox';
  const shareArea=node('div');shareArea.id='shared-link';shareArea.className='note';shareArea.setAttribute('role','status');
- const publish=button('STUDENT LINK',async()=>{let set;try{set=current();draft=set;}catch(e){notice.textContent=e.message;return;}publish.disabled=true;publish.textContent='SAVING SHARED SET…';notice.textContent='Publishing to staging…';try{const result=await runtime.publishSet(set);if(epoch!==renderEpoch)return;const a=node('a',result.url);a.href=result.url;a.target='_blank';a.rel='noopener';shareArea.replaceChildren(a);try{await navigator.clipboard.writeText(result.url);publish.textContent='✓ LINK COPIED';notice.textContent='Student link created and copied.';}catch{publish.textContent='STUDENT LINK';notice.textContent='Student link created. Automatic copy unavailable; select the link below the button.';}}catch(e){if(epoch===renderEpoch)notice.textContent='Staging publication failed: '+e.message;}finally{publish.disabled=false;if(publish.textContent==='SAVING SHARED SET…')publish.textContent='STUDENT LINK';}});
+ const publish=button('STUDENT LINK',async()=>{let set;try{set=current();draft=set;}catch(e){notice.textContent=e.message;return;}publish.disabled=true;publish.textContent='SAVING SHARED SET…';notice.textContent='Publishing to staging…';try{const result=await savedStudentLink('vocabulary',libraryPayload)||await runtime.publishSet(set);if(epoch!==renderEpoch)return;const a=node('a',result.url);a.href=result.url;a.target='_blank';a.rel='noopener';shareArea.replaceChildren(a);try{await navigator.clipboard.writeText(result.url);publish.textContent='✓ LINK COPIED';notice.textContent='Student link created and copied.';}catch{publish.textContent='STUDENT LINK';notice.textContent='Student link created. Automatic copy unavailable; select the link below the button.';}}catch(e){if(epoch===renderEpoch)notice.textContent='Staging publication failed: '+e.message;}finally{publish.disabled=false;if(publish.textContent==='SAVING SHARED SET…')publish.textContent='STUDENT LINK';}});
  sharing.append(publish,node('p','Create a public student-practice snapshot in isolated staging storage.'),shareArea);
- saving.append(button('SAVE TO FOLDER',()=>{try{current();void saveToAccount('vocabulary',()=>({...current(),metadata:{category:category.value,source:privateRecords.vocabulary?.payload.metadata.source||(category.value?'catalog':'custom')}}));}catch(e){notice.textContent=e.message;}}));
- saving.append(node('p','Save privately to your account. Choose a folder or create a new one.'));actions.append(sharing,saving);workspace.append(actions,node('h3','CHOOSE YOUR GAME'));gameGrid(workspace,gameId=>{try{draft=current();launch(draft,null,gameId);}catch(e){notice.textContent=e.message;}});workspace.append(preview);
+ saving.append(button('SAVE TO FOLDER',()=>{try{current();void saveToAccount('vocabulary',libraryPayload);}catch(e){notice.textContent=e.message;}}));
+ saving.append(node('p','Save to your account. Its student link will show the latest saved version.'));actions.append(sharing,saving);workspace.append(actions,node('h3','CHOOSE YOUR GAME'));gameGrid(workspace,gameId=>{try{draft=current();launch(draft,null,gameId);}catch(e){notice.textContent=e.message;}});workspace.append(preview);
  if(!wordEditorDraft&&!draft&&category.value)chooseCategory();else updatePreview();
 }
 

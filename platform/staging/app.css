@@ -52,3 +52,6 @@ body>header .stage-label{font-size:11px;line-height:1.3;margin:0 0 2px}
 
 
 .compact-brand-row #account-controls .account-create{background:var(--yellow);color:var(--dark);border:3px solid var(--dark);box-shadow:3px 3px #0a1628;min-height:44px;padding:8px 14px;font:inherit;font-weight:bold;cursor:pointer}
+
+
+#account-controls[hidden]{display:none}
