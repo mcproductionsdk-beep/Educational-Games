@@ -29,13 +29,14 @@ export async function mountRegistration({host=document.body,fetcher=fetch,onClos
  });
  verify.addEventListener('submit',async e=>{e.preventDefault();if(busy||!csrf||!verify.reportValidity())return;busy=true;const b=verify.querySelector('[type=submit]');b.disabled=true;status.textContent='Verifying your email…';const code=verify.elements.code.value;verify.elements.code.value='';try{const result=await post('verify',{code});if(disposed)return;if(result.stage!=='verified')throw Error();showStage('verified');}catch(error){failure(error,'Verification could not be completed. Please try again.');}finally{busy=false;if(!disposed)b.disabled=!csrf;}});
  resend.addEventListener('click',async()=>{if(busy||!csrf)return;busy=true;resend.disabled=true;try{const result=await post('resend',{});if(disposed)return;if(result.stage==='verified')showStage('verified');else status.textContent='A new code was requested. Check your inbox and spam folder.';}catch(error){failure(error,'A new code could not be sent yet. Wait a minute and try again.');}finally{busy=false;if(!disposed)cooldown=doc.defaultView.setTimeout(()=>{if(!disposed&&csrf)resend.disabled=false;},60000);}});
+ const handle={close(){if(!disposed)dialog.close();}};
  host.append(dialog);dialog.showModal();
- try{const d=await context();if(disposed)return;if(typeof d.csrf!=='string'||d.csrf.length!==43||!['entry','verify'].includes(d.stage))throw Error();csrf=d.csrf;
-  if(initialMode==='recover'){showStage('recover');status.textContent='Confirm the email and password you registered with. This will not create another account.';return;}
-  if(d.stage==='entry'&&!d.policy?.enabled){status.textContent='Registration is not open yet. Existing accounts can still sign in.';return;}
-  if(d.stage==='entry'&&initialCode){showStage('recover');status.textContent='Your verification session is unavailable. Confirm your email and password to continue verification.';return;}
+ try{const d=await context();if(disposed)return handle;if(typeof d.csrf!=='string'||d.csrf.length!==43||!['entry','verify'].includes(d.stage))throw Error();csrf=d.csrf;
+  if(initialMode==='recover'){showStage('recover');status.textContent='Confirm the email and password you registered with. This will not create another account.';return handle;}
+  if(d.stage==='entry'&&!d.policy?.enabled){status.textContent='Registration is not open yet. Existing accounts can still sign in.';return handle;}
+  if(d.stage==='entry'&&initialCode){showStage('recover');status.textContent='Your verification session is unavailable. Confirm your email and password to continue verification.';return handle;}
   const p=d.policy;entry.elements.password.minLength=p.minLength;entry.elements.confirmPassword.minLength=p.minLength;dialog.querySelector('.bt-register-requirements').textContent=['At least '+p.minLength+' characters',p.uppercase&&'an uppercase letter',p.lowercase&&'a lowercase letter',p.number&&'a number',p.symbol&&'a symbol'].filter(Boolean).join(' · ');
   submit.disabled=false;status.textContent=d.stage==='verify'?'Enter the verification code from your email.':'';showStage(d.stage);if(d.stage==='entry')entry.elements.firstName.focus();
  }catch{if(!disposed)status.textContent='Registration is temporarily unavailable. Existing accounts can still sign in.';}
- return{close(){if(!disposed)dialog.close();}};
+ return handle;
 }
