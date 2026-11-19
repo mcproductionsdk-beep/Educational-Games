@@ -1,0 +1,31 @@
+// Candidate only. Not imported by the accepted website until the server integration is verified.
+export async function mountCombinedLogin({host=document.body,fetcher=fetch,onClose=()=>{}}={}){
+ const doc=host.ownerDocument,dialog=doc.createElement('dialog');dialog.className='bt-login-window';dialog.setAttribute('aria-labelledby','bt-login-title');
+ dialog.innerHTML=`<button class="bt-login-close" type="button" aria-label="Close sign-in">Close ×</button><h2 id="bt-login-title">Sign in to Boring Teacher</h2><form><label>Email or username<input name="loginName" autocomplete="username" maxlength="320" required></label><label>Password<input name="password" type="password" autocomplete="current-password" maxlength="4096" required></label><button class="bt-login-submit" type="submit" disabled>Sign in</button></form><p class="bt-login-status" role="status" aria-live="polite">Preparing secure sign-in…</p><a href="/auth/start">Use existing sign-in / password recovery</a>`;
+ const form=dialog.querySelector('form'),submit=dialog.querySelector('[type=submit]'),status=dialog.querySelector('[role=status]'),password=form.elements.password;
+ let csrf=null,disposed=false,busy=false;const abort=new AbortController();
+ const close=()=>{password.value='';csrf=null;disposed=true;abort.abort();dialog.remove();onClose();};
+ dialog.querySelector('.bt-login-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',close,{once:true});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||!csrf||!form.reportValidity())return;
+  busy=true;submit.disabled=true;status.textContent='Signing in…';
+  const body=JSON.stringify({loginName:form.elements.loginName.value,password:password.value});password.value='';
+  try{
+   const response=await fetcher('/auth/custom/password',{method:'POST',credentials:'same-origin',cache:'no-store',redirect:'error',signal:abort.signal,headers:{'Content-Type':'application/json','X-Login-CSRF':csrf},body});
+   if(disposed)return;
+   if(!response.ok)throw Error();const data=await response.json(),u=new URL(data.callbackUrl,doc.location.origin);
+   if(u.origin!==doc.location.origin||u.pathname!=='/auth/callback'||u.hash||!u.searchParams.get('code')||!u.searchParams.get('state'))throw Error();
+   doc.defaultView.location.assign(u.href);
+  }catch{if(!disposed){status.textContent='Sign-in could not be completed. Check your details or use the existing sign-in.';password.focus();}}
+  finally{busy=false;if(!disposed)submit.disabled=!csrf;}
+ });
+ host.append(dialog);dialog.showModal();
+ try{
+  const response=await fetcher('/auth/custom/context',{credentials:'same-origin',cache:'no-store',redirect:'error',signal:abort.signal});
+  if(!response.ok)throw Error();const data=await response.json();
+  if(disposed)return;
+  if(typeof data.csrf!=='string'||data.csrf.length<32||data.csrf.length>128)throw Error();
+  csrf=data.csrf;submit.disabled=false;status.textContent='';form.elements.loginName.focus();
+ }catch{if(!disposed)status.textContent='Secure sign-in is unavailable. Use the existing sign-in below.';}
+ return {close(){if(!disposed)dialog.close();}};
+}
