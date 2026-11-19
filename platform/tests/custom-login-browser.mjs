@@ -14,9 +14,13 @@ try{for(const viewport of [{width:1280,height:800},{width:390,height:740}]){
  const d=p.getByRole('dialog');await d.getByRole('button',{name:'Sign in',exact:true}).waitFor();await p.waitForFunction(()=>!document.querySelector('.bt-login-submit').disabled);
  assert.equal(await d.getByLabel('Email or username').isVisible(),true);assert.equal(await d.getByLabel('Password',{exact:true}).isVisible(),true);
  const bounds=await d.boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=viewport.width);assert.ok(bounds.height<=viewport.height);
- await d.getByLabel('Email or username').fill('synthetic-fixture');await d.getByLabel('Password',{exact:true}).fill('synthetic-wrong-password');await d.getByRole('button',{name:'Sign in',exact:true}).click();
- await d.getByRole('status').filter({hasText:'could not be completed'}).waitFor();assert.equal(await d.getByLabel('Password',{exact:true}).inputValue(),'');
- assert.equal(await d.getByRole('link',{name:/password recovery/}).getAttribute('href'),'/auth/start');
+ await d.getByLabel('Email or username').fill('synthetic-fixture');await d.getByLabel('Password',{exact:true}).fill('synthetic-wrong-password');
+ assert.equal(await d.getByLabel('Password',{exact:true}).getAttribute('type'),'password');
+ await d.getByRole('button',{name:'Show password',exact:true}).click();assert.equal(await d.getByLabel('Password',{exact:true}).getAttribute('type'),'text');assert.equal(await d.getByRole('button',{name:'Hide password',exact:true}).getAttribute('aria-pressed'),'true');
+ await d.getByRole('button',{name:'Hide password',exact:true}).click();assert.equal(await d.getByLabel('Password',{exact:true}).getAttribute('type'),'password');
+ await d.getByRole('button',{name:'Show password',exact:true}).click();await d.getByRole('button',{name:'Sign in',exact:true}).click();
+ await d.getByRole('status').filter({hasText:'could not be completed'}).waitFor();assert.equal(await d.getByLabel('Password',{exact:true}).inputValue(),'');assert.equal(await d.getByLabel('Password',{exact:true}).getAttribute('type'),'password');assert.equal(await d.getByRole('button',{name:'Show password',exact:true}).getAttribute('aria-pressed'),'false');
+ assert.equal(await d.getByRole('link',{name:'Forgot password?',exact:true}).getAttribute('href'),'/auth/start');
  await p.keyboard.press('Escape');await d.waitFor({state:'detached'});assert.equal(await p.locator('#draft').inputValue(),'unsaved words');assert.deepEqual(await p.evaluate(()=>Object.keys(localStorage)),[]);await p.close();
  }assert.equal(submissions,2);console.log('Combined login browser checks passed at desktop/mobile: both fields, bounds, failure, cleared password, recovery, Escape, intact draft.');
 }finally{await browser.close();server.close();}

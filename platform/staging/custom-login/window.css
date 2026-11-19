@@ -9,3 +9,10 @@
 .bt-login-window .bt-login-submit{width:100%;margin-top:24px;background:#89df6c;color:#10243d;border:4px solid #091422;box-shadow:3px 3px #091422;padding:12px;font:12px/1.8 BTLoginArcade,monospace}
 .bt-login-window button:disabled{opacity:.6;cursor:wait}.bt-login-window a{display:inline-block;min-height:44px;color:#ffda67;font:14px/1.5 Arial,sans-serif}.bt-login-window .bt-login-status{min-height:24px;color:#f0e6cb;font:14px/1.5 Arial,sans-serif}.bt-login-window :focus-visible{outline:3px solid #ffda67;outline-offset:3px}
 @media(max-width:480px){.bt-login-window{padding:18px}.bt-login-window h2{font-size:12px}}
+
+.bt-login-window .bt-login-password-row{display:flex;align-items:stretch;gap:6px;margin-top:6px}
+.bt-login-window .bt-login-password-row input{flex:1;min-width:0;margin-top:0}
+.bt-login-window .bt-login-visibility{flex:0 0 88px;border:3px solid #091422;background:#e7d8b8;color:#10243d;padding:6px;font:700 13px/1.3 Arial,sans-serif;box-shadow:none}
+.bt-login-window .bt-login-recovery{margin:8px 0 0}
+.bt-login-window .bt-login-recovery a{display:inline-flex;align-items:center;min-height:44px}
+.bt-login-window .bt-login-submit{margin-top:12px}
