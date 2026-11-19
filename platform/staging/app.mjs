@@ -90,7 +90,12 @@ async function openAccountWindow(mode,initialCode=''){
  if(loginWindow)return;loginWindow=true;
  try{const mounted=await (mode==='profile'?mountProfile:mode==='register'||mode==='recover'?mountRegistration:mountCombinedLogin)({onSaved:()=>void accounts.refresh(),initialCode,initialMode:mode==='recover'?'recover':'entry',onVerifyEmail:()=>void openAccountWindow('recover'),onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
 }
-const library=createLibraryWindow({onSaved:record=>{privateRecords[record.family]=record;},onOpen:async record=>{
+function preserveAccountDraft(){
+ const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
+ const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
+ sessionStorage.setItem(accountDraftKey,saved);
+}
+const library=createLibraryWindow({onSignIn:()=>{preserveAccountDraft();void openAccountWindow('signin');},onSaved:record=>{privateRecords[record.family]=record;},onOpen:async record=>{
  if(record.deleted_at!==null){notice.textContent='Restore this set from Trash before opening it.';return false;}
  if(!window.confirm('Open this saved set in its editor? It will replace that editor’s current contents.'))return false;
  captureEditorDraft();
@@ -101,9 +106,7 @@ const library=createLibraryWindow({onSaved:record=>{privateRecords[record.family
 const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save({getPayload,record:privateRecords[type],pending:pendingSaves[type]});};
 let libraryAccountId=null;
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
- const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
- const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
- sessionStorage.setItem(accountDraftKey,saved);
+ preserveAccountDraft();
 }});
 function restoreAccountDraft(){
  const saved=savedAccountDraft;savedAccountDraft=null;if(!saved)return;

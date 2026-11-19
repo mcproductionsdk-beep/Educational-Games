@@ -1,6 +1,6 @@
 import {createLibraryClient} from './library-client.mjs';
 
-export function createLibraryWindow({host=document.body,client=createLibraryClient(),onOpen=()=>{},onSaved=()=>{},onChanged=()=>{},confirm=message=>window.confirm(message)}={}){
+export function createLibraryWindow({host=document.body,client=createLibraryClient(),onOpen=()=>{},onSaved=()=>{},onChanged=()=>{},onSignIn=null,confirm=message=>window.confirm(message)}={}){
  const doc=host.ownerDocument;
  let active=null,epoch=0;
  const node=(tag,text)=>{const n=doc.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
@@ -15,7 +15,10 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
  function field(parent,label,value='',type='input'){
   const l=node('label',label),control=node(type);control.value=value;l.append(control);parent.append(l);return control;
  }
- const showError=(status,e)=>{status.textContent=e.message||'My Library is unavailable. Please try again.';};
+ const showError=(status,e)=>{
+  status.textContent=e.message||'My Library is unavailable. Please try again.';
+  if(e.code==='SIGN_IN_REQUIRED'&&onSignIn){const signIn=button('Sign in',()=>{try{onSignIn();close();}catch{status.textContent='Your draft could not be preserved. Close this window and try again.';}});status.append(doc.createElement('br'),signIn);}
+ };
  async function browse(){
   const {d,status,current}=shell('MY LIBRARY');status.textContent='Loading your private library…';
   const controls=node('section'),rows=node('section'),folderRows=node('section'),pagination=node('div');d.append(controls,folderRows,rows,pagination);
