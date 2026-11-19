@@ -17,3 +17,11 @@ test('missing or failing binding returns unavailable; guest assets remain access
  assert.equal((await gateway.fetch(new Request(site+'/me'),{ACCOUNTS_SERVICE:{fetch(){throw Error();}}})).status,503);
  assert.equal(await (await gateway.fetch(new Request(site+'/'),{ASSETS:{fetch:()=>new Response('guest games')}})).text(),'guest games');
 });
+
+
+test('combined password transport rejects cross-site and preserves separate HttpOnly flow cookies',async()=>{
+ const origin='https://feature-accounts-ui.bt-vocabulary-platform-staging.pages.dev';let calls=0;
+ const env={ACCOUNTS_SERVICE:{fetch:async()=>{calls++;const h=new Headers();h.append('Set-Cookie','a=one; HttpOnly; Secure');h.append('Set-Cookie','b=two; HttpOnly; Secure');return new Response('{}',{headers:h});}}};
+ const bad=await gateway.fetch(new Request(origin+'/auth/custom/password',{method:'POST',headers:{Origin:'https://evil.test'}}),env);assert.equal(bad.status,403);assert.equal(calls,0);
+ const good=await gateway.fetch(new Request(origin+'/auth/custom/context'),env);assert.equal(good.status,200);assert.equal(good.headers.getSetCookie().length,2);
+});
