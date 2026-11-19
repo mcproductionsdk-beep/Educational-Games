@@ -25,6 +25,8 @@ jobs:
         run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/custom-login-browser.mjs
       - name: Test email registration window
         run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/registration-browser.mjs
+      - name: Test profile window
+        run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/profile-browser.mjs
       - name: Test central shell with actual engine
         shell: bash
         run: |

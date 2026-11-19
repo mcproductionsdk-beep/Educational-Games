@@ -1,5 +1,5 @@
 // Account state is verified by same-origin /me. Never infer authentication from storage.
-export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null}){
+export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null,openProfile=null}){
  let disposed=false,epoch=0;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
@@ -8,9 +8,10 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  createAccount.addEventListener('click',()=>{try{beforeSignIn();void openRegistration?.();}catch{status.textContent='Unable to preserve your draft. Registration cancelled.';}});
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
- root.replaceChildren(status,signIn,createAccount,logout,retry);
+ const profile=doc.createElement('button');profile.type='button';profile.textContent='Edit profile';profile.hidden=true;profile.addEventListener('click',()=>void openProfile?.());
+ root.replaceChildren(status,signIn,createAccount,profile,logout,retry);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;logout.hidden=!signed;retry.hidden=!unavailable;
+  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;profile.hidden=!signed||!openProfile;logout.hidden=!signed;retry.hidden=!unavailable;
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -22,7 +23,8 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
    if(r.status!==200||!r.headers.get('content-type')?.includes('application/json'))throw Error();
    const text=await r.text();if(text.length>1024)throw Error();const value=JSON.parse(text);
    if(typeof value.account_id!=='string'||!/^[a-f0-9]{8}-[a-f0-9-]{27}$/.test(value.account_id))throw Error();
-   if(current===epoch&&!disposed)view('Signed in · Account '+value.account_id.slice(0,8),{signed:true});
+   if(current===epoch&&!disposed)view('Signed in',{signed:true});
+   try{const pr=await fetcher('/profile',{credentials:'same-origin',cache:'no-store',redirect:'manual',signal:abort.signal});if(pr.status===401){if(current===epoch&&!disposed)view('Guest');return;}if(pr.status===200){const text=await pr.text();if(text.length>1024)throw Error();const p=JSON.parse(text);if(typeof p.display_name==='string'&&Array.from(p.display_name).length<=80&&current===epoch&&!disposed)view('Signed in · '+p.display_name,{signed:true});}}catch{}
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}
  }

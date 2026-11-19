@@ -1,5 +1,6 @@
 import {mountAccounts} from './accounts.mjs';
 import {mountCombinedLogin} from './custom-login/window.mjs';
+import {mountProfile} from './custom-login/profile.mjs';
 import {mountRegistration} from './custom-login/register.mjs';
 import {LOCALES} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
@@ -80,9 +81,9 @@ let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
 let loginWindow=null;
 async function openAccountWindow(mode,initialCode=''){
  if(loginWindow)return;loginWindow=true;
- try{const mounted=await (mode==='register'||mode==='recover'?mountRegistration:mountCombinedLogin)({initialCode,initialMode:mode==='recover'?'recover':'entry',onVerifyEmail:()=>void openAccountWindow('recover'),onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
+ try{const mounted=await (mode==='profile'?mountProfile:mode==='register'||mode==='recover'?mountRegistration:mountCombinedLogin)({onSaved:()=>void accounts.refresh(),initialCode,initialMode:mode==='recover'?'recover':'entry',onVerifyEmail:()=>void openAccountWindow('recover'),onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
 }
-const accounts=mountAccounts({root:document.getElementById('account-controls'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
+const accounts=mountAccounts({root:document.getElementById('account-controls'),openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  const fields={};for(const id of draftFields){const field=document.getElementById(id);if(field)fields[id]=field.value;}
  const saved=JSON.stringify({family,hash:location.hash,fields});if(saved.length>150000)throw Error('Draft too large');
  sessionStorage.setItem(accountDraftKey,saved);
