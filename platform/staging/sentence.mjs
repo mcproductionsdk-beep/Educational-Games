@@ -176,7 +176,7 @@ export function saveSentenceDraft(storage, set, folder, columnOrder) {
   storage.setItem(SENTENCE_DRAFT_KEY, JSON.stringify(saved));
 }
 
-export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch }) {
+export function createSentenceWorkspace({ node, button, voice, notice, renderPairPreview, launch, saveToAccount=null }) {
   let draft = { title: '', language: 'es-ES', text: '', topic: '', columnOrder: 'english-first' };
   let catalog;
   const textFor = (pairs, order = 'english-first') => pairs.map(pair => (order === 'target-first' ? [...pair].reverse() : pair).join('\t')).join('\n');
@@ -251,7 +251,7 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
       review.textContent = pairs.length + ' valid pairs' + (errors.length ? ' · Review lines ' + errors.join(', ') : '');
       summary.textContent = 'en-US → ' + language.value + ' · ' + pairs.length + ' pairs · at least 2 required to play/share';
       renderPairPreview(previewRows, rows, ['en-US', language.value]);
-      draft = { title: title.value, language: language.value, text: text.value, topic: topic.value, columnOrder: order.value };
+      draft = { title: title.value, language: language.value, text: text.value, topic: topic.value, columnOrder: order.value,source:draft.source };
       return { pairs, errors };
     }
     function selectedSet() {
@@ -365,7 +365,9 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
       } catch { result.textContent = 'Local storage is unavailable.'; }
       dialog.append(button('CLOSE', () => dialog.close()));dialog.showModal();
     });
-    saving.className = 'actionbox';saving.append(save, node('p', 'Save and load on this device and site. Cloud sync is not available.'));
+    saving.className = 'actionbox';
+    if(saveToAccount)saving.append(button('SAVE TO ACCOUNT',()=>{try{const set=selectedSet();void saveToAccount(()=>({...set,...selectedSet(),family:'sentence',schemaVersion:1,promptLanguage:'en-US',metadata:{topic:topic.value,columnOrder:order.value,source:draft.source||(topic.value?'catalog':'custom')}}));}catch(error){notice.textContent=error.message;}}));
+    saving.append(save, node('p', 'Device-only saves stay in this browser. Use Save to account for your private library.'));
     actions.className = 'actions';
     sharing.className = 'actionbox';
     sharing.append(share, shareArea);
@@ -374,5 +376,8 @@ export function createSentenceWorkspace({ node, button, voice, notice, renderPai
     workspace.append(grid, actions, dialog, node('h3', 'CHOOSE YOUR GAME'), gameButton(selectedSet), preview);
     refresh();
   }
-  return { render };
+  return { render,loadPrivate(payload){
+    const set=validateSentenceSet(payload);
+    draft={title:set.title,language:set.language,text:textFor(set.pairs,payload.metadata.columnOrder),topic:payload.metadata.topic,columnOrder:payload.metadata.columnOrder,source:payload.metadata.source};
+  } };
 }

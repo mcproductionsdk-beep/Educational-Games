@@ -25,3 +25,12 @@ test('combined password transport rejects cross-site and preserves separate Http
  const bad=await gateway.fetch(new Request(origin+'/auth/custom/password',{method:'POST',headers:{Origin:'https://evil.test'}}),env);assert.equal(bad.status,403);assert.equal(calls,0);
  const good=await gateway.fetch(new Request(origin+'/auth/custom/context'),env);assert.equal(good.status,200);assert.equal(good.headers.getSetCookie().length,2);
 });
+
+test('private library routes require same-origin browser requests and preserve session/CSRF headers',async()=>{
+ let seen=null;const env={ACCOUNTS_SERVICE:{async fetch(r){seen=r;return Response.json({sets:[]});}}};
+ const id='668f7475-8c19-45ed-b273-8b3a820c1e05';
+ for(const request of [new Request(site+'/library/sets'),new Request(site+'/library/sets/'+id,{method:'PATCH',headers:{'Sec-Fetch-Site':'same-origin',Origin:'https://evil.test'}}),new Request(site+'/library/admin',{headers:{'Sec-Fetch-Site':'same-origin'}})])assert.ok([403,404].includes((await gateway.fetch(request,env)).status));
+ assert.equal(seen,null);
+ const r=await gateway.fetch(new Request(site+'/library/sets/'+id,{method:'PATCH',headers:{Origin:site,'Sec-Fetch-Site':'same-origin','X-Library-CSRF':'fixture','Content-Type':'application/json',Cookie:'be_session=synthetic'},body:'{"revision":1,"folder_id":null}'}),env);
+ assert.equal(r.status,200);assert.equal(seen.method,'PATCH');assert.equal(seen.headers.get('X-Library-CSRF'),'fixture');assert.equal(seen.headers.get('Cookie'),'be_session=synthetic');assert.equal(r.headers.get('Cache-Control'),'no-store');
+});

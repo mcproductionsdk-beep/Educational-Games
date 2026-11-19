@@ -1,6 +1,6 @@
 // Account state is verified by same-origin /me. Never infer authentication from storage.
-export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null,openProfile=null}){
- let disposed=false,epoch=0;
+export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null,openProfile=null,openLibrary=null,onStateChange=()=>{}}){
+ let disposed=false,epoch=0,activeAccount=null;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
  const signIn=doc.createElement('a');signIn.textContent='Sign in';signIn.href='/auth/start';
@@ -9,9 +9,10 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
  const profile=doc.createElement('button');profile.type='button';profile.textContent='Edit profile';profile.hidden=true;profile.addEventListener('click',()=>void openProfile?.());
- root.replaceChildren(status,signIn,createAccount,profile,logout,retry);
+ const library=doc.createElement('button');library.type='button';library.textContent='My Library';library.hidden=true;library.addEventListener('click',()=>void openLibrary?.());
+ root.replaceChildren(status,signIn,createAccount,library,profile,logout,retry);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;profile.hidden=!signed||!openProfile;logout.hidden=!signed;retry.hidden=!unavailable;
+  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;profile.hidden=!signed||!openProfile;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -23,7 +24,7 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
    if(r.status!==200||!r.headers.get('content-type')?.includes('application/json'))throw Error();
    const text=await r.text();if(text.length>1024)throw Error();const value=JSON.parse(text);
    if(typeof value.account_id!=='string'||!/^[a-f0-9]{8}-[a-f0-9-]{27}$/.test(value.account_id))throw Error();
-   if(current===epoch&&!disposed)view('Signed in',{signed:true});
+   if(current===epoch&&!disposed){activeAccount=value.account_id;view('Signed in',{signed:true});}
    try{const pr=await fetcher('/profile',{credentials:'same-origin',cache:'no-store',redirect:'manual',signal:abort.signal});if(pr.status===401){if(current===epoch&&!disposed)view('Guest');return;}if(pr.status===200){const text=await pr.text();if(text.length>1024)throw Error();const p=JSON.parse(text);if(typeof p.display_name==='string'&&Array.from(p.display_name).length<=80&&current===epoch&&!disposed)view('Signed in · '+p.display_name,{signed:true});}}catch{}
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}
