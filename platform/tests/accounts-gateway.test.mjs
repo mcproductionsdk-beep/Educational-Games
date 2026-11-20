@@ -63,7 +63,7 @@ test('private billing endpoints retain same-origin restrictions and forward sess
 test('test page and script resolve only to fixed static assets without granting backend authority',async()=>{
  const seen=[],env={ASSETS:{fetch:async r=>{seen.push(r.url);return new Response('synthetic asset');}}};
  for(const path of ['/billing/test','/billing/test.mjs'])assert.equal((await gateway.fetch(new Request(site+path),env)).status,200);
- assert.deepEqual(seen,[site+'/billing-test.html',site+'/billing-test.mjs']);
+ assert.deepEqual(seen,[site+'/billing-test',site+'/billing-test.mjs']);
  assert.equal((await gateway.fetch(new Request(site+'/billing/test',{method:'POST'}),env)).status,405);
 });
 

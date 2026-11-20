@@ -8,7 +8,8 @@ export default {
    if(url.origin!==origin||url.search)return new Response('Not found',{status:404,headers});
    if(['/billing/test','/billing/test.mjs'].includes(url.pathname)){
     if(request.method!=='GET')return new Response('Method not allowed',{status:405,headers});
-    const path=url.pathname==='/billing/test'?'/billing-test.html':'/billing-test.mjs';
+    // Pages canonicalizes .html asset URLs; request the extensionless asset internally.
+    const path=url.pathname==='/billing/test'?'/billing-test':'/billing-test.mjs';
     return env.ASSETS.fetch(new Request(new URL(path,origin),request));
    }
    const webhook=url.pathname==='/billing/webhooks/mollie';
