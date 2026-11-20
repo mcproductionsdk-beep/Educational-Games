@@ -16,7 +16,9 @@ for(const name of files.filter(name=>name.endsWith('.mjs')))execFileSync(process
 await rm(out,{recursive:true,force:true});
 for(const name of files){const target=new URL(name,out);await mkdir(new URL('./',target),{recursive:true});await writeFile(target,await readFile(new URL(name,root)));}
 await writeFile(new URL('_worker.js',out),await readFile(new URL('platform/staging/accounts-gateway.mjs',root)));
-await writeFile(new URL('_routes.json',out),JSON.stringify({version:1,include:['/shared-sets/*','/library','/library/*','/profile','/auth','/auth/*','/me'],exclude:[]}));
+await writeFile(new URL('_routes.json',out),JSON.stringify({version:1,include:['/billing/*','/shared-sets/*','/library','/library/*','/profile','/auth','/auth/*','/me'],exclude:[]}));
+await writeFile(new URL('billing-test.html',out),await readFile(new URL('platform/staging/billing-test.html',root)));
+await writeFile(new URL('billing-test.mjs',out),await readFile(new URL('platform/staging/billing-test.mjs',root)));
 await writeFile(new URL('index.html',out),await readFile(new URL('platform/staging/index.html',root)));
 await writeFile(new URL('404.html',out),'<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title><h1>Staging page not found</h1></html>');
 await writeFile(new URL('catalog.json',out),await readFile(new URL('libraries/vocabulary/v2.json',root)));
@@ -29,6 +31,7 @@ await writeFile(new URL('_headers',out),`/*
   Cache-Control: no-store
 `);
 console.log('Built isolated central staging launcher with pinned engine',engine.buildId);
+
 
 
 

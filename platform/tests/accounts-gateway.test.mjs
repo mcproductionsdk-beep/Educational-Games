@@ -45,3 +45,25 @@ test('ensuring a stable link is an authenticated CSRF-protected private operatio
  const id='668f7475-8c19-45ed-b273-8b3a820c1e05';let seen;const env={ACCOUNTS_SERVICE:{fetch:async r=>{seen=r;return Response.json({share_id:id});}}};
  const result=await gateway.fetch(new Request(site+'/library/sets/'+id+'/share',{method:'POST',headers:{Origin:site,'Sec-Fetch-Site':'same-origin','X-Library-CSRF':'fixture',Cookie:'be_session=fixture','Content-Type':'application/json'},body:'{}'}),env);assert.equal(result.status,200);assert.equal(seen.headers.get('Cookie'),'be_session=fixture');
 });
+
+test('Mollie notification is a narrowly scoped public POST without cookies, authorization or response cookies',async()=>{
+ let seen,calls=0;const env={ACCOUNTS_SERVICE:{fetch:async r=>{seen=r;calls++;return new Response('OK',{headers:{'Set-Cookie':'private','X-Internal':'private'}});}}};
+ const r=await gateway.fetch(new Request(site+'/billing/webhooks/mollie',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Cookie:'be_session=secret',Authorization:'Bearer secret','X-Forwarded-Host':'evil.test','X-Account-Id':'forged'},body:'id=tr_fixture'}),env);
+ assert.equal(r.status,200);assert.equal(await seen.text(),'id=tr_fixture');assert.equal(seen.headers.get('Content-Type'),'application/x-www-form-urlencoded');
+ for(const h of ['Cookie','Authorization','X-Forwarded-Host','X-Account-Id'])assert.equal(seen.headers.get(h),null);
+ assert.equal(r.headers.get('Set-Cookie'),null);assert.equal(r.headers.get('X-Internal'),null);assert.equal(r.headers.get('Cache-Control'),'no-store');
+ for(const request of [new Request(site+'/billing/webhooks/mollie'),new Request(site+'/billing/webhooks/mollie?url=https://evil.test',{method:'POST'}),new Request(site+'/billing/webhooks/other',{method:'POST'})])assert.ok([404,405].includes((await gateway.fetch(request,env)).status));assert.equal(calls,1);
+});
+test('private billing endpoints retain same-origin restrictions and forward session plus CSRF to backend',async()=>{
+ let seen,calls=0;const env={ACCOUNTS_SERVICE:{fetch:async r=>{seen=r;calls++;return Response.json({mode:'test'});}}};
+ for(const r of [new Request(site+'/billing/status'),new Request(site+'/billing/checkout',{method:'POST',headers:{'Sec-Fetch-Site':'same-origin',Origin:'https://evil.test'}}),new Request('https://boringteacher.com/billing/status')])assert.ok([403,404].includes((await gateway.fetch(r,env)).status));assert.equal(calls,0);
+ const r=await gateway.fetch(new Request(site+'/billing/checkout',{method:'POST',headers:{'Sec-Fetch-Site':'same-origin',Origin:site,Cookie:'be_session=fixture','X-Billing-CSRF':'fixture','Content-Type':'application/json'},body:'{}'}),env);
+ assert.equal(r.status,200);assert.equal(seen.headers.get('Cookie'),'be_session=fixture');assert.equal(seen.headers.get('X-Billing-CSRF'),'fixture');
+});
+test('test page and script resolve only to fixed static assets without granting backend authority',async()=>{
+ const seen=[],env={ASSETS:{fetch:async r=>{seen.push(r.url);return new Response('synthetic asset');}}};
+ for(const path of ['/billing/test','/billing/test.mjs'])assert.equal((await gateway.fetch(new Request(site+path),env)).status,200);
+ assert.deepEqual(seen,[site+'/billing-test.html',site+'/billing-test.mjs']);
+ assert.equal((await gateway.fetch(new Request(site+'/billing/test',{method:'POST'}),env)).status,405);
+});
+

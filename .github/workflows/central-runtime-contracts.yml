@@ -1,7 +1,7 @@
 name: Central runtime contracts
 on:
   push:
-    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119', 'feature/library-explorer-20261119', 'feature/library-save-picker-20261119', 'feature/stable-library-links-20261119']
+    branches: ['feature/central-runtime-config-20261104', 'feature/accounts-ui', 'feature/custom-login-20261119', 'feature/private-library-20261119', 'feature/library-explorer-20261119', 'feature/library-save-picker-20261119', 'feature/stable-library-links-20261119', 'feature/mollie-test-checkout-20261120']
   pull_request:
     paths: ['platform/**', '.github/workflows/central-runtime-contracts.yml']
 permissions:
@@ -19,6 +19,8 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright-core@1.56.1
       - name: Prepare pinned engine test dependency
         run: python3 platform/tests/prepare-engine.py
+      - name: Test isolated Mollie test checkout page
+        run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/billing-browser.mjs
       - name: Test account controls in Chromium
         run: CHROME_BIN="$(command -v google-chrome)" node platform/tests/accounts-browser.mjs
       - name: Test combined login window
@@ -43,4 +45,5 @@ jobs:
           name: library-explorer-browser-evidence
           path: artifacts/library-*.png
           if-no-files-found: ignore
+
 
