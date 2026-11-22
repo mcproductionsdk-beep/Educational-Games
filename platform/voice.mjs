@@ -1,5 +1,5 @@
 import { LOCALES } from './content.mjs';
-const normalized = value => String(value ?? '').replace(/_/g, '-').toLowerCase();
+const normalized = value => String(value ?? '').replace(/_/g, '-').toLowerCase().replace(/^no(?=-|$)/, 'nb');
 
 // One pronunciation path for gameplay and TEST VOICE. No external speech service.
 export function createPronunciationService({synth = globalThis.speechSynthesis,

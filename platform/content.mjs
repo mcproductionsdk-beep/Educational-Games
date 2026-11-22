@@ -1,4 +1,4 @@
-export const LOCALES = Object.freeze(['en-US', 'es-ES', 'de-DE', 'da-DK', 'fr-FR', 'it-IT']);
+export const LOCALES = Object.freeze(['en-US', 'es-ES', 'de-DE', 'da-DK', 'fr-FR', 'it-IT', 'nb-NO', 'sv-SE']);
 
 export function validateVocabulary(input, { legacy = false } = {}) {
   const fail = () => { throw new Error('INVALID_VOCABULARY'); };
