@@ -96,7 +96,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   function setMenu(item,anchor){
    if(busy||location==='trash')return;choose(item,'set');closeMenu();menu=node('div');menu.className='bt-library-context-menu';menu.setAttribute('role','menu');menu.setAttribute('aria-label','Set actions');
    const option=(label,action)=>{const b=button(label,()=>{closeMenu();action();});b.setAttribute('role','menuitem');menu.append(b);return b;};
-   option('Rename',()=>editPanel('rename-set'));option(item.family==='lesson'?'Open full lesson':'Edit',()=>void openSelected());
+   option('Rename',()=>editPanel('rename-set'));option(item.family==='lesson'?'Open lesson':'Edit',()=>void openSelected());
    const share=option('Copy share link',()=>void run(async()=>{status.textContent='Getting student link…';const fresh=await client.get(item.set_id);if(fresh.deleted_at!==null)throw Error('Restore this set before sharing it.');const result=await onShare(fresh);if(current!==epoch)return;status.textContent=result.copied?'Student link copied.':'Student link created. Copy the link below.';const link=node('a',result.url);link.href=result.url;link.target='_blank';link.rel='noopener noreferrer';status.append(node('br'),link);}));share.disabled=!onShare;
    d.append(menu);const width=doc.documentElement.clientWidth,height=doc.documentElement.clientHeight;menu.style.left=Math.max(8,Math.min(anchor.x,width-220))+'px';menu.style.top=Math.max(8,Math.min(anchor.y,height-180))+'px';menu.querySelector('button')?.focus();
   }
@@ -106,7 +106,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
    const {item,kind}=selected;item.nameOrTitle=kind==='folder'?item.name:item.title;
    actions.append(node('strong',item.nameOrTitle));
    if(location==='trash'){actions.append(button('Restore',()=>void run(async()=>{await client.restore(item);onChanged(item.set_id);selected=null;await load();status.textContent='Set restored.';})));return;}
-   actions.append(button(kind==='folder'?'Open folder':item.family==='lesson'?'Open full lesson':'Open in editor',()=>void openSelected()),button('Move to…',()=>editPanel('move')));
+   actions.append(button(kind==='folder'?'Open folder':item.family==='lesson'?'Open lesson':'Open in editor',()=>void openSelected()),button('Move to…',()=>editPanel('move')));
    if(kind==='folder')actions.append(button('Rename',()=>editPanel('rename')));
    else actions.append(button('Set actions',e=>{e.stopPropagation();const rect=e.currentTarget.getBoundingClientRect();setMenu(item,{x:rect.left,y:rect.bottom});}));
    actions.append(button(kind==='folder'?'Delete folder':'Delete set',()=>{

@@ -27,6 +27,11 @@ export default {
     return new Response(response.body,{status:response.status,headers:safe});
    }catch{return Response.json({error:'BILLING_UNAVAILABLE'},{status:503,headers});}
   }
+  if(url.pathname.startsWith('/shared-sets/')&&url.pathname.endsWith('/attempt')){
+   if(url.origin!==origin||url.search||!/^\/shared-sets\/[a-f0-9-]{36}\/attempt$/.test(url.pathname)||request.method!=='POST')return new Response('Not found',{status:404,headers});
+   const forwarded=new Request(url.href,{method:'POST',headers:{'Content-Type':request.headers.get('Content-Type')||''},body:request.body,duplex:'half'});
+   return env.ACCOUNTS_SERVICE.fetch(forwarded);
+  }
   if(url.pathname.startsWith('/shared-sets/')){
    if(url.origin!==origin||!/^\/shared-sets\/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(url.pathname)||url.search)return new Response('Not found',{status:404,headers});
    if(request.method!=='GET')return new Response('Method not allowed',{status:405,headers});
@@ -39,7 +44,7 @@ export default {
   if(!auth)return env.ASSETS.fetch(request);
   if(url.origin!==origin)return new Response('Not found',{status:404,headers});
   if(library){
-   if(!/^\/library\/(?:context|folders|sets)(?:\/[a-f0-9-]{36}(?:\/(?:restore|share))?)?$/.test(url.pathname))return new Response('Not found',{status:404,headers});
+   if(!/^\/library\/(?:context|folders|sets)(?:\/[a-f0-9-]{36}(?:\/(?:restore|share|results))?)?$/.test(url.pathname))return new Response('Not found',{status:404,headers});
    if(!['GET','POST','PATCH','DELETE'].includes(request.method))return new Response('Method not allowed',{status:405,headers});
    if(request.headers.get('Sec-Fetch-Site')!=='same-origin'||request.method!=='GET'&&request.headers.get('Origin')!==origin)return new Response('Forbidden',{status:403,headers});
   }
