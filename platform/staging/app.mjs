@@ -1,3 +1,4 @@
+import {lessonSetHash,readLessonSet} from '../lesson-link.mjs';
 import {LOCALES} from '../content.mjs';
 import {parseVocabularyDraft,inspectVocabularyDraft,catalogCategories,categoryPairs} from '../editor.mjs';
 import {createVocabularyRuntime} from '../runtime.mjs';
@@ -14,7 +15,7 @@ const BASE='bt-vocabulary-platform-staging.pages.dev';
 const API='https://boringteacher-vocabulary-api-staging.mcproductionsdk.workers.dev';
 const allowedHost=location.hostname===BASE||location.hostname.endsWith('.'+BASE);
 const workspace=document.getElementById('workspace'),gameplay=document.getElementById('gameplay'),notice=document.getElementById('notice');
-const label={ 'en-US':'English','es-ES':'Spanish','de-DE':'German','da-DK':'Danish','fr-FR':'French','it-IT':'Italian' };
+const label={ 'en-US':'English','es-ES':'Spanish','de-DE':'German','da-DK':'Danish','fr-FR':'French','it-IT':'Italian','nb-NO':'Norwegian Bokmål','sv-SE':'Swedish' };
 let runtime,catalog,game,renderEpoch=0,draft=null,soundOn=true;
 const games=[['vocabulary-snake','🐍','Word Snake'],['vocabulary-racer','🏎️','Vocabulary Racer'],['vocabulary-jumper','🏃','Vocabulary Jumper'],['vocabulary-invaders','👾','Vocabulary Invaders'],['vocabulary-frog','🐸','Vocabulary Frog'],['vocabulary-match','🔗','Vocabulary Match'],['vocabulary-eater','🟡','Vocabulary Eater'],['vocabulary-warehouse','📦','Vocabulary Warehouse']];
 function gameGrid(parent,onPlay){const grid=node('div');grid.className='gamegrid';for(const [id,icon,name]of games){const b=button('',()=>onPlay(id));b.className='game';b.dataset.game=id;b.append(node('span',icon),node('small',name.toUpperCase()));if(!['vocabulary-snake','vocabulary-racer','vocabulary-jumper','vocabulary-invaders','vocabulary-frog','vocabulary-match','vocabulary-eater','vocabulary-warehouse'].includes(id)){b.disabled=true;b.title='Not yet migrated to isolated staging';}grid.append(b);}parent.append(grid);}
@@ -23,10 +24,10 @@ async function loadCatalog(){if(catalog)return;const response=await fetch(runtim
 const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const button=(text,action)=>{const b=node('button',text);b.type='button';b.addEventListener('click',action);return b;};
 const voice=createPronunciationService({onStatus:state=>{notice.textContent=state==='error'||state==='unavailable'?'Pronunciation unavailable on this device.':state==='requested'?'Pronunciation requested.':state==='started'?'Speaking…':'';}});
-const racerOrigin='https://72dd2d78.bt-vocabulary-racer-preview.pages.dev';
+const racerOrigin='https://feb1d87b.bt-vocabulary-racer-preview.pages.dev';
 function configuration(gameId='vocabulary-snake'){
  const variant=matchMedia('(pointer: coarse) and (max-width: 760px) and (orientation: portrait)').matches?'mobile':'desktop';
- const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant,buildId:'a4afaa1908445178c4b7559856161b8b05a14aa2'}:gameId==='vocabulary-jumper'?{url:'https://cbd5d3cd.bt-vocabulary-jumper-preview.pages.dev/engine',buildId:'f177ff7be1897bc89e29df69d08f09e9799b60dc'}:gameId==='vocabulary-invaders'?{url:'https://f80f705c.bt-vocabulary-invaders-preview.pages.dev/invaders-game',buildId:'32644f495b60e26736a6d48d1a52431baca3b751'}:gameId==='vocabulary-frog'?{url:'https://82dc1cac.bt-vocabulary-frog-preview.pages.dev/',buildId:'b99776f4a432db00fd8bdacd2d99c5ac9965ca00'}:gameId==='vocabulary-match'?{url:'https://b12ef808.bt-vocabulary-match-preview.pages.dev/',buildId:'75fa265b57a9b6700340a75b939d3e85b661bb30'}:gameId==='vocabulary-eater'?{url:'https://d1203cab.bt-vocabulary-eater-preview.pages.dev/eater-game.html',buildId:'1c1511e562738b824497440cbb505f6df927fcc5'}:gameId==='vocabulary-warehouse'?{url:'https://3fa45459.bt-vocabulary-warehouse-preview.pages.dev/electric/'+(matchMedia('(max-width: 760px) and (orientation: portrait)').matches?'mobile-preview':'game-multilingual-v2'),buildId:'629374a28333dbe4c09c623f1252edf4cb44b6c0'}:engine;
+ const selected=gameId==='vocabulary-racer'?{url:racerOrigin+'/engine-'+variant,buildId:'832262a62b3bed33908970f6d7cb03dfe3b6862a'}:gameId==='vocabulary-jumper'?{url:'https://1f062d42.bt-vocabulary-jumper-preview.pages.dev/engine',buildId:'f4290006b403b92d1ba7603e7b8eefd2a4fe2175'}:gameId==='vocabulary-invaders'?{url:'https://74735f47.bt-vocabulary-invaders-preview.pages.dev/invaders-game',buildId:'2ae7b7babcb1d21d63ca3a949dd832dd36b93ad9'}:gameId==='vocabulary-frog'?{url:'https://c9599dee.bt-vocabulary-frog-preview.pages.dev/',buildId:'287ed06b8f84e879d7a0611bf274ff5e5fab8ae6'}:gameId==='vocabulary-match'?{url:'https://08673a01.bt-vocabulary-match-preview.pages.dev/',buildId:'e6726014f76aa0273b3196669a431d9acec577d6'}:gameId==='vocabulary-eater'?{url:'https://4b166680.bt-vocabulary-eater-preview.pages.dev/eater-game.html',buildId:'6f025176cca9d717c6f1921ffb93132536719086'}:gameId==='vocabulary-warehouse'?{url:'https://7b436388.bt-vocabulary-warehouse-preview.pages.dev/electric/'+(matchMedia('(max-width: 760px) and (orientation: portrait)').matches?'mobile-preview':'game-multilingual-v2'),buildId:'13f93094489f79639f7f6affb95f089933d4c57d'}:engine;
  if(!allowedHost||location.protocol!=='https:'||engine.environment!=='staging')throw new Error('Unapproved staging deployment.');
  const config={schemaVersion:1,environment:'staging',configRevision:'staging-v1',registryRevision:'snake-v1',shellOrigin:location.origin,catalogUrl:location.origin+'/catalog.json',launcherUrl:location.origin+'/',sharingBaseUrl:API,sharingTimeoutMs:12000};
  const registry={schemaVersion:1,revision:'snake-v1',engines:[{id:gameId,family:'vocabulary',protocol:'bt-vocabulary-engine/1',minPairs:5,url:selected.url,buildId:selected.buildId}]};
@@ -88,7 +89,7 @@ async function render(){
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  const hash=location.hash;
  const sentence=hash.startsWith('#sentence-set=')||(!hash&&family==='sentence');
- familyTabs.hidden=hash.startsWith('#sentence-set=');
+ familyTabs.hidden=Boolean(hash);
  wordTab.setAttribute('aria-current',sentence?'false':'page');
  sentenceTab.setAttribute('aria-current',sentence?'page':'false');
  if(sentence){
@@ -96,11 +97,16 @@ async function render(){
   return;
  }
  if(hash){
-  if(!/^#set=[A-Z0-9]{6}$/.test(hash)){notice.textContent='Invalid staging link. Open the staging homepage to create a test set.';return;}
-  const id=hash.slice(5);notice.textContent='Loading shared vocabulary…';
-  try{const set=await runtime.loadSet(id);if(epoch!==renderEpoch)return;notice.textContent='';
+  const lessonLink=hash.startsWith('#lesson-words=');
+  if(!lessonLink&&!/^#set=[A-Z0-9]{6}$/.test(hash)){notice.textContent='Invalid staging link. Open the staging homepage to create a test set.';return;}
+  const id=lessonLink?null:hash.slice(5);notice.textContent='Loading shared vocabulary…';
+  try{const set=lessonLink?readLessonSet(hash):await runtime.loadSet(id);if(epoch!==renderEpoch)return;notice.textContent='';
    const box=node('section');box.className='student-panel';box.append(node('h2',set.title),node('p',label[set.promptLanguage]+' → '+label[set.language]+' · '+set.pairs.length+' pairs'));
-   box.append(node('h3','CHOOSE YOUR GAME'));gameGrid(box,gameId=>launch(set,id,gameId));workspace.append(box);
+   const lang=set.promptLanguage;
+   const phrase={'en-US':'Choose your game','da-DK':'Vælg dit spil','nb-NO':'Velg spillet ditt','sv-SE':'Välj ditt spel','es-ES':'Elige un juego','de-DE':'Spiel auswählen','it-IT':'Scegli un gioco','fr-FR':'Choisissez un jeu'};
+   const names=new Intl.DisplayNames([lang],{type:'language'});
+   if(lessonLink){document.documentElement.lang=lang;box.querySelector('p').textContent=names.of(lang)+' → '+names.of(set.language)+' · '+set.pairs.length;}
+   box.append(node('h3',phrase[lang]));gameGrid(box,gameId=>launch(set,id,gameId));workspace.append(box);
   }catch{if(epoch===renderEpoch)notice.textContent='Shared staging vocabulary could not be loaded. Check the link and try again.';}
   return;
  }
@@ -123,12 +129,12 @@ async function render(){
  function updatePreview(){const parsed=inspectVocabularyDraft(words.value);parseStatus.textContent=parsed.pairs.length+' valid pairs'+(parsed.errors.length?' · Review lines: '+parsed.errors.join(', '):'');parseStatus.className='status '+(parsed.errors.length?'bad':'ok');previewSummary.textContent=prompt.value+' → '+target.value+' · '+parsed.pairs.length+' pairs · at least 5 required to play/share';renderPairPreview(previewRows,parsed.rows,[prompt.value,target.value]);}
  function chooseCategory(){if(!category.value){title.value='';words.value='';updatePreview();return;}try{words.value=categoryPairs(catalog,category.value,prompt.value,target.value).map(p=>p.join('\t')).join('\n');title.value=category.value;notice.textContent='';}catch(e){notice.textContent=e.message;}updatePreview();}
  category.addEventListener('change',chooseCategory);for(const select of [prompt,target])select.addEventListener('change',()=>{if(category.value)chooseCategory();else updatePreview();});words.addEventListener('input',()=>{category.value='';updatePreview();});
- settings.append(button('TEST VOICE',()=>void voice.speak(inspectVocabularyDraft(words.value).pairs[0]?.[1]||({ 'en-US':'Hello','es-ES':'Hola','de-DE':'Hallo','da-DK':'Hej','fr-FR':'Bonjour','it-IT':'Ciao' }[target.value]),target.value)));
+ settings.append(button('TEST VOICE',()=>void voice.speak(inspectVocabularyDraft(words.value).pairs[0]?.[1]||({ 'en-US':'Hello','es-ES':'Hola','de-DE':'Hallo','da-DK':'Hej','fr-FR':'Bonjour','it-IT':'Ciao','nb-NO':'Hei','sv-SE':'Hej' }[target.value]),target.value)));
  const editing=node('div');editing.className='row';editing.append(button('CHECK IMPORT',updatePreview),button('CLEAR',()=>{category.value='';chooseCategory();}));editor.append(parseStatus,editing);
  const swap=button('⇄ SWAP LANGUAGES + COLUMNS',()=>{const parsed=inspectVocabularyDraft(words.value);if(parsed.errors.length){notice.textContent='Fix invalid rows before swapping.';return;}const p=prompt.value;prompt.value=target.value;target.value=p;words.value=parsed.pairs.map(([p,t])=>t+'\t'+p).join('\n');category.value='';updatePreview();});swap.className='swap';editor.append(swap);grid.append(settings,editor);workspace.append(grid);
  const actions=node('div');actions.className='actions';const sharing=node('div'),saving=node('div');sharing.className=saving.className='actionbox';
  const shareArea=node('div');shareArea.id='shared-link';shareArea.className='note';shareArea.setAttribute('role','status');
- const publish=button('STUDENT LINK',async()=>{let set;try{set=current();draft=set;}catch(e){notice.textContent=e.message;return;}publish.disabled=true;publish.textContent='SAVING SHARED SET…';notice.textContent='Publishing to staging…';try{const result=await runtime.publishSet(set);if(epoch!==renderEpoch)return;const a=node('a',result.url);a.href=result.url;a.target='_blank';a.rel='noopener';shareArea.replaceChildren(a);try{await navigator.clipboard.writeText(result.url);publish.textContent='✓ LINK COPIED';notice.textContent='Student link created and copied.';}catch{publish.textContent='STUDENT LINK';notice.textContent='Student link created. Automatic copy unavailable; select the link below the button.';}}catch(e){if(epoch===renderEpoch)notice.textContent='Staging publication failed: '+e.message;}finally{publish.disabled=false;if(publish.textContent==='SAVING SHARED SET…')publish.textContent='STUDENT LINK';}});
+ const publish=button('STUDENT LINK',async()=>{let set;try{set=current();draft=set;}catch(e){notice.textContent=e.message;return;}publish.disabled=true;publish.textContent='SAVING SHARED SET…';notice.textContent='Publishing to staging…';try{const nordic=['nb-NO','sv-SE'];const result=nordic.includes(set.language)||nordic.includes(set.promptLanguage)?{url:location.origin+'/'+lessonSetHash(set)}:await runtime.publishSet(set);if(epoch!==renderEpoch)return;const a=node('a',result.url);a.href=result.url;a.target='_blank';a.rel='noopener';shareArea.replaceChildren(a);try{await navigator.clipboard.writeText(result.url);publish.textContent='✓ LINK COPIED';notice.textContent='Student link created and copied.';}catch{publish.textContent='STUDENT LINK';notice.textContent='Student link created. Automatic copy unavailable; select the link below the button.';}}catch(e){if(epoch===renderEpoch)notice.textContent='Staging publication failed: '+e.message;}finally{publish.disabled=false;if(publish.textContent==='SAVING SHARED SET…')publish.textContent='STUDENT LINK';}});
  sharing.append(publish,node('p','Create a public student-practice snapshot in isolated staging storage.'),shareArea);
  const dialog=node('dialog');dialog.className='dialog';dialog.setAttribute('aria-label','Save to folder');
  saving.append(button('SAVE TO FOLDER',()=>{let set;try{set=current();}catch(e){notice.textContent=e.message;return;}dialog.replaceChildren(node('h3','SAVE TO FOLDER'),node('p','Local prototype only: this browser and staging site. No account or cloud sync.'));
