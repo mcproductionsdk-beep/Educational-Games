@@ -1,5 +1,5 @@
 const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
-export function teacherLesson(root,record){
+export function teacherLesson(root,record,openResults=false){
  const snapshot=record.payload.snapshot;
  const bytes=Uint8Array.from(atob(snapshot.slice(4).replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));
  const lesson=JSON.parse(new TextDecoder().decode(bytes));
@@ -49,4 +49,11 @@ export function teacherLesson(root,record){
   button.textContent=panel.hidden?'See student results':'Back to lesson';button.setAttribute('aria-expanded',String(!panel.hidden));
   if(!panel.hidden){panel.replaceChildren(node('p','Loading student results…'));void results(0,generation);}
  };
+ if(openResults){
+  button.textContent='Open lesson';
+  button.onclick=()=>{location.hash='private-set='+record.set_id;};
+  button.removeAttribute('aria-expanded');
+  generation++;panel.hidden=false;body.hidden=true;
+  panel.append(node('p','Loading student results…'));void results(0,generation);
+ }
 }

@@ -99,7 +99,7 @@ function preserveAccountDraft(){
 }
 const libraryClient=createLibraryClient();
 let openedPrivateId=null;
-const privateLink=/^#private-set=([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$/;
+const privateLink=/^#(?:private-set|lesson-results)=([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$/;
 function loadPrivateRecord(record){
  if(record.deleted_at!==null)throw Error('Restore this set from Trash before opening it.');
  if(record.family==='sentence'){sentenceWorkspace.loadPrivate(record.payload);family='sentence';}
@@ -167,11 +167,16 @@ async function render(skipCapture=false){
   return;
  }
 
- if(hash.startsWith('#private-set=')){
+ if(hash.startsWith('#private-set=')||hash.startsWith('#lesson-results=')){
   const match=hash.match(privateLink);if(!match){notice.textContent='This private set link is invalid.';return;}
   if(openedPrivateId!==match[1]){
    notice.textContent='Opening your private set…';
-   try{await accounts.refresh();if(epoch!==renderEpoch)return;const record=await libraryClient.get(match[1]);if(epoch!==renderEpoch)return;if(record.family==='lesson'&&record.deleted_at===null){familyTabs.hidden=true;notice.textContent='';teacherLesson(workspace,record);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
+   try{await accounts.refresh();if(epoch!==renderEpoch)return;const record=await libraryClient.get(match[1]);if(epoch!==renderEpoch)return;if(record.family==='lesson'&&record.deleted_at===null){familyTabs.hidden=true;notice.textContent='';
+     if(hash.startsWith('#lesson-results=')){teacherLesson(workspace,record,true);return;}
+     const url=new URL('https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev/');
+     url.searchParams.set('saved',record.set_id);
+     url.hash=new URLSearchParams({snapshot:record.payload.snapshot,title:record.title,revision:String(record.revision)}).toString();
+     const link=node('a','Open lesson');link.href=url.href;link.referrerPolicy='origin';workspace.replaceChildren(link);link.click();return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';
