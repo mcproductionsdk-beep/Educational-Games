@@ -20,7 +20,8 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   status.textContent=e.message||'My Library is unavailable. Please try again.';
   if(e.code==='SIGN_IN_REQUIRED'&&onSignIn){const signIn=button('Sign in',()=>{try{onSignIn();close();}catch{status.textContent='Your draft could not be preserved. Close this window and try again.';}});status.append(doc.createElement('br'),signIn);}
  };
- const icon=kind=>{const i=node('span',kind==='folder'?'':kind==='sentence'?'S':'V');i.className='bt-library-icon bt-library-icon-'+kind;i.setAttribute('aria-hidden','true');return i;};
+ const familyLabel=kind=>({lesson:'Lesson',sentence:'Sentence set',vocabulary:'Vocabulary set',folder:'Folder'})[kind];
+ const icon=kind=>{const i=node('span',({folder:'',lesson:'L',sentence:'S',vocabulary:'V'})[kind]);i.className='bt-library-icon bt-library-icon-'+kind;i.setAttribute('aria-hidden','true');return i;};
  function renderFolderTree({side,folders,location,expanded,navigate,redraw,links,decorate=()=>{}}){
   side.replaceChildren(node('h3','FOLDERS'));
   for(const [id,label] of links){const b=button(label,()=>void navigate(id));b.className='bt-library-location';b.setAttribute('aria-current',location===id?'page':'false');side.append(b);decorate(b,id);}
@@ -95,7 +96,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   function setMenu(item,anchor){
    if(busy||location==='trash')return;choose(item,'set');closeMenu();menu=node('div');menu.className='bt-library-context-menu';menu.setAttribute('role','menu');menu.setAttribute('aria-label','Set actions');
    const option=(label,action)=>{const b=button(label,()=>{closeMenu();action();});b.setAttribute('role','menuitem');menu.append(b);return b;};
-   option('Rename',()=>editPanel('rename-set'));option('Edit',()=>void openSelected());
+   option('Rename',()=>editPanel('rename-set'));option(item.family==='lesson'?'Open full lesson':'Edit',()=>void openSelected());
    const share=option('Copy share link',()=>void run(async()=>{status.textContent='Getting student link…';const fresh=await client.get(item.set_id);if(fresh.deleted_at!==null)throw Error('Restore this set before sharing it.');const result=await onShare(fresh);if(current!==epoch)return;status.textContent=result.copied?'Student link copied.':'Student link created. Copy the link below.';const link=node('a',result.url);link.href=result.url;link.target='_blank';link.rel='noopener noreferrer';status.append(node('br'),link);}));share.disabled=!onShare;
    d.append(menu);const width=doc.documentElement.clientWidth,height=doc.documentElement.clientHeight;menu.style.left=Math.max(8,Math.min(anchor.x,width-220))+'px';menu.style.top=Math.max(8,Math.min(anchor.y,height-180))+'px';menu.querySelector('button')?.focus();
   }
@@ -105,7 +106,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
    const {item,kind}=selected;item.nameOrTitle=kind==='folder'?item.name:item.title;
    actions.append(node('strong',item.nameOrTitle));
    if(location==='trash'){actions.append(button('Restore',()=>void run(async()=>{await client.restore(item);onChanged(item.set_id);selected=null;await load();status.textContent='Set restored.';})));return;}
-   actions.append(button(kind==='folder'?'Open folder':'Open in editor',()=>void openSelected()),button('Move to…',()=>editPanel('move')));
+   actions.append(button(kind==='folder'?'Open folder':item.family==='lesson'?'Open full lesson':'Open in editor',()=>void openSelected()),button('Move to…',()=>editPanel('move')));
    if(kind==='folder')actions.append(button('Rename',()=>editPanel('rename')));
    else actions.append(button('Set actions',e=>{e.stopPropagation();const rect=e.currentTarget.getBoundingClientRect();setMenu(item,{x:rect.left,y:rect.bottom});}));
    actions.append(button(kind==='folder'?'Delete folder':'Delete set',()=>{
@@ -123,7 +124,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
    if(!grid.children.length){const empty=node('p',search.value?'No matching sets in this location.':location==='trash'?'Trash is empty.':'This folder is empty.');empty.className='bt-library-empty';grid.append(empty);}
    pagination.replaceChildren();if(offset>0)pagination.append(button('Previous page',()=>{if(!busy){offset=Math.max(0,offset-50);void run(load);}}));if(next!==null)pagination.append(button('Next page',()=>{if(!busy){offset=next;void run(load);}}));
    function addTile(item,kind){
-    const folder=kind==='folder',type=folder?'Folder':kind==='sentence'?'Sentence set':'Vocabulary set',title=folder?item.name:item.title;
+    const folder=kind==='folder',type=familyLabel(kind),title=folder?item.name:item.title;
     const card=node('article');card.className='bt-library-tile';card.dataset.item=(folder?'folder:':'set:')+(folder?item.folder_id:item.set_id);
     const b=button('',()=>choose(item,folder?'folder':'set'));b.className='bt-library-tile-button';b.setAttribute('aria-label',type+': '+title);b.title=title;b.append(icon(kind),node('span',title),node('small',type));b.addEventListener('dblclick',()=>{if(location!=='trash'){choose(item,folder?'folder':'set');void openSelected();}});b.addEventListener('keydown',e=>{if(e.key==='Enter'&&selected?.item===item&&location!=='trash'){e.preventDefault();void openSelected();}});card.append(b);
     if(!folder&&location!=='trash'){card.addEventListener('contextmenu',e=>{e.preventDefault();setMenu(item,{x:e.clientX,y:e.clientY});});b.addEventListener('keydown',e=>{if(e.key==='ContextMenu'||e.shiftKey&&e.key==='F10'){e.preventDefault();const rect=b.getBoundingClientRect();setMenu(item,{x:rect.left,y:rect.bottom});}});}
@@ -157,7 +158,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
   const target=()=>folders.some(f=>f.folder_id===location)?location:null;
   function controls(){submit.disabled=busy||!ready;newFolder.disabled=busy||!ready;refresh.disabled=busy;create.disabled=busy||!ready;copy.disabled=busy;}
   function drawSummary(){
-   summary.replaceChildren();try{const p=getPayload();summary.append(icon(p.family==='sentence'?'sentence':'vocabulary'),node('strong',p.title));}catch(e){ready=false;showError(status,e);}
+   summary.replaceChildren();try{const p=getPayload();summary.append(icon(p.family),node('strong',p.title));}catch(e){ready=false;showError(status,e);}
    destination.textContent='Destination: '+(target()?folderLabel(folders,target()):'Unfiled (top level)');copy.parentElement.hidden=!record;submit.textContent=copy.checked?'Save a copy':record?'Save changes':'Save set';controls();
   }
   async function run(action){if(busy)return;busy=true;controls();d.setAttribute('aria-busy','true');try{await action();}catch(e){if(current===epoch){if(e.code==='SIGN_IN_REQUIRED')ready=false;showError(status,e);}}finally{busy=false;if(current===epoch){d.removeAttribute('aria-busy');controls();}}}
@@ -169,7 +170,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
    grid.replaceChildren();
    const childFolders=location==='unfiled'?[]:folders.filter(f=>(f.parent_folder_id||null)===target());
    for(const f of childFolders){const card=node('article');card.className='bt-library-tile';const open=button('',()=>void navigate(f.folder_id));open.className='bt-library-tile-button';open.setAttribute('aria-label','Folder: '+f.name);open.append(icon('folder'),node('span',f.name),node('small','Folder'));card.append(open);grid.append(card);}
-   for(const item of items){const card=node('article'),content=node('div');card.className='bt-library-tile bt-library-reference';card.setAttribute('aria-label',(item.family==='sentence'?'Sentence set: ':'Vocabulary set: ')+item.title);content.className='bt-library-tile-button';content.append(icon(item.family),node('span',item.title),node('small',item.family==='sentence'?'Sentence set':'Vocabulary set'));card.append(content);grid.append(card);}
+   for(const item of items){const card=node('article'),content=node('div');card.className='bt-library-tile bt-library-reference';card.setAttribute('aria-label',(familyLabel(item.family)+': ')+item.title);content.className='bt-library-tile-button';content.append(icon(item.family),node('span',item.title),node('small',familyLabel(item.family)));card.append(content);grid.append(card);}
    if(!grid.children.length){const empty=node('p','This folder is empty. You can save your set here.');empty.className='bt-library-empty';grid.append(empty);}
    pagination.replaceChildren();if(offset>0)pagination.append(button('Previous page',()=>{if(!busy){offset=Math.max(0,offset-50);void run(load);}}));if(next!==null)pagination.append(button('Next page',()=>{if(!busy){offset=next;void run(load);}}));drawSummary();
   }

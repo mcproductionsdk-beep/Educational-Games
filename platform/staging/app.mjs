@@ -145,6 +145,12 @@ for(const [tab,value] of [[wordTab,'word'],[sentenceTab,'sentence']]){
  tab.addEventListener('click',()=>{family=value;void render();});
 }
 
+function openLesson(snapshot){
+ if(typeof snapshot!=='string'||!/^#v2\.[A-Za-z0-9_-]{1,22000}$/.test(snapshot))throw Error('This lesson link is invalid.');
+ const url=new URL('https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev/student/');
+ url.hash=snapshot;
+ location.replace(url.href);
+}
 async function render(skipCapture=false){
  if(!skipCapture)captureEditorDraft();
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
@@ -153,6 +159,7 @@ async function render(skipCapture=false){
  if(stableStudent){
   familyTabs.hidden=true;notice.textContent='Loading shared set…';
   try{const raw=await loadLibraryShare(hash.slice('#shared-set='.length));if(epoch!==renderEpoch)return;
+   if(raw.family==='lesson'){openLesson(raw.snapshot);return;}
    if(raw.family==='sentence'){if(raw.promptLanguage!=='en-US')throw Error();await sentenceWorkspace.render(workspace,hash,()=>epoch===renderEpoch,validateSentenceSet(raw));}
    else{const set=validateVocabulary(raw);notice.textContent='';const box=node('section');box.className='student-panel';box.append(node('h2',set.title),node('p',label[set.promptLanguage]+' → '+label[set.language]+' · '+set.pairs.length+' pairs'),node('h3','CHOOSE YOUR GAME'));gameGrid(box,gameId=>launch(set,null,gameId));workspace.append(box);}
   }catch(e){if(epoch===renderEpoch){workspace.replaceChildren();notice.textContent=e.message||'This shared set could not be loaded. Check the link and try again.';}}
@@ -163,7 +170,7 @@ async function render(skipCapture=false){
   const match=hash.match(privateLink);if(!match){notice.textContent='This private set link is invalid.';return;}
   if(openedPrivateId!==match[1]){
    notice.textContent='Opening your private set…';
-   try{await accounts.refresh();if(epoch!==renderEpoch)return;const record=await libraryClient.get(match[1]);if(epoch!==renderEpoch)return;loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
+   try{await accounts.refresh();if(epoch!==renderEpoch)return;const record=await libraryClient.get(match[1]);if(epoch!==renderEpoch)return;if(record.family==='lesson'&&record.deleted_at===null){openLesson(record.payload.snapshot);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';

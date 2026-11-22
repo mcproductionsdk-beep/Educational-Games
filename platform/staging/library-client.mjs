@@ -39,6 +39,7 @@ export async function loadLibraryShare(id,{fetcher=fetch}={}){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
  try{const response=await fetcher('/shared-sets/'+id,{credentials:'omit',cache:'no-store',redirect:'error',referrerPolicy:'no-referrer',signal:controller.signal});
   if(!response.ok||!response.headers.get('Content-Type')?.includes('application/json'))throw Error();const raw=await response.text();if(raw.length>400000)throw Error();const value=JSON.parse(raw).set;
+  if(value?.family==='lesson' && value.schemaVersion===1 && typeof value.title==='string' && /^#v2\.[A-Za-z0-9_-]{1,22000}$/.test(value.snapshot) && Object.keys(value).every(k=>['family','title','schemaVersion','snapshot'].includes(k)))return value;
   if(!value||value.schemaVersion!==1||!['vocabulary','sentence'].includes(value.family)||Object.keys(value).some(k=>!['family','schemaVersion','title','promptLanguage','language','pairs'].includes(k)))throw Error();return value;
  }catch{throw Error('This shared set is unavailable. Check the link or try again.');}finally{clearTimeout(timer);}
 }
