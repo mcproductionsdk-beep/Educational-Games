@@ -218,8 +218,9 @@ async function render(skipCapture=false){
      if(hash.startsWith('#lesson-results=')){teacherLesson(workspace,record,true);return;}
      const url=new URL('/embedded',lessonOrigin);
      url.searchParams.set('saved',record.set_id);
-     url.hash=new URLSearchParams({snapshot:record.payload.snapshot,title:record.title,revision:String(record.revision)}).toString();
-     const frame=node('iframe');frame.title='Edit saved lesson';frame.src=url.href;frame.allow='clipboard-write';frame.id='lesson-builder';workspace.classList.add('lesson-workspace');workspace.replaceChildren(frame);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
+     const publishedUrl=await ensureStableLink(record);if(epoch!==renderEpoch)return;
+     url.hash=new URLSearchParams({share:new URL(publishedUrl).hash.slice('#shared-set='.length),snapshot:record.payload.snapshot,title:record.title,revision:String(record.revision)}).toString();
+     const frame=node('iframe');frame.title='Edit saved lesson';frame.referrerPolicy='origin';frame.src=url.href;frame.allow='clipboard-write';frame.id='lesson-builder';workspace.classList.add('lesson-workspace');workspace.replaceChildren(frame);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';

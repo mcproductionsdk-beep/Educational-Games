@@ -42,3 +42,19 @@ export function appendReview(parent,groups,lang){
     parent.append(section);
   }
 }
+
+export function appendScores(parent,scores,{results,gap,test,sectionName}){
+  const add=(tag,text,cls)=>{
+    const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;parent.append(el);
+  };
+  add('h2',results);
+  if(Number.isInteger(scores.correctGaps))add('p',gap+' · '+scores.correctGaps+' / '+scores.totalGaps,'result-score');
+  if(Number.isInteger(scores.correctTest))add('p',test+' · '+scores.correctTest+' / '+scores.totalTest,'result-score');
+  if(scores.sections?.length){
+    const list=document.createElement('ul');list.className='exam-breakdown';
+    scores.sections.forEach((part,i)=>{
+      const li=document.createElement('li');li.textContent=sectionName(part,i)+' · '+part.correct+' / '+part.total;list.append(li);
+    });
+    parent.append(list);
+  }
+}
