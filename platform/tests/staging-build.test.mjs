@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,readdirSync} from 'node:fs';
-import {resolve} from 'node:path';
+import {dirname,resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'../..');
 test('central staging output excludes engine copies, tests and production endpoints',()=>{
  execFileSync(process.execPath,['platform/build-staging.mjs'],{cwd:root});const out=resolve(root,'dist-staging');
@@ -10,6 +10,12 @@ test('central staging output excludes engine copies, tests and production endpoi
  for(const path of paths.filter(p=>/\.(html|mjs|css|json)$/.test(p))){
   if(path==='platform/config.mjs')continue; // This validator contains production denylist strings.
   const text=readFileSync(resolve(out,path),'utf8');assert.doesNotMatch(text,/https:\/\/boringteacher\.com|https:\/\/boringteacher-vocabulary-api\.mcproductionsdk/);
+ }
+ for(const file of paths.filter(path=>path.endsWith('.mjs'))){
+  const source=readFileSync(resolve(out,file),'utf8');
+  for(const match of source.matchAll(/\b(?:from\s*|import\s*)['"](\.{1,2}\/[^'"]+)['"]/g)){
+   assert.ok(paths.includes(resolve(out,dirname(file),match[1]).slice(out.length+1)),file+' needs '+match[1]);
+  }
  }
  const headers=readFileSync(resolve(out,'_headers'),'utf8');assert.match(headers,/connect-src 'self' https:\/\/boringteacher-vocabulary-api-staging/);assert.match(headers,/frame-src https:\/\/87e18652/);
  const version=JSON.parse(readFileSync(resolve(out,'version.json'),'utf8'));assert.equal(version.environment,'staging');assert.equal(version.engine.buildId,'c633cb915e402af01d9d36e4c3f280b58e8b4e0f');
