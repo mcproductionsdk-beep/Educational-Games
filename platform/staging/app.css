@@ -58,3 +58,8 @@ body>header .stage-label{font-size:11px;line-height:1.3;margin:0 0 2px}
 
 #workspace.lesson-workspace{border:0;padding:0;background:transparent;box-shadow:none}
 .lesson-workspace iframe{display:block;width:100%;height:85vh;border:0}
+
+.review-correct {color:#176437;font-weight:700}
+.review-incorrect {color:#a02124;font-weight:700}
+.review-key {text-decoration:underline;text-underline-offset:.15em}
+.review-model {color:#642d89}

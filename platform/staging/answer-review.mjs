@@ -19,20 +19,23 @@ export function appendReview(parent,groups,lang){
       const li=document.createElement('li'),prompt=document.createElement('strong');
       prompt.textContent=item.prompt;
       li.append(prompt);
-      const line=(label,value)=>{
+      const line=(label,value,style)=>{
         const p=document.createElement('p');
-        p.textContent=label+' · '+value;
+        const answer=document.createElement('span');
+        answer.className=style;answer.textContent=value;
+        p.append(label+' · ',answer);
         li.append(p);
       };
       const join=values=>values.join(item.ordered?' → ':' · ');
-      line(response,join(item.answer));
+      const grade=typeof item.correct==='boolean'?(item.correct?'review-correct':'review-incorrect'):'';
+      line(response,join(item.answer),grade);
       if(typeof item.correct==='boolean'){
         const status=document.createElement('strong');
-        status.textContent=item.correct?yes:no;
+        status.className=grade;status.textContent=item.correct?yes:no;
         li.append(status);
       }
-      if(item.expected)line(key,join(item.expected));
-      if(item.model)line(model,item.model);
+      if(item.expected)line(key,join(item.expected),'review-key');
+      if(item.model)line(model,item.model,'review-model');
       list.append(li);
     }
     section.append(heading,list);

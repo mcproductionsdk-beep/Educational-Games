@@ -219,7 +219,7 @@ async function render(skipCapture=false){
      const url=new URL('/embedded',lessonOrigin);
      url.searchParams.set('saved',record.set_id);
      url.hash=new URLSearchParams({snapshot:record.payload.snapshot,title:record.title,revision:String(record.revision)}).toString();
-     const frame=node('iframe');frame.title='Edit saved lesson';frame.src=url.href;frame.id='lesson-builder';workspace.classList.add('lesson-workspace');workspace.replaceChildren(frame);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
+     const frame=node('iframe');frame.title='Edit saved lesson';frame.src=url.href;frame.allow='clipboard-write';frame.id='lesson-builder';workspace.classList.add('lesson-workspace');workspace.replaceChildren(frame);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';
@@ -228,7 +228,7 @@ async function render(skipCapture=false){
   familyTabs.hidden=false;
   wordTab.setAttribute('aria-current','false');sentenceTab.setAttribute('aria-current','false');lessonTab.setAttribute('aria-current','page');
   workspace.classList.add('lesson-workspace');
-  const frame=node('iframe');frame.title='Create a lesson';frame.src=lessonOrigin+'/embedded';frame.id='lesson-builder';
+  const frame=node('iframe');frame.title='Create a lesson';frame.src=lessonOrigin+'/embedded';frame.allow='clipboard-write';frame.id='lesson-builder';
   workspace.append(frame);return;
  }
  const sentence=hash.startsWith('#sentence-set=')||(!hash&&family==='sentence');
