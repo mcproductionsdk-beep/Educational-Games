@@ -1,3 +1,4 @@
+import {saveApprovedLesson} from './save-lesson.mjs';
 import {teacherLesson} from './teacher-lesson.mjs';
 import {mountAccounts} from './accounts.mjs';
 import {createLibraryWindow} from './library-window.mjs';
@@ -81,6 +82,8 @@ function renderPairPreview(container,rows,locales){
 }
 
 const wordTab=document.getElementById('word-tab'),sentenceTab=document.getElementById('sentence-tab');
+const lessonTab=document.getElementById('lesson-tab');
+const lessonOrigin='https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev';
 const familyTabs=document.getElementById('family-tabs');
 const accountDraftKey='bt-staging-signin-draft-v1';
 const draftFields=['prompt-language','target-language','category','set-title','pairs','sentence-language','sentence-topic','sentence-title','sentence-pairs','sentence-column-order'];
@@ -122,7 +125,8 @@ async function savedStudentLink(type,getPayload){
 }
 const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save({getPayload,record:privateRecords[type],pending:pendingSaves[type]});};
 let libraryAccountId=null;
-const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
+let labAccount=null;
+const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  preserveAccountDraft();
 }});
 function restoreAccountDraft(){
@@ -143,9 +147,34 @@ const sentenceWorkspace=createSentenceWorkspace({node,button,voice,notice,render
   onError:message=>{void render().then(()=>{notice.textContent=message+' Return to the game card to retry.';});}});
 }});
 for(const [tab,value] of [[wordTab,'word'],[sentenceTab,'sentence']]){
- tab.addEventListener('click',()=>{family=value;void render();});
+ tab.addEventListener('click',()=>{family=value;if(location.hash==='#lesson-lab')location.hash='';else void render();});
 }
 
+lessonTab.addEventListener('click',()=>{if(location.hash!=='#lesson-lab')location.hash='lesson-lab';});
+window.addEventListener('message',async event=>{
+ const frame=document.getElementById('lesson-builder');
+ if(!frame||event.source!==frame.contentWindow||event.origin!==lessonOrigin)return;
+ const data=event.data;
+ if(data?.type==='lesson-height'&&Number.isFinite(data.height)){
+  frame.style.height=Math.min(20000,Math.max(450,Math.ceil(data.height)))+'px';return;
+ }
+ if(data?.type==='lesson-account'){
+  if(!labAccount||labAccount.unavailable)await accounts.refresh();
+  if(!frame.isConnected)return;
+  const signed=Boolean(labAccount?.signed);
+  frame.contentWindow.postMessage({type:'lesson-account-reply',signed},lessonOrigin);
+  if(!signed){if(labAccount?.unavailable)notice.textContent='Account service unavailable. Please try again.';else void openAccountWindow('signin');}
+ }
+ if(data?.type==='lesson-save'&&typeof data.params==='string'&&data.params.length<26000){
+  const params=new URLSearchParams(data.params);
+  const reply={type:'lesson-saved',nonce:params.get('nonce')};
+  try{
+   const record=await saveApprovedLesson(params,libraryClient);
+   Object.assign(reply,{set:record.set_id,share:record.share_id,revision:record.revision});
+  }catch(e){reply.error=e.code||'UNAVAILABLE';}
+  if(frame.isConnected)frame.contentWindow.postMessage(reply,lessonOrigin);
+ }
+});
 function openLesson(snapshot,share){
  if(typeof snapshot!=='string'||!/^#v2\.[A-Za-z0-9_-]{1,22000}$/.test(snapshot))throw Error('This lesson link is invalid.');
  const url=new URL('https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev/student/');
@@ -154,6 +183,8 @@ function openLesson(snapshot,share){
 }
 async function render(skipCapture=false){
  if(!skipCapture)captureEditorDraft();
+ workspace.classList.remove('lesson-workspace');
+ lessonTab.setAttribute('aria-current','false');
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  let hash=location.hash;
  const stableStudent=hash.startsWith('#shared-set=');document.getElementById('account-controls').hidden=stableStudent;
@@ -180,6 +211,13 @@ async function render(skipCapture=false){
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';
+ }
+ if(hash==='#lesson-lab'){
+  familyTabs.hidden=false;
+  wordTab.setAttribute('aria-current','false');sentenceTab.setAttribute('aria-current','false');lessonTab.setAttribute('aria-current','page');
+  workspace.classList.add('lesson-workspace');
+  const frame=node('iframe');frame.title='Create a lesson';frame.src=lessonOrigin+'/embedded';frame.id='lesson-builder';
+  workspace.append(frame);return;
  }
  const sentence=hash.startsWith('#sentence-set=')||(!hash&&family==='sentence');
  familyTabs.hidden=hash.startsWith('#sentence-set=');

@@ -30,4 +30,4 @@ async function run(){
  }
  location.replace(editor+'/#'+reply.toString());
 }
-if(typeof document!=='undefined')void run();
+if(typeof document!=='undefined'&&location.pathname==='/platform/staging/save-lesson.html')void run();
