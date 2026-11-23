@@ -1,3 +1,4 @@
+import {appendReview} from './answer-review.mjs';
 const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
 export function teacherLesson(root,record,openResults=false){
  const snapshot=record.payload.snapshot;
@@ -33,7 +34,11 @@ export function teacherLesson(root,record,openResults=false){
     summary.textContent=row.nickname+' · Test '+s.correctTest+' / '+s.totalTest+' · '+new Date(row.submitted_at).toLocaleString();details.append(summary);
     if(Number.isInteger(s.totalGaps))details.append(node('p','Fill the blanks · '+s.correctGaps+' / '+s.totalGaps));
     for(const [i,part] of (s.sections||[]).entries())details.append(node('p','Section '+(i+1)+' · '+part.correct+' / '+part.total));
-    for(const item of s.writtenFeedback||[])details.append(node('p',item.number+'. '+item.prompt),node('p',item.answer));
+    if(s.review)appendReview(details,s.review,'en');
+    else{
+      details.append(node('p','This earlier attempt was saved before full answer reviews were available.'));
+      for(const item of s.writtenFeedback||[])details.append(node('p',item.number+'. '+item.prompt),node('p','Student response · '+item.answer),node('p','Model answer · '+item.model));
+    }
     panel.append(details);
    }
    if(data.next_offset!==null){const next=node('button','Show more results');next.onclick=()=>results(data.next_offset,version);panel.append(next);}
