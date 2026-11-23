@@ -136,7 +136,7 @@ function resumeLessonSession(){
  const title=node('h2','Sign in to continue your lesson');title.id='resume-lesson-title';
  const message=node('p','Your lesson stays open here. Sign in with the same account in a new tab, then return to this tab.');
  message.setAttribute('role','status');
- const link=node('a','Sign in in a new tab');link.href='/auth/start';link.target='_blank';link.rel='noopener';
+ const link=node('a','Sign in in a new tab');link.href='/?open=signin';link.target='_blank';link.rel='noopener';
  const resume=node('button','Continue lesson');resume.type='button';
  const cancel=node('button','Keep editing');cancel.type='button';
  let finish;
@@ -356,6 +356,12 @@ try{
  runtime=createVocabularyRuntime(configuration());
  await render();
  restoreAccountDraft();
+ const entry=new URL(location.href);
+ if(!entry.hash&&entry.searchParams.get('open')==='signin'){
+  entry.searchParams.delete('open');
+  history.replaceState(null,'',entry);
+  await openAccountWindow('signin');
+ }
 }catch(error){notice.textContent='Staging initialization failed: '+error.message;}
 window.addEventListener('hashchange',()=>void render());
 window.addEventListener('pagehide',()=>{game?.destroy();voice.cancel();});

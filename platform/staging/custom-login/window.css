@@ -24,3 +24,6 @@
 .bt-login-window .bt-registration-names{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .bt-login-window .bt-register-requirements{font:13px/1.5 Arial,sans-serif;margin:8px 0;color:#f0e6cb}
 .bt-login-window .bt-register-resend{margin-top:8px}
+
+.bt-login-window > a[href="/auth/start"]{display:flex;align-items:center;width:fit-content}
+.bt-login-window .bt-login-status:empty{min-height:0;margin:0}
