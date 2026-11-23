@@ -138,7 +138,7 @@ export function createLibraryWindow({host=document.body,client=createLibraryClie
     if(!['root','all','unfiled','trash'].includes(where)&&!isFolder(where)){location='root';offset=0;selected=null;await load();return;}
     const options={search:query,...(where==='root'||where==='unfiled'?{folder:null}:isFolder(where)?{folder:where}:{})};
     const result=await client.sets(where==='trash',offset,options);if(current!==epoch||request!==loadEpoch)return;items=result.sets;next=result.next_offset;
-    selected=null;status.textContent=ctx.plan==='free'?ctx.saved_count+' of 5 saved sets used.':ctx.plan==='premium'?ctx.monthly_created+' of 50 new sets used this month.':ctx.saved_count+' saved sets.';draw();
+    selected=null;status.textContent=ctx.limit_kind==='monthly_creation'?ctx.monthly_created+' of '+ctx.limit+' new sets used this month.':ctx.saved_count+' saved sets.';draw();
    }catch(e){if(current===epoch&&request===loadEpoch){grid.replaceChildren();actions.replaceChildren();side.replaceChildren();endPanel();showError(status,e);}}
   }
   let searchTimer;search.addEventListener('input',()=>{clearTimeout(searchTimer);offset=0;selected=null;searchTimer=setTimeout(()=>{if(current===epoch)void load();},250);});
