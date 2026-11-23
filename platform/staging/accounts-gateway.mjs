@@ -59,6 +59,14 @@ export default {
   const auth=library||url.pathname==='/profile'||url.pathname==='/me'||url.pathname==='/auth'||url.pathname.startsWith('/auth/');
   if(!auth)return env.ASSETS.fetch(request);
   if(url.origin!==origin)return new Response('Not found',{status:404,headers});
+  if(url.pathname==='/auth/register/restart'){
+   if(url.search||request.method!=='POST'||request.headers.get('Origin')!==origin||
+      request.headers.get('Sec-Fetch-Site')!=='same-origin'||request.headers.get('X-Registration-Action')!=='restart'){
+    return new Response('Forbidden',{status:403,headers});
+   }
+   return new Response(null,{status:204,headers:{...headers,
+    'Set-Cookie':'be_registration=; Path=/auth/register; Max-Age=0; HttpOnly; Secure; SameSite=Strict'}});
+  }
   if(library){
    if(!/^\/library\/(?:context|folders|sets)(?:\/[a-f0-9-]{36}(?:\/(?:restore|share|results))?)?$/.test(url.pathname))return new Response('Not found',{status:404,headers});
    if(!['GET','POST','PATCH','DELETE'].includes(request.method))return new Response('Method not allowed',{status:405,headers});
