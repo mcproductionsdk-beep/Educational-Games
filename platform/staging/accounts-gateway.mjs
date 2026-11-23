@@ -4,6 +4,22 @@ const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Re
 export default {
  async fetch(request,env){
   const url=new URL(request.url);
+  if(url.pathname.startsWith('/lesson-author/')){
+   const action=url.pathname.slice('/lesson-author/'.length);
+   const poll=/^jobs\/[a-f0-9]{64}$/.test(action);
+   if(url.origin!==origin||url.search||!(poll||['draft','record','image','exam','questions','voice-sample'].includes(action)))return new Response(null,{status:404,headers});
+   if(request.method!==(poll?'GET':'POST')||request.headers.get('Sec-Fetch-Site')!=='same-origin'||!poll&&request.headers.get('Origin')!==origin)return new Response(null,{status:403,headers});
+   try{
+    const read=path=>env.ACCOUNTS_SERVICE.fetch(new Request(origin+path,{headers:{Cookie:request.headers.get('Cookie')||'','Sec-Fetch-Site':'same-origin',Accept:'application/json'}}));
+    const [me,context]=await Promise.all([read('/me'),read('/library/context')]);
+    if(me.status===401||context.status===401)return Response.json({error:'signinRequired'},{status:401,headers});
+    if(!me.ok||!context.ok)throw Error();
+    const {account_id}=await me.json(),{plan}=await context.json();
+    if(plan!=='premium')return Response.json({error:'premiumRequired'},{status:403,headers});
+    const studio='https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev';
+    return await env.LESSON_AUTHOR.fetch(new Request(studio+'/api/author/'+action,{method:request.method,headers:{Origin:studio,'Content-Type':'application/json','X-Lesson-Account':account_id},...(poll?{}:{body:request.body,duplex:'half'})}));
+   }catch{return Response.json({error:'aiUnavailable'},{status:503,headers});}
+  }
   if(url.pathname.startsWith('/billing/')){
    if(url.origin!==origin||url.search)return new Response('Not found',{status:404,headers});
    if(['/billing/test','/billing/test.mjs'].includes(url.pathname)){

@@ -158,6 +158,18 @@ window.addEventListener('message',async event=>{
  if(data?.type==='lesson-height'&&Number.isFinite(data.height)){
   frame.style.height=Math.min(20000,Math.max(450,Math.ceil(data.height)))+'px';return;
  }
+ if(data?.type==='lesson-author-request'){
+  const port=event.ports[0],action=data.action;
+  if(!port)return;
+  try{
+   const poll=typeof action==='string'&&/^jobs\/[a-f0-9]{64}$/.test(action);
+   if(!(poll||['draft','record','image','exam','questions','voice-sample'].includes(action))||!poll&&(typeof data.body!=='string'||data.body.length>32000))throw Error();
+   const response=await fetch('/lesson-author/'+action,{method:poll?'GET':'POST',credentials:'same-origin',redirect:'error',cache:'no-store',...(poll?{}:{headers:{'Content-Type':'application/json'},body:data.body})});
+   port.postMessage({status:response.status,body:await response.text()});
+  }catch{port.postMessage({status:503,body:'{"error":"aiUnavailable"}'});}
+  finally{port.close();}
+  return;
+ }
  if(data?.type==='lesson-account'){
   if(!labAccount||labAccount.unavailable)await accounts.refresh();
   if(!frame.isConnected)return;
@@ -204,10 +216,10 @@ async function render(skipCapture=false){
    notice.textContent='Opening your private set…';
    try{await accounts.refresh();if(epoch!==renderEpoch)return;const record=await libraryClient.get(match[1]);if(epoch!==renderEpoch)return;if(record.family==='lesson'&&record.deleted_at===null){familyTabs.hidden=true;notice.textContent='';
      if(hash.startsWith('#lesson-results=')){teacherLesson(workspace,record,true);return;}
-     const url=new URL('https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev/');
+     const url=new URL('/embedded',lessonOrigin);
      url.searchParams.set('saved',record.set_id);
      url.hash=new URLSearchParams({snapshot:record.payload.snapshot,title:record.title,revision:String(record.revision)}).toString();
-     const link=node('a','Open lesson');link.href=url.href;link.referrerPolicy='origin';workspace.replaceChildren(link);link.click();return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
+     const frame=node('iframe');frame.title='Edit saved lesson';frame.src=url.href;frame.id='lesson-builder';workspace.classList.add('lesson-workspace');workspace.replaceChildren(frame);return;}loadPrivateRecord(record);openedPrivateId=match[1];notice.textContent='Private set opened. Use Save to folder to save your changes.';}
    catch(e){if(epoch===renderEpoch)notice.textContent=e.code==='SIGN_IN_REQUIRED'?'Sign in to open this private set.':e.message;return;}
   }
   hash='';
