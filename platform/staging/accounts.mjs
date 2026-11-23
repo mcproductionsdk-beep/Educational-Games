@@ -15,10 +15,17 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  const home=doc.createElement('a');home.href='/';home.textContent='Home';
  const tabs=doc.createElement('nav');tabs.setAttribute('aria-label','Site navigation');
  for(const item of [home,account,plans])if(host.location?.pathname===item.getAttribute('href')&&!host.location.hash)item.setAttribute('aria-current','page');
- tabs.append(home,library,account,plans,signIn,createAccount,logout,retry);
- root.replaceChildren(status,tabs);
+ const menu=doc.createElement('details');
+ const toggle=doc.createElement('summary');toggle.textContent='Account';
+ const options=doc.createElement('div');options.className='account-options';
+ options.append(status,account,plans,signIn,createAccount,logout,retry);
+ menu.append(toggle,options);
+ tabs.append(home,library,menu);
+ tabs.addEventListener('click',event=>{if(event.target!==toggle)menu.open=false;});
+ tabs.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.open){menu.open=false;toggle.focus();}});
+ root.replaceChildren(tabs);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;account.hidden=!signed;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
+  status.textContent=text;account.hidden=!signed;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;library.hidden=!openLibrary;library.disabled=!signed;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;

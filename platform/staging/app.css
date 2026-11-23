@@ -74,12 +74,35 @@ body>header .stage-label{font-size:11px;line-height:1.3;margin:0 0 2px}
 
 #workspace:empty { display: none; }
 
-/* Keep navigation together while the account name wraps in its own column. */
-.compact-brand-row #account-controls{flex:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px}
-.compact-brand-row #account-controls[hidden]{display:none}
-#account-controls [role=status]{align-self:center;text-align:right;overflow-wrap:anywhere;line-height:1.35}
-.compact-brand-row #account-controls nav{display:flex;flex-wrap:nowrap;align-items:stretch;gap:0;border-bottom:3px solid var(--yellow);max-width:100%;overflow-x:auto}
-.compact-brand-row #account-controls nav :is(a,button){flex:none;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0;padding:6px 9px;background:var(--cream);color:var(--dark);font:bold 14px/1.2 'Courier New',monospace;border:2px solid var(--dark);border-bottom:0;box-shadow:none;border-radius:0}
-.compact-brand-row #account-controls nav [aria-current=page]{background:var(--yellow)}
-.compact-brand-row #account-controls nav [hidden]{display:none}
-@media(max-width:850px){.compact-brand-row:has(#account-controls){flex-wrap:wrap}.compact-brand-row #account-controls{flex-basis:100%;grid-template-columns:minmax(0,1fr)}#account-controls [role=status]{text-align:left}.compact-brand-row #account-controls nav{justify-self:start}}
+
+/* Shared compact masthead for the game, account and pricing pages. */
+html { scrollbar-gutter: stable; }
+body > header:has(.compact-brand-row) {
+ max-width:none; margin:0 -12px 20px; padding:0 max(15px,calc((100% - 1100px)/2));
+ background:#12263c; border:0; border-bottom:5px solid var(--yellow); box-shadow:none;
+}
+body > header .stage-label { font-size:10px; margin:0; padding-top:4px; }
+.compact-brand-row { min-height:64px; gap:12px; }
+.compact-brand-row .compact-brand-logo { display:block; width:clamp(145px,22vw,220px); height:auto; }
+.compact-brand-row #account-controls nav { display:flex; align-items:center; gap:4px; }
+.compact-brand-row #account-controls nav :is(a,button,summary) {
+ display:inline-flex; align-items:center; min-height:44px; margin:0; padding:8px 10px;
+ background:transparent; color:#fff; border:0; box-shadow:none; border-radius:0;
+ font:normal clamp(9px,1vw,12px)/1.55 BTLoginArcade,monospace;
+ cursor:pointer; text-decoration:none;
+}
+.compact-brand-row #account-controls nav [hidden] { display:none; }
+.compact-brand-row #account-controls nav :is([aria-current=page],a:hover,button:hover,summary:hover,details[open]>summary) { background:#29465f; color:#ffdf80; }
+#account-controls details { position:relative; }
+#account-controls summary::after { content:'▾'; margin-left:5px; }
+#account-controls .account-options { position:absolute; right:0; z-index:20; min-width:15rem; max-width:90vw; background:#12263c; border:2px solid #ffdf80; box-shadow:4px 4px #132136; padding:6px; }
+.compact-brand-row #account-controls .account-options :is(a,button) { width:100%; justify-content:flex-start; }
+#account-controls .account-options [role=status] { display:block; text-align:left; color:#dceafa; padding:6px 10px; overflow-wrap:anywhere; }
+@media(max-width:650px) {
+ body > header:has(.compact-brand-row) { margin-inline:-6px; padding-inline:10px; }
+ .compact-brand-row { flex-wrap:wrap; gap:0 8px; }
+ .compact-brand-row h1 { width:auto; }
+ .compact-brand-row #account-controls nav :is(a,button,summary) { padding-inline:6px; }
+}
+@view-transition { navigation:auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation:none; }
