@@ -1,5 +1,5 @@
 // Account state is verified by same-origin /me. Never infer authentication from storage.
-export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null,openProfile=null,openLibrary=null,onStateChange=()=>{}}){
+export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{},openSignIn=null,openRegistration=null,openProfile=null,afterLogout=null,openLibrary=null,onStateChange=()=>{}}){
  let disposed=false,epoch=0,activeAccount=null;
  const doc=root.ownerDocument;
  const status=doc.createElement('span');status.setAttribute('role','status');
@@ -9,12 +9,16 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
  const library=doc.createElement('button');library.type='button';library.textContent='My Library';library.hidden=true;library.addEventListener('click',()=>void openLibrary?.());
- const plans=doc.createElement('a');plans.href='/pricing';plans.textContent='Pricing';
+ const plans=doc.createElement('a');plans.href='/pricing';plans.textContent='View plans';
  const account=doc.createElement('a');account.href='/account';account.textContent='My account';account.hidden=true;
  for(const link of [plans,account])link.addEventListener('click',()=>beforeSignIn());
- root.replaceChildren(status,signIn,createAccount,library,account,logout,retry,plans);
+ const home=doc.createElement('a');home.href='/';home.textContent='Home';
+ const tabs=doc.createElement('nav');tabs.setAttribute('aria-label','Site navigation');
+ for(const item of [home,account,plans])if(host.location?.pathname===item.getAttribute('href')&&!host.location.hash)item.setAttribute('aria-current','page');
+ tabs.append(home,library,account,plans,signIn,createAccount,logout,retry);
+ root.replaceChildren(status,tabs);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;account.hidden=!signed;if(!signed)plans.textContent='Pricing';else if(plans.textContent==='Pricing')plans.textContent='View plans';signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
+  status.textContent=text;account.hidden=!signed;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -27,10 +31,7 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
    const text=await r.text();if(text.length>1024)throw Error();const value=JSON.parse(text);
    if(typeof value.account_id!=='string'||!/^[a-f0-9]{8}-[a-f0-9-]{27}$/.test(value.account_id))throw Error();
    if(current===epoch&&!disposed){activeAccount=value.account_id;view('Signed in',{signed:true});
-    try{
-     const context=await fetcher('/library/context',{credentials:'same-origin',cache:'no-store',signal:abort.signal});
-     if(context.ok){const data=await context.json();if(current===epoch&&!disposed)plans.textContent=data.plan==='free'?'Upgrade':'View plans';}
-    }catch{}}
+   }
    try{const pr=await fetcher('/profile',{credentials:'same-origin',cache:'no-store',redirect:'manual',signal:abort.signal});if(pr.status===401){if(current===epoch&&!disposed)view('Guest');return;}if(pr.status===200){const text=await pr.text();if(text.length>1024)throw Error();const p=JSON.parse(text);if(typeof p.display_name==='string'&&Array.from(p.display_name).length<=80&&current===epoch&&!disposed)view('Signed in · '+p.display_name,{signed:true});}}catch{}
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}
@@ -40,7 +41,7 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
   ++epoch;logout.disabled=true;retry.hidden=true;status.textContent='Signing out…';
   const abort=new AbortController(),timer=host.setTimeout(()=>abort.abort(),8000);
   try{const r=await fetcher('/auth/logout',{method:'POST',credentials:'same-origin',cache:'no-store',redirect:'manual',signal:abort.signal});
-   if(r.status!==204&&r.status!==401)throw Error();view('Guest');
+   if(r.status!==204&&r.status!==401)throw Error();view('Guest');afterLogout?.();
   }catch{view('Sign-out could not be confirmed',{unavailable:true});}
   finally{host.clearTimeout(timer);logout.disabled=false;}
  });

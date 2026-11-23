@@ -1,5 +1,4 @@
-import {mountCombinedLogin} from './custom-login/window.mjs';
-import {mountRegistration} from './custom-login/register.mjs';
+import {authenticate} from './page-navigation.mjs';
 import {mountProfile} from './custom-login/profile.mjs';
 
 const plans=[
@@ -13,19 +12,9 @@ const create=(tag,text)=>{const el=document.createElement(tag);el.textContent=te
 function link(label,url){const a=create('a',label);a.href=url;a.className='plan-action';return a;}
 function action(label,fn){const b=create('button',label);b.type='button';b.addEventListener('click',fn);return b;}
 const accountPage=location.pathname.replace(/\/$/,'')==='/account';
-const returnKey='bt-plan-return';
+
 let period=new URLSearchParams(location.search).get('interval')==='yearly'?'yearly':'monthly';
 let context=null,state='loading',epoch=0,pilot=false,testUntil=null;
-const pendingReturn=()=>accountPage?'/account':'/pricing?interval='+period;
-function clearReturn(){try{sessionStorage.removeItem(returnKey);}catch{}}
-function authenticate(mode){
- try{sessionStorage.setItem(returnKey,pendingReturn());}catch{}
- if(mode==='register'||mode==='recover'){
-  void mountRegistration({initialMode:mode==='recover'?'recover':'entry',onClose:clearReturn,onSignIn:()=>authenticate('signin')});
- }else{
-  void mountCombinedLogin({onClose:clearReturn,onCreateAccount:()=>authenticate('register'),onVerifyEmail:()=>authenticate('recover')});
- }
-}
 function showPrices(){
  $('cards').replaceChildren();
  for(const p of plans){
@@ -65,8 +54,6 @@ function showAccount(){
 function draw(){
  document.title=(accountPage?'My account':'Pricing')+' · Boring Teacher';
  $('prices').hidden=accountPage;$('overview').hidden=!accountPage;
- $(accountPage?'account-link':'pricing-link').setAttribute('aria-current','page');
- $('account-link').hidden=!context&&!accountPage;
  if(accountPage)showAccount();else showPrices();
 }
 async function refresh(){

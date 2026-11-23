@@ -124,6 +124,7 @@ async function savedStudentLink(type,getPayload){
  return {url:await ensureStableLink(record)};
 }
 const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save({getPayload,record:privateRecords[type],pending:pendingSaves[type]});};
+let openLibraryOnArrival=new URLSearchParams(location.search).get('open')==='library';
 let libraryAccountId=null;
 let labAccount=null;
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;
@@ -134,7 +135,12 @@ const accounts=mountAccounts({root:document.getElementById('account-controls'),o
    }
   }catch{}
  }
- if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
+ if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}
+ if(openLibraryOnArrival&&!state.unavailable){
+  openLibraryOnArrival=false;const url=new URL(location.href);url.searchParams.delete('open');history.replaceState(null,'',url);
+  if(state.signed)void library.browse();else void openAccountWindow('signin');
+ }
+},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  preserveAccountDraft();
 }});
 function restoreAccountDraft(){
