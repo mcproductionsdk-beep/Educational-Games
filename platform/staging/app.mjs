@@ -126,7 +126,15 @@ async function savedStudentLink(type,getPayload){
 const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save({getPayload,record:privateRecords[type],pending:pendingSaves[type]});};
 let libraryAccountId=null;
 let labAccount=null;
-const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
+const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;
+ if(state.signed&&!location.hash){
+  try{const next=sessionStorage.getItem('bt-plan-return');
+   if(['/pricing?interval=monthly','/pricing?interval=yearly','/account'].includes(next)){
+    sessionStorage.removeItem('bt-plan-return');location.replace(next);return;
+   }
+  }catch{}
+ }
+ if(!state.signed&&!state.unavailable||state.signed&&libraryAccountId!==state.accountId){libraryAccountId=state.signed?state.accountId:null;library.reset();privateRecords.vocabulary=privateRecords.sentence=null;pendingSaves.vocabulary={};pendingSaves.sentence={};}},openProfile:()=>openAccountWindow('profile'),openRegistration:()=>openAccountWindow('register'),openSignIn:()=>openAccountWindow('signin'),beforeSignIn:()=>{
  preserveAccountDraft();
 }});
 function restoreAccountDraft(){
@@ -209,7 +217,7 @@ async function render(skipCapture=false){
  lessonTab.setAttribute('aria-current','false');
  const epoch=++renderEpoch;showWorkspace();workspace.replaceChildren();
  let hash=location.hash;
- const stableStudent=hash.startsWith('#shared-set=');document.getElementById('account-controls').hidden=stableStudent;
+ const stableStudent=hash.startsWith('#shared-set=');document.getElementById('account-controls').hidden=stableStudent||/^#(?:set|sentence-set)=/.test(hash);
  if(stableStudent){
   familyTabs.hidden=true;notice.textContent='Loading shared set…';
   try{const raw=await loadLibraryShare(hash.slice('#shared-set='.length));if(epoch!==renderEpoch)return;

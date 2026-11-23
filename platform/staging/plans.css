@@ -1,0 +1,29 @@
+.plans-site{padding-bottom:2rem}
+.plans-site [hidden]{display:none!important}
+.plans-site .compact-brand-logo{max-width:min(320px,75vw)}
+.plans-site nav,.interval,.plans-heading{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.plans-site nav a,.plan-action,.plans-site button{font:700 .95rem/1.3 'Courier New',monospace}
+.plans-site nav a,.plan-action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.55rem .85rem;text-decoration:none;border:3px solid var(--dark);box-shadow:3px 3px #0a1628;background:var(--cream);color:var(--dark)}
+.plans-site nav a[aria-current=page],.plan-action{background:var(--yellow)}
+#plans-main{max-width:1100px;margin:20px auto;padding:clamp(1rem,3vw,2.1rem)}
+.plans-heading{justify-content:space-between;margin-bottom:1.65rem}
+.plans-site h1,.plans-site h2{font:normal clamp(1rem,2.1vw,1.4rem)/1.65 BTLoginArcade,monospace;letter-spacing:0;text-align:left;margin:0}
+.interval{gap:0;border:3px solid var(--navy)}
+.interval button{box-shadow:none;border:0;background:transparent;padding:.55rem 1rem}
+.interval button[aria-pressed=true]{background:var(--navy);color:white}
+.plans-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.plan-card{--accent:#91da7c;display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:1.1rem;background:var(--panel);color:#fff;border:3px solid var(--navy);border-top:8px solid var(--accent);box-shadow:4px 4px var(--dark)}
+.plan-card[data-plan=silver]{--accent:#aed2ee}.plan-card[data-plan=golden]{--accent:var(--yellow)}
+.plan-card h2{color:var(--accent);font-size:1rem}
+.plan-price{font:bold clamp(1.8rem,4vw,2.65rem)/1.1 'Courier New',monospace;margin:1.1rem 0 .2rem}
+.plan-period,.plans-foot{font-size:.9rem;line-height:1.5}
+.plan-card ul{width:100%;box-sizing:border-box;padding:1rem 0 0 1.15rem;border-top:2px solid #7490a8;margin:1rem 0 auto}
+.plan-card li{line-height:1.5;margin-bottom:.65rem}
+.plan-card footer{margin-top:1rem;min-height:44px;display:flex;align-items:center}
+.plan-current{font-weight:bold;color:var(--accent)}
+.account-panel{max-width:42rem;border:3px solid var(--navy);padding:1.25rem;background:var(--panel);color:white}
+.account-panel h2{color:var(--yellow)}.account-panel p{line-height:1.6}
+.account-panel progress{width:100%;height:1rem;accent-color:var(--green)}
+.plans-foot{margin:1.5rem 0 0}.plans-site a:focus-visible{outline:3px solid #ed782c;outline-offset:3px}
+#plans-status:empty{display:none}
+@media(max-width:740px){.plans-grid{grid-template-columns:1fr}.plans-site .compact-brand-row{flex-wrap:wrap}.plan-card{padding:1rem}.plans-heading{align-items:flex-start}}

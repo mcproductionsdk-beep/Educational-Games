@@ -8,11 +8,13 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
  createAccount.addEventListener('click',()=>{try{beforeSignIn();void openRegistration?.();}catch{status.textContent='Unable to preserve your draft. Registration cancelled.';}});
  const logout=doc.createElement('button');logout.type='button';logout.textContent='Log out';logout.hidden=true;
  const retry=doc.createElement('button');retry.type='button';retry.textContent='Retry';retry.hidden=true;
- const profile=doc.createElement('button');profile.type='button';profile.textContent='Edit profile';profile.hidden=true;profile.addEventListener('click',()=>void openProfile?.());
  const library=doc.createElement('button');library.type='button';library.textContent='My Library';library.hidden=true;library.addEventListener('click',()=>void openLibrary?.());
- root.replaceChildren(status,signIn,createAccount,library,profile,logout,retry);
+ const plans=doc.createElement('a');plans.href='/pricing';plans.textContent='Pricing';
+ const account=doc.createElement('a');account.href='/account';account.textContent='My account';account.hidden=true;
+ for(const link of [plans,account])link.addEventListener('click',()=>beforeSignIn());
+ root.replaceChildren(status,signIn,createAccount,library,account,logout,retry,plans);
  function view(text,{signed=false,unavailable=false}={}){
-  status.textContent=text;signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;profile.hidden=!signed||!openProfile;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
+  status.textContent=text;account.hidden=!signed;if(!signed)plans.textContent='Pricing';else if(plans.textContent==='Pricing')plans.textContent='View plans';signIn.hidden=signed||unavailable;createAccount.hidden=signed||unavailable;library.hidden=!signed||!openLibrary;logout.hidden=!signed;retry.hidden=!unavailable;onStateChange({signed,unavailable,accountId:signed?activeAccount:null});
  }
  async function refresh(){
   const current=++epoch;view('Checking account…',{unavailable:true});retry.hidden=true;
@@ -24,7 +26,11 @@ export function mountAccounts({root,fetcher=fetch,host=window,beforeSignIn=()=>{
    if(r.status!==200||!r.headers.get('content-type')?.includes('application/json'))throw Error();
    const text=await r.text();if(text.length>1024)throw Error();const value=JSON.parse(text);
    if(typeof value.account_id!=='string'||!/^[a-f0-9]{8}-[a-f0-9-]{27}$/.test(value.account_id))throw Error();
-   if(current===epoch&&!disposed){activeAccount=value.account_id;view('Signed in',{signed:true});}
+   if(current===epoch&&!disposed){activeAccount=value.account_id;view('Signed in',{signed:true});
+    try{
+     const context=await fetcher('/library/context',{credentials:'same-origin',cache:'no-store',signal:abort.signal});
+     if(context.ok){const data=await context.json();if(current===epoch&&!disposed)plans.textContent=data.plan==='free'?'Upgrade':'View plans';}
+    }catch{}}
    try{const pr=await fetcher('/profile',{credentials:'same-origin',cache:'no-store',redirect:'manual',signal:abort.signal});if(pr.status===401){if(current===epoch&&!disposed)view('Guest');return;}if(pr.status===200){const text=await pr.text();if(text.length>1024)throw Error();const p=JSON.parse(text);if(typeof p.display_name==='string'&&Array.from(p.display_name).length<=80&&current===epoch&&!disposed)view('Signed in · '+p.display_name,{signed:true});}}catch{}
   }catch{if(current===epoch&&!disposed)view('Account service unavailable',{unavailable:true});}
   finally{host.clearTimeout(timer);}

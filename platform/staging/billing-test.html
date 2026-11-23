@@ -1,13 +1,15 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer"><title>Boring Teacher — test checkout</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'"><title>Silver test checkout · Boring Teacher</title>
+<link rel="stylesheet" href="/platform/staging/app.css"><link rel="stylesheet" href="/platform/staging/custom-login/window.css"><link rel="stylesheet" href="/platform/staging/plans.css">
 <script type="module" src="/billing/test.mjs"></script></head>
-<body><main><h1>Test checkout</h1>
-<p>Simulate a €1.00 payment for one hour of Premium test access. No real money is charged. This test does not renew automatically.</p>
-<p>Available only to approved staging test accounts.</p>
+<body class="plans-site"><header><p class="stage-label">STAGING · USE NONPERSONAL TEST CONTENT</p><div class="compact-brand-row">
+<a href="/" aria-label="Boring Teacher home"><img class="compact-brand-logo" src="/platform/staging/assets/boring-teacher-logo.webp" alt="Boring Teacher"></a>
+<nav aria-label="Account navigation"><a href="/pricing">Pricing</a><a href="/account">My account</a></nav></div></header>
+<main id="plans-main"><div class="plans-heading"><h1>Silver test checkout</h1></div>
+<section class="account-panel"><h2>€1 simulated payment</h2>
+<p>One hour of test access. No real charge or automatic renewal.</p>
 <p id="billing-status" role="status" aria-live="polite">Checking access…</p>
 <button id="billing-start" type="button" disabled>Open Mollie test checkout</button>
-<button id="billing-refresh" type="button" disabled>Check payment status</button>
-<p><a href="/auth/start">Sign in</a> · <a href="/">Return to Boring Teacher</a></p>
-</main></body></html>
+<button id="billing-refresh" type="button" disabled>Check payment status</button></section>
+<p><a href="/account">Return to My account</a></p></main></body></html>

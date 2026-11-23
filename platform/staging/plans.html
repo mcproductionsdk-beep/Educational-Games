@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plans · Boring Teacher</title>
+<link rel="stylesheet" href="/platform/staging/app.css">
+<link rel="stylesheet" href="/platform/staging/custom-login/window.css">
+<link rel="stylesheet" href="/platform/staging/plans.css">
+</head>
+<body class="plans-site">
+<header><p class="stage-label">STAGING · USE NONPERSONAL TEST CONTENT</p><div class="compact-brand-row">
+<a href="/" aria-label="Boring Teacher home"><img class="compact-brand-logo" src="/platform/staging/assets/boring-teacher-logo.webp" alt="Boring Teacher"></a>
+<nav aria-label="Site navigation"><a href="/">Games</a><a href="/pricing" id="pricing-link">Pricing</a><a href="/account" id="account-link" hidden>My account</a></nav>
+</div></header>
+<main id="plans-main">
+<section id="prices" hidden aria-labelledby="prices-title">
+<div class="plans-heading"><h1 id="prices-title">Teacher plans</h1><div class="interval" role="group" aria-label="Billing interval"><button type="button" id="monthly" aria-pressed="true">Monthly</button><button type="button" id="yearly" aria-pressed="false">Yearly</button></div></div>
+<div class="plans-grid" id="cards"></div>
+<p class="plans-foot">Students play for free. Paid plans are previews on staging. Monthly AI allowances are pending cost checks.</p>
+</section>
+<section id="overview" hidden aria-labelledby="account-title"><div class="plans-heading"><h1 id="account-title">My account</h1><button id="profile" hidden>Edit profile</button></div><div id="details"></div></section>
+<p role="status" id="plans-status"></p>
+</main>
+<script type="module" src="/platform/staging/plans.mjs"></script>
+</body></html>
