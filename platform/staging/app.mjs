@@ -92,6 +92,7 @@ try{const raw=sessionStorage.getItem(accountDraftKey);if(raw&&raw.length<150000)
 let family=savedAccountDraft?.family==='sentence'?'sentence':'word';
 let loginWindow=null;
 async function openAccountWindow(mode,initialCode=''){
+ if(mode==='signin'&&document.getElementById('lesson-builder'))return resumeLessonSession();
  if(loginWindow)return;loginWindow=true;
  try{const mounted=await (mode==='profile'?mountProfile:mode==='register'||mode==='recover'?mountRegistration:mountCombinedLogin)({onSaved:()=>void accounts.refresh(),initialCode,initialMode:mode==='recover'?'recover':'entry',onVerifyEmail:()=>void openAccountWindow('recover'),onClose:()=>{loginWindow=null;},onSignIn:()=>void openAccountWindow('signin'),onCreateAccount:()=>void openAccountWindow('register')});if(loginWindow)loginWindow=mounted;}catch{loginWindow=null;notice.textContent='Account window could not open. Please try again.';}
 }
@@ -127,7 +128,35 @@ const saveToAccount=(type,getPayload)=>{captureEditorDraft();return library.save
 let openLibraryOnArrival=new URLSearchParams(location.search).get('open')==='library';
 let libraryAccountId=null;
 let labAccount=null;
+// Keep the editor and its in-flight work mounted while authentication navigates elsewhere.
+let lessonOwner=null,lessonLogin=null;
+function resumeLessonSession(){
+ if(lessonLogin)return lessonLogin.promise;
+ const dialog=node('dialog');dialog.className='dialog';dialog.setAttribute('aria-labelledby','resume-lesson-title');
+ const title=node('h2','Sign in to continue your lesson');title.id='resume-lesson-title';
+ const message=node('p','Your lesson stays open here. Sign in with the same account in a new tab, then return to this tab.');
+ message.setAttribute('role','status');
+ const link=node('a','Sign in in a new tab');link.href='/auth/start';link.target='_blank';link.rel='noopener';
+ const resume=node('button','Continue lesson');resume.type='button';
+ const cancel=node('button','Keep editing');cancel.type='button';
+ let finish;
+ const promise=new Promise(resolve=>{finish=resolve;});
+ lessonLogin={promise,dialog};
+ const done=ok=>{if(lessonLogin?.dialog!==dialog)return;lessonLogin=null;dialog.close();dialog.remove();finish(ok);};
+ cancel.onclick=()=>done(false);
+ dialog.oncancel=e=>{e.preventDefault();done(false);};
+ resume.onclick=async()=>{
+  resume.disabled=true;
+  await accounts.refresh();
+  if(labAccount?.signed&&(!lessonOwner||lessonOwner===labAccount.accountId)){lessonOwner=labAccount.accountId;done(true);}
+  else message.textContent=labAccount?.unavailable?'Account service unavailable. Your lesson is still open.':'Sign in with the account that started this lesson, then choose Continue lesson.';
+  resume.disabled=false;
+ };
+ dialog.append(title,message,link,resume,cancel);document.body.append(dialog);dialog.showModal();
+ return promise;
+}
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;
+ if(state.signed&&!lessonOwner&&document.getElementById('lesson-builder'))lessonOwner=state.accountId;
  if(state.signed&&!location.hash){
   try{const next=sessionStorage.getItem('bt-plan-return');
    if(['/pricing?interval=monthly','/pricing?interval=yearly','/account'].includes(next)){
@@ -178,24 +207,41 @@ window.addEventListener('message',async event=>{
   try{
    const poll=typeof action==='string'&&/^jobs\/[a-f0-9]{64}$/.test(action);
    if(!(poll||['draft','record','image','exam','questions','voice-sample'].includes(action))||!poll&&(typeof data.body!=='string'||data.body.length>32000))throw Error();
-   const response=await fetch('/lesson-author/'+action,{method:poll?'GET':'POST',credentials:'same-origin',redirect:'error',cache:'no-store',...(poll?{}:{headers:{'Content-Type':'application/json'},body:data.body})});
+   const request=()=>fetch('/lesson-author/'+action,{method:poll?'GET':'POST',credentials:'same-origin',redirect:'error',cache:'no-store',...(poll?{}:{headers:{'Content-Type':'application/json'},body:data.body})});
+   let response;
+   if(lessonOwner&&labAccount?.signed&&lessonOwner!==labAccount.accountId){
+    response=Response.json({error:'signinRequired'},{status:401});
+   }else response=await request();
+   if(response.status===401){
+    port.postMessage({waitingForSignIn:true});
+    if(await resumeLessonSession()&&frame.isConnected)response=await request();
+   }
    port.postMessage({status:response.status,body:await response.text()});
   }catch{port.postMessage({status:503,body:'{"error":"aiUnavailable"}'});}
   finally{port.close();}
   return;
  }
  if(data?.type==='lesson-account'){
-  if(!labAccount||labAccount.unavailable)await accounts.refresh();
+  await accounts.refresh();
   if(!frame.isConnected)return;
-  const signed=Boolean(labAccount?.signed);
-  frame.contentWindow.postMessage({type:'lesson-account-reply',signed},lessonOrigin);
-  if(!signed){if(labAccount?.unavailable)notice.textContent='Account service unavailable. Please try again.';else void openAccountWindow('signin');}
+  let signed=Boolean(labAccount?.signed&&(!lessonOwner||labAccount.accountId===lessonOwner));
+  if(!signed&&!labAccount?.unavailable)signed=await resumeLessonSession();
+  if(labAccount?.unavailable)notice.textContent='Account service unavailable. Please try again.';
+  if(frame.isConnected)frame.contentWindow.postMessage({type:'lesson-account-reply',signed},lessonOrigin);
  }
  if(data?.type==='lesson-save'&&typeof data.params==='string'&&data.params.length<26000){
   const params=new URLSearchParams(data.params);
   const reply={type:'lesson-saved',nonce:params.get('nonce')};
   try{
-   const record=await saveApprovedLesson(params,libraryClient);
+   const save=()=>saveApprovedLesson(params,libraryClient);
+   let record;
+   try{
+    if(lessonOwner&&labAccount?.signed&&lessonOwner!==labAccount.accountId)throw Object.assign(Error(),{code:'SIGN_IN_REQUIRED'});
+    record=await save();
+   }catch(e){
+    if(e.code!=='SIGN_IN_REQUIRED'||!await resumeLessonSession()||!frame.isConnected)throw e;
+    record=await save();
+   }
    Object.assign(reply,{set:record.set_id,share:record.share_id,revision:record.revision});
   }catch(e){reply.error=e.code||'UNAVAILABLE';}
   if(frame.isConnected)frame.contentWindow.postMessage(reply,lessonOrigin);
@@ -208,6 +254,7 @@ function openLesson(snapshot,share){
  location.replace(url.href);
 }
 function mountLessonBuilder(src,title){
+ lessonOwner=labAccount?.signed?labAccount.accountId:null;
  const frame=node('iframe');
  frame.title=title;
  frame.referrerPolicy='origin';
