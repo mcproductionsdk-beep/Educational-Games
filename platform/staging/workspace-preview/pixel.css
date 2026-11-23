@@ -1,0 +1,100 @@
+/* Pixel edition of the teacher workspace. Layout is inherited from preview.css. */
+:root {
+  --ink: #191925;
+  --line: #191925;
+  --blue: #a4cdec;
+  --cream: #fffae9;
+  --gold: #ffda39;
+  --green: #9ce3b4;
+}
+body {
+  min-height: 100vh;
+  background-image: radial-gradient(#58698755 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+header { background: var(--ink); border-bottom-color: var(--gold); }
+.bar nav > a[aria-current], .bar summary:hover {
+  background: var(--gold); color: var(--ink); box-shadow: 3px 3px #8b76db;
+}
+.menu { background: var(--ink); box-shadow: 4px 4px #8579bd; }
+.tabs a {
+  --tone: #ffda39;
+  position: relative;
+  background: var(--tone);
+  box-shadow: 3px 3px var(--ink);
+}
+.tabs a:nth-child(2) { --tone: #67d6c8; }
+.tabs a:nth-child(3) { --tone: #c1a6fa; }
+.tabs [aria-current] {
+  background: var(--ink); color: var(--tone);
+  box-shadow: inset 0 -4px var(--tone), 3px 3px var(--ink);
+}
+section#panel {
+  position: relative;
+  box-shadow: 6px 6px var(--ink), inset 0 4px #fff;
+}
+h1 { letter-spacing: -.035em; text-shadow: 2px 2px #f8cf53; }
+.grid { align-items: stretch; }
+.box {
+  --strip: #8dded3;
+  padding: 0 clamp(.75rem, 1.6vw, 1.15rem) .9rem;
+  border: 2px solid var(--ink);
+  background: #fffdf5;
+  box-shadow: 3px 3px var(--ink);
+  min-width: 0;
+}
+.box:nth-child(even) { --strip: #fac1d1; }
+.box > h2 {
+  display: flex; align-items: center; gap: .65rem;
+  margin: 0 calc(-1 * clamp(.75rem, 1.6vw, 1.15rem)) 1rem;
+  padding: .7rem clamp(.75rem, 1.6vw, 1.15rem);
+  background: var(--strip); border-bottom: 2px solid var(--ink);
+  font: .76rem/1.55 Arcade, monospace;
+}
+.box > h2::before {
+  content: ""; flex: 0 0 12px; height: 12px;
+  background: var(--ink);
+  clip-path: polygon(0 25%,25% 25%,25% 0,75% 0,75% 25%,100% 25%,100% 75%,75% 75%,75% 100%,25% 100%,25% 75%,0 75%);
+}
+.box:nth-child(even) > h2::before {
+  clip-path: polygon(0 75%,25% 75%,25% 50%,50% 50%,50% 25%,75% 25%,75% 0,100% 0,100% 50%,50% 100%,0 100%);
+}
+input, select, textarea {
+  border: 2px solid #383847; border-radius: 0;
+  box-shadow: inset 2px 2px #e2dfd2; background-color: #fff;
+}
+label { font-size: .95rem; }
+input, select, textarea { font-size: 1rem; }
+.steps a, .button, button {
+  border: 2px solid var(--ink); box-shadow: 3px 3px var(--ink);
+}
+.steps a { font-size: .94rem; }
+.steps [aria-current] { box-shadow: inset 0 -3px var(--ink), 3px 3px var(--ink); }
+.item {
+  position: relative; width: min(100%, 26rem);
+  margin: 1.7rem 0 .25rem; padding: .9rem 1rem;
+  background: #fff4c8; border: 2px solid var(--ink);
+  box-shadow: 4px 4px var(--ink);
+}
+.item[href="#lessons"]::before {
+  content: ""; position: absolute; bottom: 100%; left: -2px;
+  width: 4.4rem; height: .65rem;
+  background: var(--gold); border: 2px solid var(--ink); border-bottom: 0;
+  clip-path: polygon(0 0,86% 0,86% 25%,92% 25%,92% 50%,100% 50%,100% 100%,0 100%);
+}
+.item[href="#saved"] { background: #ece5ff; }
+.item[href="#saved"] .icon { background: #c1a6fa; font: .9rem Arcade, monospace; }
+.plan { padding: .8rem; border: 2px solid var(--ink); margin-bottom: .65rem; background: #fffdf5; }
+.plan:nth-of-type(2) { background: #d7e8f7; }
+.plan:nth-of-type(3) { background: #ffe794; }
+@media (hover: hover) {
+  .tabs a:hover, .item:hover, .button:hover { outline: 2px solid var(--ink); outline-offset: 1px; }
+}
+:where(a,button,summary,input,select,textarea):focus-visible {
+  outline: 3px solid #6533ac; outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .steps a { font-size: .8rem; }
+  h1 { text-shadow: 1px 1px #f8cf53; }
+  section#panel { box-shadow: 4px 4px var(--ink); }
+}
