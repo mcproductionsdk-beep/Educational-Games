@@ -41,10 +41,11 @@ function showPrices(){
   const cadence=create('span',p.key==='free'?'Always free':period==='monthly'?'Billed monthly':'Billed yearly · save 25%');cadence.className='plan-period';
   const list=create('ul','');for(const feature of p.features)list.append(create('li',feature));
   const foot=create('footer','');
-  if(context&&names[context.plan]===p.name){const label=create('strong','Current plan');label.className='plan-current';foot.append(label);}
+  if(p.key==='silver'&&period==='monthly'&&pilot&&!silver.renewable&&!silver.until)foot.append(action('Subscribe · €5/month (test)',()=>void silverAction('checkout')));
+  else if(p.key==='silver'&&period==='monthly'&&pilot&&(silver.renewable||silver.until))foot.append(link('Manage Silver test subscription','/account'));
+  else if(context&&names[context.plan]===p.name){const label=create('strong','Current plan');label.className='plan-current';foot.append(label);}
   else if(p.key==='free'&&state==='guest')foot.append(action('Create free account',()=>authenticate('register')));
   else if(p.key==='silver'&&period==='monthly'&&state==='guest')foot.append(action('Sign in for Silver',()=>{try{sessionStorage.setItem('bt-silver-monthly-intent','yes');}catch{}void authenticate('signin');}));
-  else if(p.key==='silver'&&period==='monthly'&&context?.plan==='free'&&pilot)foot.append(action('Subscribe · €5/month (test)',()=>void silverAction('checkout')));
   else if(p.key!=='free'&&state!=='loading')foot.append(create('small',p.key==='silver'&&period==='monthly'&&context?.plan==='free'?'Test checkout by invitation':'Checkout coming later'));
   card.append(create('h2',p.name),price,cadence,list,foot);$('cards').append(card);
  }
@@ -91,7 +92,7 @@ async function refresh(){
    if(!res.ok)throw Error();const value=await res.json();if(request!==epoch)return;
    if(!Object.hasOwn(names,value.plan)||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value.month))throw Error();
    context=value;state='signed';
-   if(accountPage||value.plan==='free'){
+   {
     const billing=await fetch('/billing/context',opts).catch(()=>null);
     if(request!==epoch)return;
     if(billing?.ok){const data=await billing.json();if(request!==epoch)return;silver=data.silver;billingToken=data.csrf;pilot=data.mode==='test'&&Boolean(silver&&billingToken);testUntil=pilot?data.premium_test_until:null;}
@@ -100,7 +101,7 @@ async function refresh(){
   $('plans-status').textContent='';draw();
   if(!accountPage&&state==='signed'){
    let selected=false;try{selected=sessionStorage.getItem('bt-silver-monthly-intent')==='yes';sessionStorage.removeItem('bt-silver-monthly-intent');}catch{}
-   if(selected&&period==='monthly'&&context.plan==='free'&&pilot)document.querySelector('[data-plan=silver] footer button')?.focus();
+   if(selected&&period==='monthly'&&pilot)document.querySelector('[data-plan=silver] footer button')?.focus();
   }
  }catch{if(request!==epoch)return;state='error';context=null;$('plans-status').replaceChildren(create('span','Account details are unavailable. '),action('Retry',refresh));draw();}
 }
