@@ -133,26 +133,42 @@ let lessonOwner=null,lessonLogin=null;
 function resumeLessonSession(){
  if(lessonLogin)return lessonLogin.promise;
  const dialog=node('dialog');dialog.className='dialog';dialog.setAttribute('aria-labelledby','resume-lesson-title');
- const title=node('h2','Sign in to continue your lesson');title.id='resume-lesson-title';
- const message=node('p','Your lesson stays open here. Sign in with the same account in a new tab, then return to this tab.');
+ const title=node('h2','Sign in to continue');title.id='resume-lesson-title';
+ const message=node('p','Your draft stays here. Sign in in a new tab, then return to your lesson.');
  message.setAttribute('role','status');
- const link=node('a','Sign in in a new tab');link.href='/?open=signin';link.target='_blank';link.rel='noopener';
- const resume=node('button','Continue lesson');resume.type='button';
+ const signIn=node('button','Sign in');signIn.type='button';
  const cancel=node('button','Keep editing');cancel.type='button';
- let finish;
+ let finish,checking=false,started=false;
  const promise=new Promise(resolve=>{finish=resolve;});
  lessonLogin={promise,dialog};
- const done=ok=>{if(lessonLogin?.dialog!==dialog)return;lessonLogin=null;dialog.close();dialog.remove();finish(ok);};
+ function done(ok){
+  if(lessonLogin?.dialog!==dialog)return;
+  window.removeEventListener('focus',check);
+  document.removeEventListener('visibilitychange',check);
+  lessonLogin=null;dialog.close();dialog.remove();finish(ok);
+ }
+ async function check(){
+  if(!started||checking||document.hidden)return;
+  checking=true;
+  try{
+   await accounts.refresh();
+   if(lessonLogin?.dialog!==dialog)return;
+   if(labAccount?.signed&&(!lessonOwner||lessonOwner===labAccount.accountId)){
+    lessonOwner=labAccount.accountId;done(true);
+   }else{
+    message.textContent=labAccount?.signed?'Use the account that started this lesson. Your draft is still here.':'Your draft is still here. Sign in to continue.';
+   }
+  }finally{checking=false;}
+ }
+ signIn.onclick=()=>{
+  started=true;
+  window.open('/?open=signin','_blank','noopener');
+ };
  cancel.onclick=()=>done(false);
  dialog.oncancel=e=>{e.preventDefault();done(false);};
- resume.onclick=async()=>{
-  resume.disabled=true;
-  await accounts.refresh();
-  if(labAccount?.signed&&(!lessonOwner||lessonOwner===labAccount.accountId)){lessonOwner=labAccount.accountId;done(true);}
-  else message.textContent=labAccount?.unavailable?'Account service unavailable. Your lesson is still open.':'Sign in with the account that started this lesson, then choose Continue lesson.';
-  resume.disabled=false;
- };
- dialog.append(title,message,link,resume,cancel);document.body.append(dialog);dialog.showModal();
+ window.addEventListener('focus',check);
+ document.addEventListener('visibilitychange',check);
+ dialog.append(title,message,signIn,cancel);document.body.append(dialog);dialog.showModal();
  return promise;
 }
 const accounts=mountAccounts({root:document.getElementById('account-controls'),openLibrary:()=>{captureEditorDraft();void library.browse();},onStateChange:state=>{labAccount=state;
