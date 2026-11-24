@@ -41,8 +41,9 @@ function showPrices(){
   const cadence=create('span',p.key==='free'?'Always free':period==='monthly'?'Billed monthly':'Billed yearly · save 25%');cadence.className='plan-period';
   const list=create('ul','');for(const feature of p.features)list.append(create('li',feature));
   const foot=create('footer','');
-  if(p.key==='silver'&&period==='monthly'&&pilot&&!silver.renewable&&!silver.until)foot.append(action('Subscribe · €5/month (test)',()=>void silverAction('checkout')));
-  else if(p.key==='silver'&&period==='monthly'&&pilot&&(silver.renewable||silver.until))foot.append(link('Manage Silver test subscription','/account'));
+  const hasSilver=Boolean(silver?.until||silver?.renewable&&silver.state!=='canceled');
+  if(p.key==='silver'&&period==='monthly'&&pilot&&!hasSilver)foot.append(action('Subscribe · €5/month (test)',()=>void silverAction('checkout')));
+  else if(p.key==='silver'&&period==='monthly'&&pilot&&hasSilver)foot.append(link('Manage Silver test subscription','/account'));
   else if(context&&names[context.plan]===p.name){const label=create('strong','Current plan');label.className='plan-current';foot.append(label);}
   else if(p.key==='free'&&state==='guest')foot.append(action('Create free account',()=>authenticate('register')));
   else if(p.key==='silver'&&period==='monthly'&&state==='guest')foot.append(action('Sign in for Silver',()=>{try{sessionStorage.setItem('bt-silver-monthly-intent','yes');}catch{}void authenticate('signin');}));
