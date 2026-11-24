@@ -28,9 +28,9 @@ export default {
     const path=url.pathname==='/billing/test'?'/billing-test':'/billing-test.mjs';
     return env.ASSETS.fetch(new Request(new URL(path,origin),request));
    }
-   const webhook=url.pathname==='/billing/webhooks/mollie';
+   const webhook=url.pathname==='/billing/webhooks/mollie'||/^\/billing\/webhooks\/silver\/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(url.pathname);
    const read=['/billing/context','/billing/status'].includes(url.pathname);
-   if(!webhook&&!read&&!['/billing/checkout','/billing/refresh'].includes(url.pathname))return new Response('Not found',{status:404,headers});
+   if(!webhook&&!read&&!['/billing/checkout','/billing/refresh','/billing/silver/checkout','/billing/silver/refresh','/billing/silver/cancel'].includes(url.pathname))return new Response('Not found',{status:404,headers});
    if(request.method!==(read?'GET':'POST'))return new Response('Method not allowed',{status:405,headers});
    if(!webhook&&(request.headers.get('Sec-Fetch-Site')!=='same-origin'||!read&&request.headers.get('Origin')!==origin))return new Response('Forbidden',{status:403,headers});
    try{
@@ -87,6 +87,7 @@ export default {
   }catch{return new Response('Authentication unavailable',{status:503,headers});}
  }
 };
+
 
 
 
