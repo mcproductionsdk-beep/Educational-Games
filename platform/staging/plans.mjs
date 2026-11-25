@@ -16,13 +16,13 @@ const accountPage=location.pathname.replace(/\/$/,'')==='/account';
 let period=new URLSearchParams(location.search).get('interval')==='yearly'?'yearly':'monthly';
 let context=null,state='loading',epoch=0,pilot=false,testUntil=null;
 let silver=null,billingToken=null,submitting=false;
-async function silverAction(operation){
+async function silverAction(operation,offer){
  if(submitting||!billingToken)return;
  submitting=true;
  const status=$('plans-status');status.textContent=operation==='checkout'?'Opening Mollie test checkout…':'Updating subscription…';
  try{
   const response=await fetch('/billing/silver/'+operation,{method:'POST',credentials:'same-origin',cache:'no-store',redirect:'error',
-   headers:{'Content-Type':'application/json','X-Billing-CSRF':billingToken},body:'{}'});
+   headers:{'Content-Type':'application/json','X-Billing-CSRF':billingToken},body:JSON.stringify(offer?{offer}:{})});
   const result=await response.json();if(!response.ok)throw Error(result.error);
   if(result.checkout_url){
    const u=new URL(result.checkout_url);
@@ -41,17 +41,23 @@ function showPrices(){
   const cadence=create('span',p.key==='free'?'Always free':period==='monthly'?'Billed monthly':'Billed yearly · save 25%');cadence.className='plan-period';
   const list=create('ul','');for(const feature of p.features)list.append(create('li',feature));
   const foot=create('footer','');
-  const hasSilver=Boolean(silver?.until||silver?.renewable&&silver.state!=='canceled');
-  if(p.key==='silver'&&period==='monthly'&&pilot&&!hasSilver)foot.append(action('Subscribe · €5/month (test)',()=>void silverAction('checkout')));
-  else if(p.key==='silver'&&period==='monthly'&&pilot&&hasSilver)foot.append(link('Manage Silver test subscription','/account'));
-  else if(context&&names[context.plan]===p.name){const label=create('strong','Current plan');label.className='plan-current';foot.append(label);}
+  const offer=p.key+'-'+period;
+  const sameOffer=silver?.offer===offer;
+  const pending=['creating','open','authorized','pending'].includes(silver?.state);
+  const renewing=silver?.renewable&&silver.state!=='canceled';
+  if(p.key!=='free'&&pilot){
+   if(sameOffer&&(renewing||silver.until))foot.append(link('Manage subscription','/account'));
+   else if(renewing||pending&&!sameOffer)foot.append(link('View current subscription','/account'));
+   else foot.append(action('Subscribe · €'+p[period]+'/'+(period==='monthly'?'month':'year')+' (test)',()=>void silverAction('checkout',offer)));
+  }else if(context&&names[context.plan]===p.name)foot.append(create('strong','Current plan'));
   else if(p.key==='free'&&state==='guest')foot.append(action('Create free account',()=>authenticate('register')));
-  else if(p.key==='silver'&&period==='monthly'&&state==='guest')foot.append(action('Sign in for Silver',()=>{try{sessionStorage.setItem('bt-silver-monthly-intent','yes');}catch{}void authenticate('signin');}));
-  else if(p.key!=='free'&&state!=='loading')foot.append(create('small',p.key==='silver'&&period==='monthly'&&context?.plan==='free'?'Test checkout by invitation':'Checkout coming later'));
+  else if(p.key!=='free'&&state==='guest')foot.append(action('Sign in for '+p.name,()=>{try{sessionStorage.setItem('bt-plan-intent',offer);}catch{}void authenticate('signin');}));
+  else if(p.key!=='free'&&state!=='loading')foot.append(create('small','Test checkout by invitation'));
   card.append(create('h2',p.name),price,cadence,list,foot);$('cards').append(card);
  }
  for(const key of ['monthly','yearly'])$(key).setAttribute('aria-pressed',String(key===period));
 }
+function subscriptionLabel(){return (silver?.offer||'silver-monthly').split('-').map((v,i)=>i?v:v[0].toUpperCase()+v.slice(1)).join(' ');}
 function confirmRenewalCancellation(){
  if(submitting||document.getElementById('renewal-dialog'))return;
  const dialog=document.createElement('dialog');dialog.id='renewal-dialog';
@@ -59,7 +65,7 @@ function confirmRenewalCancellation(){
  dialog.setAttribute('aria-describedby','renewal-description');
  const title=create('h2','Cancel automatic renewal?');title.id='renewal-title';
  const through=silver?.until?new Date(silver.until).toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}):null;
- const description=create('p',through?'Your Silver test access continues through '+through+'.':'Your Silver test access continues through the current paid period.');
+ const description=create('p',through?'Your '+subscriptionLabel()+' test access continues through '+through+'.':'Your test access continues through the current paid period.');
  description.id='renewal-description';
  const keep=action('Keep renewal on',()=>dialog.close());keep.autofocus=true;
  const cancel=action('Cancel renewal',()=>{
@@ -79,7 +85,7 @@ function showAccount(){
  panel.append(create('h2',names[context.plan]+' plan'));
  if(silver?.state){
   const canCancel=['active','pending','suspended'].includes(silver.state)&&silver.renewable;
-  if(silver.until)panel.append(create('p','Silver test access through '+new Date(silver.until).toLocaleDateString()+'.'));
+  if(silver.until)panel.append(create('p',subscriptionLabel()+' test access through '+new Date(silver.until).toLocaleDateString()+'.'));
   panel.append(create('p',silver.state==='canceled'?'Automatic renewal canceled.':'Test subscription status · '+silver.state));
   if(canCancel)panel.append(action('Cancel automatic renewal',confirmRenewalCancellation));
   else if(!silver.renewable&&!['failed','expired','canceled'].includes(silver.state))panel.append(action('Check payment status',()=>void silverAction('refresh')));
@@ -131,8 +137,8 @@ async function refresh(){
   $('plans-status').textContent='';
   if(snapshot!==renderedAccount){renderedAccount=snapshot;draw();}
   if(!accountPage&&state==='signed'){
-   let selected=false;try{selected=sessionStorage.getItem('bt-silver-monthly-intent')==='yes';sessionStorage.removeItem('bt-silver-monthly-intent');}catch{}
-   if(selected&&period==='monthly'&&pilot)document.querySelector('[data-plan=silver] footer button')?.focus();
+   let selected;try{selected=sessionStorage.getItem('bt-plan-intent');sessionStorage.removeItem('bt-plan-intent');}catch{}
+   for(const p of plans)if(selected===p.key+'-'+period&&pilot)document.querySelector('[data-plan='+p.key+'] footer button')?.focus();
   }
  }catch{if(request!==epoch)return;renderedAccount='';state='error';context=null;silver=null;billingToken=null;pilot=false;testUntil=null;$('plans-status').replaceChildren(create('span','Account details are unavailable. '),action('Retry',refresh));draw();}
  finally{if(request===epoch)refreshing=false;}
@@ -147,4 +153,5 @@ function refreshOnReturn(){
 window.addEventListener('pageshow',refreshOnReturn);
 window.addEventListener('focus',refreshOnReturn);
 draw();
+
 
