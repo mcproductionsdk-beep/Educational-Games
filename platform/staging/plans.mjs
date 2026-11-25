@@ -83,34 +83,49 @@ function draw(){
  $('prices').hidden=accountPage;$('overview').hidden=!accountPage;
  if(accountPage)showAccount();else showPrices();
 }
+let refreshing=false;
+let renderedAccount='';
 async function refresh(){
- const request=++epoch;context=null;pilot=false;testUntil=null;silver=null;billingToken=null;state='loading';$('plans-status').textContent='Checking account…';draw();
+ const request=++epoch;
+ refreshing=true;
+ if(state==='loading')$('plans-status').textContent='Checking account…';
  try{
   const opts={credentials:'same-origin',cache:'no-store',redirect:'error'};
-  const res=await fetch('/library/context',opts);if(request!==epoch)return;
-  if(res.status===401){state='guest';}
-  else{
-   if(!res.ok)throw Error();const value=await res.json();if(request!==epoch)return;
-   if(!Object.hasOwn(names,value.plan)||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value.month))throw Error();
-   context=value;state='signed';
-   {
-    const billing=await fetch('/billing/context',opts).catch(()=>null);
-    if(request!==epoch)return;
-    if(billing?.ok){const data=await billing.json();if(request!==epoch)return;silver=data.silver;billingToken=data.csrf;pilot=data.mode==='test'&&Boolean(silver&&billingToken);testUntil=pilot?data.premium_test_until:null;}
-   }
+  const res=await fetch('/library/context',opts);
+  if(request!==epoch)return;
+  let nextContext=null,data=null;
+  if(res.status!==401){
+   if(!res.ok)throw Error();
+   nextContext=await res.json();
+   if(!Object.hasOwn(names,nextContext.plan)||!/^\d{4}-(0[1-9]|1[0-2])$/.test(nextContext.month))throw Error();
+   if(request!==epoch)return;
+   const billing=await fetch('/billing/context',opts).catch(()=>null);
+   if(billing?.ok)data=await billing.json();
+   if(billing?.status===401)nextContext=null;
   }
-  $('plans-status').textContent='';draw();
+  if(request!==epoch)return;
+  context=nextContext;state=context?'signed':'guest';
+  silver=data?.silver??null;billingToken=data?.csrf??null;
+  pilot=data?.mode==='test'&&Boolean(silver&&billingToken);
+  testUntil=pilot?data.premium_test_until:null;
+  const snapshot=JSON.stringify([state,context,silver,pilot,testUntil]);
+  $('plans-status').textContent='';
+  if(snapshot!==renderedAccount){renderedAccount=snapshot;draw();}
   if(!accountPage&&state==='signed'){
    let selected=false;try{selected=sessionStorage.getItem('bt-silver-monthly-intent')==='yes';sessionStorage.removeItem('bt-silver-monthly-intent');}catch{}
    if(selected&&period==='monthly'&&pilot)document.querySelector('[data-plan=silver] footer button')?.focus();
   }
- }catch{if(request!==epoch)return;state='error';context=null;$('plans-status').replaceChildren(create('span','Account details are unavailable. '),action('Retry',refresh));draw();}
+ }catch{if(request!==epoch)return;renderedAccount='';state='error';context=null;silver=null;billingToken=null;pilot=false;testUntil=null;$('plans-status').replaceChildren(create('span','Account details are unavailable. '),action('Retry',refresh));draw();}
+ finally{if(request===epoch)refreshing=false;}
 }
 for(const key of ['monthly','yearly'])$(key).addEventListener('click',()=>{
  period=key;history.replaceState(null,'','/pricing?interval='+key);showPrices();
 });
 $('profile').addEventListener('click',()=>void mountProfile({onSaved:refresh}));
-window.addEventListener('pageshow',refresh);
-window.addEventListener('focus',()=>{if(!document.querySelector('dialog[open]'))void refresh();});
+function refreshOnReturn(){
+ if(!refreshing&&!submitting&&!document.hidden&&!document.querySelector('dialog[open]'))void refresh();
+}
+window.addEventListener('pageshow',refreshOnReturn);
+window.addEventListener('focus',refreshOnReturn);
 draw();
 
