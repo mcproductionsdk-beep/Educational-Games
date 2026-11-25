@@ -52,6 +52,25 @@ function showPrices(){
  }
  for(const key of ['monthly','yearly'])$(key).setAttribute('aria-pressed',String(key===period));
 }
+function confirmRenewalCancellation(){
+ if(submitting||document.getElementById('renewal-dialog'))return;
+ const dialog=document.createElement('dialog');dialog.id='renewal-dialog';
+ dialog.setAttribute('aria-labelledby','renewal-title');
+ dialog.setAttribute('aria-describedby','renewal-description');
+ const title=create('h2','Cancel automatic renewal?');title.id='renewal-title';
+ const through=silver?.until?new Date(silver.until).toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}):null;
+ const description=create('p',through?'Your Silver test access continues through '+through+'.':'Your Silver test access continues through the current paid period.');
+ description.id='renewal-description';
+ const keep=action('Keep renewal on',()=>dialog.close());keep.autofocus=true;
+ const cancel=action('Cancel renewal',()=>{
+  dialog.close();
+  void silverAction('cancel');
+ });
+ const actions=document.createElement('div');actions.className='renewal-actions';
+ actions.append(keep,cancel);dialog.append(title,description,actions);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+ $('overview').append(dialog);dialog.showModal();
+}
 function showAccount(){
  const box=$('details');box.replaceChildren();$('profile').hidden=!context;
  if(state==='guest'){box.append(create('p','Sign in to see your plan and usage.'),action('Sign in',()=>authenticate('signin')));return;}
@@ -62,7 +81,7 @@ function showAccount(){
   const canCancel=['active','pending','suspended'].includes(silver.state)&&silver.renewable;
   if(silver.until)panel.append(create('p','Silver test access through '+new Date(silver.until).toLocaleDateString()+'.'));
   panel.append(create('p',silver.state==='canceled'?'Automatic renewal canceled.':'Test subscription status · '+silver.state));
-  if(canCancel)panel.append(action('Cancel automatic renewal',()=>{if(window.confirm('Cancel future Silver test renewals? Access continues through the paid period.'))void silverAction('cancel');}));
+  if(canCancel)panel.append(action('Cancel automatic renewal',confirmRenewalCancellation));
   else if(!silver.renewable&&!['failed','expired','canceled'].includes(silver.state))panel.append(action('Check payment status',()=>void silverAction('refresh')));
  }
  if(testUntil)panel.append(create('p','Simulated access ends '+new Date(testUntil).toLocaleString()+'.'));
