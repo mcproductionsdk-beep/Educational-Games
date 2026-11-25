@@ -67,3 +67,16 @@ test('test page and script resolve only to fixed static assets without granting 
  assert.equal((await gateway.fetch(new Request(site+'/billing/test',{method:'POST'}),env)).status,405);
 });
 
+test('Lesson Lab accepts both paid plans and blocks free and unknown plans',async()=>{
+ for(const [plan,allowed] of [['premium',true],['ai_premium',true],['free',false],['unknown',false]]){
+  let calls=0;
+  const env={
+   ACCOUNTS_SERVICE:{fetch:r=>Response.json(new URL(r.url).pathname==='/me'?{account_id:'teacher'}:{plan})},
+   LESSON_AUTHOR:{fetch:r=>{calls++;assert.equal(r.headers.get('X-Lesson-Account'),'teacher');return new Response(null,{status:202});}}
+  };
+  const req=new Request(site+'/lesson-author/draft',{method:'POST',headers:{Origin:site,'Sec-Fetch-Site':'same-origin'},body:'{}'});
+  const res=await gateway.fetch(req,env);
+  assert.equal(res.status,allowed?202:403,plan);
+  assert.equal(calls,allowed?1:0,plan);
+ }
+});

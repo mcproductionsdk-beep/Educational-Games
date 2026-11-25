@@ -15,7 +15,7 @@ export default {
     if(me.status===401||context.status===401)return Response.json({error:'signinRequired'},{status:401,headers});
     if(!me.ok||!context.ok)throw Error();
     const {account_id}=await me.json(),{plan}=await context.json();
-    if(plan!=='premium')return Response.json({error:'premiumRequired'},{status:403,headers});
+    if(plan!=='premium'&&plan!=='ai_premium')return Response.json({error:'premiumRequired'},{status:403,headers});
     const studio='https://feature-lesson-staging-20261.bt-lessons-staging.pages.dev';
     return await env.LESSON_AUTHOR.fetch(new Request(studio+'/api/author/'+action,{method:request.method,headers:{Origin:studio,'Content-Type':'application/json','X-Lesson-Account':account_id},...(poll?{}:{body:request.body,duplex:'half'})}));
    }catch{return Response.json({error:'aiUnavailable'},{status:503,headers});}
